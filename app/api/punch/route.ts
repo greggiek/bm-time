@@ -32,25 +32,60 @@ export async function POST(request: Request) {
 
   const supabase = getAdminClient();
   if (!supabase) return NextResponse.json({ message: 'Supabase is not configured.' }, { status: 503 });
-  const { data: employees, error } = await supabase.from('employees').select('id,first_name,pin_hash,active').eq('active', true);
+
+  const { data: employees, error } = await supabase
+    .from('time_employees')
+    .select('id,first_name,pin_hash,active')
+    .eq('active', true);
+
   if (error) return NextResponse.json({ message: 'Unable to read employees.' }, { status: 500 });
   const employee = await findMatchingEmployee(employees ?? [], parsed.data.pin);
   if (!employee) return NextResponse.json({ message: 'PIN not recognized.' }, { status: 404 });
 
-  const { data: latest } = await supabase.from('punch_events').select('action').eq('employee_id', employee.id).order('occurred_at', { ascending: false }).limit(1).maybeSingle();
+  const { data: latest } = await supabase
+    .from('time_punch_events')
+    .select('action')
+    .eq('employee_id', employee.id)
+    .order('occurred_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
   const status = latest?.action === 'clock_in' ? 'clocked_in' : 'clocked_out';
   if (parsed.data.action === 'identify') return NextResponse.json({ employeeId: employee.id, firstName: employee.first_name, status });
+
   const expected = status === 'clocked_in' ? 'clock_out' : 'clock_in';
   if (parsed.data.action !== expected) return NextResponse.json({ message: `You are already ${status === 'clocked_in' ? 'clocked in' : 'clocked out'}.` }, { status: 409 });
 
-  const { data: kiosk } = await supabase.from('kiosks').select('id,location_id').eq('token', parsed.data.kioskToken).eq('active', true).maybeSingle();
+  const { data: kiosk } = await supabase
+    .from('time_kiosks')
+    .select('id,location_id')
+    .eq('token', parsed.data.kioskToken)
+    .eq('active', true)
+    .maybeSingle();
+
   if (!kiosk) return NextResponse.json({ message: 'Kiosk registration was not found.' }, { status: 401 });
-  const { data: punch, error: punchError } = await supabase.from('punch_events').insert({ employee_id: employee.id, location_id: kiosk.location_id, kiosk_id: kiosk.id, action: parsed.data.action }).select('occurred_at').single();
+
+  const { data: punch, error: punchError } = await supabase
+    .from('time_punch_events')
+    .insert({
+      employee_id: employee.id,
+      location_id: kiosk.location_id,
+      kiosk_id: kiosk.id,
+      action: parsed.data.action,
+    })
+    .select('occurred_at')
+    .single();
+
   if (punchError) return NextResponse.json({ message: 'Punch could not be saved.' }, { status: 500 });
   return NextResponse.json({ ok: true, firstName: employee.first_name, action: parsed.data.action, occurredAt: punch.occurred_at });
 }
 
-async function findMatchingEmployee(employees: Array<{id:string;first_name:string;pin_hash:string;active:boolean}>, pin: string) {
-  for (const employee of employees) if (await bcrypt.compare(pin, employee.pin_hash)) return employee;
+async function findMatchingEmployee(
+  employees: Array<{ id: string; first_name: string; pin_hash: string; active: boolean }>,
+  pin: string,
+) {
+  for (const employee of employees) {
+    if (await bcrypt.compare(pin, employee.pin_hash)) return employee;
+  }
   return null;
 }
