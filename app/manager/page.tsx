@@ -1,4 +1,157 @@
 'use client';
+
 import { useState } from 'react';
-type Row={id:string;name:string;location:string;jobTitle:string;status:string;latest:string|null};
-export default function ManagerPage(){const[password,setPassword]=useState('');const[rows,setRows]=useState<Row[]>([]);const[error,setError]=useState('');const[loading,setLoading]=useState(false);async function load(){setLoading(true);setError('');const r=await fetch('/api/manager/status',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({password})});const d=await r.json();if(!r.ok)setError(d.message);else setRows(d.rows);setLoading(false)}return <main className="managerShell"><header className="managerHeader"><div><div className="brand">BM TIME</div><div className="location">Manager Dashboard</div></div><a href="/kiosk">Open Kiosk</a></header><section className="managerCard">{rows.length===0?<div className="loginBox"><h1>Manager Login</h1><input type="password" placeholder="Manager password" value={password} onChange={e=>setPassword(e.target.value)} onKeyDown={e=>e.key==='Enter'&&load()}/><button className="primary" onClick={load} disabled={!password||loading}>{loading?'Loading…':'View Time Clock'}</button>{error&&<div className="error">{error}</div>}<p className="demoNote">Demo password comes from MANAGER_PASSWORD.</p></div>:<><div className="summary"><div><strong>{rows.filter(r=>r.status==='clocked_in').length}</strong><span>Clocked In</span></div><div><strong>{rows.length}</strong><span>Active Employees</span></div></div><div className="tableWrap"><table><thead><tr><th>Employee</th><th>Location</th><th>Job Title</th><th>Status</th><th>Last Punch</th></tr></thead><tbody>{rows.map(r=><tr key={r.id}><td><strong>{r.name}</strong></td><td>{r.location}</td><td>{r.jobTitle}</td><td><span className={`pill ${r.status}`}>{r.status==='clocked_in'?'Clocked In':'Clocked Out'}</span></td><td>{r.latest?new Date(r.latest).toLocaleString():'—'}</td></tr>)}</tbody></table></div><button className="refresh" onClick={load}>Refresh</button></>}</section></main>}
+
+type Row = {
+  id: string;
+  name: string;
+  location: string;
+  jobTitle: string;
+  status: string;
+  latest: string | null;
+};
+
+type User = {
+  name: string;
+  role: 'admin' | 'manager';
+  locationName: string | null;
+  allLocations: boolean;
+};
+
+export default function ManagerPage() {
+  const [pin, setPin] = useState('');
+  const [user, setUser] = useState<User | null>(null);
+  const [rows, setRows] = useState<Row[]>([]);
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  async function signIn() {
+    setLoading(true);
+    setError('');
+    try {
+      const response = await fetch('/api/auth/pin-login', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ pin }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || 'Unable to sign in.');
+      setPin('');
+      await loadDashboard();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Unable to sign in.');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function loadDashboard() {
+    const response = await fetch('/api/manager/status', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: '{}',
+    });
+    const data = await response.json();
+    if (response.status === 401) setUser(null);
+    if (!response.ok) throw new Error(data.message || 'Unable to load the dashboard.');
+    setRows(data.rows || []);
+    setUser(data.user);
+  }
+
+  async function refresh() {
+    setLoading(true);
+    setError('');
+    try {
+      await loadDashboard();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Unable to refresh.');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function logout() {
+    await fetch('/api/auth/logout', { method: 'POST' });
+    setUser(null);
+    setRows([]);
+    setPin('');
+    setError('');
+  }
+
+  if (!user) {
+    return (
+      <main className="managerShell">
+        <header className="managerHeader">
+          <div><div className="brand">BM TIME</div><div className="location">Manager Dashboard</div></div>
+          <a href="/kiosk">Open Kiosk</a>
+        </header>
+        <section className="managerCard">
+          <div className="loginBox">
+            <h1>Manager Login</h1>
+            <input
+              type="password"
+              inputMode="numeric"
+              maxLength={4}
+              pattern="\d{4}"
+              placeholder="4-digit PIN"
+              value={pin}
+              onChange={(event) => setPin(event.target.value.replace(/\D/g, '').slice(0, 4))}
+              onKeyDown={(event) => event.key === 'Enter' && pin.length === 4 && signIn()}
+            />
+            <button className="primary" onClick={signIn} disabled={pin.length !== 4 || loading}>
+              {loading ? 'Signing in…' : 'Open Dashboard'}
+            </button>
+            {error && <div className="error">{error}</div>}
+          </div>
+        </section>
+      </main>
+    );
+  }
+
+  return (
+    <main className="managerShell">
+      <header className="managerHeader">
+        <div>
+          <div className="brand">BM TIME</div>
+          <div className="location">
+            Manager Dashboard · {user.name}
+            {user.role === 'manager' && !user.allLocations && user.locationName ? ` · ${user.locationName}` : ''}
+          </div>
+        </div>
+        <div>
+          <a href="/admin/timecards">Timecards</a>
+          {user.role === 'admin' && <> · <a href="/admin/employees">Employees</a> · <a href="/admin/managers">Managers</a></>}
+          {' · '}<a href="/kiosk">Kiosk</a> · <button type="button" onClick={logout}>Log Out</button>
+        </div>
+      </header>
+
+      <section className="managerCard">
+        <div className="summary">
+          <div><strong>{rows.filter((row) => row.status === 'clocked_in').length}</strong><span>Clocked In</span></div>
+          <div><strong>{rows.length}</strong><span>Active Employees</span></div>
+        </div>
+
+        <div className="tableWrap">
+          <table>
+            <thead><tr><th>Employee</th><th>Location</th><th>Job Title</th><th>Status</th><th>Last Punch</th></tr></thead>
+            <tbody>
+              {rows.map((row) => (
+                <tr key={row.id}>
+                  <td><strong>{row.name}</strong></td>
+                  <td>{row.location}</td>
+                  <td>{row.jobTitle}</td>
+                  <td><span className={`pill ${row.status}`}>{row.status === 'clocked_in' ? 'Clocked In' : 'Clocked Out'}</span></td>
+                  <td>{row.latest ? new Date(row.latest).toLocaleString() : '—'}</td>
+                </tr>
+              ))}
+              {rows.length === 0 && <tr><td colSpan={5}>No active employees are available for this account.</td></tr>}
+            </tbody>
+          </table>
+        </div>
+
+        <button className="refresh" onClick={refresh} disabled={loading}>{loading ? 'Refreshing…' : 'Refresh'}</button>
+        {error && <div className="error">{error}</div>}
+      </section>
+    </main>
+  );
+}
