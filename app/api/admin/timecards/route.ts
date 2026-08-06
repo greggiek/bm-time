@@ -1,9 +1,9 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
+import { readSessionToken, sessionCookie, TimeUserSession } from '@/lib/auth-session';
 import { getAdminClient } from '@/lib/supabase-server';
 
 const BaseSchema = z.object({
-  password: z.string().min(1),
   weekStart: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
 });
 
@@ -20,26 +20,30 @@ const CreateSchema = BaseSchema.extend({
   occurredAt: z.string().datetime(),
 });
 
-function isAuthorized(password: string) {
-  const expected = process.env.ADMIN_PASSWORD || process.env.MANAGER_PASSWORD;
-  return Boolean(expected && password === expected);
-}
+export async function POST(request: NextRequest) {
+  const session = readSessionToken(request.cookies.get(sessionCookie.name)?.value);
+  if (!session) return NextResponse.json({ message: 'Please sign in with your manager PIN.' }, { status: 401 });
 
-export async function POST(request: Request) {
   const body = await request.json().catch(() => null);
   const base = BaseSchema.safeParse(body);
-  if (!base.success || !isAuthorized(base.data.password)) {
-    return NextResponse.json({ message: 'Incorrect admin password.' }, { status: 401 });
-  }
+  if (!base.success) return NextResponse.json({ message: 'Choose a valid week.' }, { status: 400 });
 
   const supabase = getAdminClient();
-  if (!supabase) {
-    return NextResponse.json({ message: 'Supabase is not configured.' }, { status: 503 });
-  }
+  if (!supabase) return NextResponse.json({ message: 'Supabase is not configured.' }, { status: 503 });
 
   if (body?.action === 'update_punch') {
     const parsed = UpdateSchema.safeParse(body);
     if (!parsed.success) return NextResponse.json({ message: 'Invalid punch update.' }, { status: 400 });
+
+    const { data: existing } = await supabase
+      .from('time_punch_events')
+      .select('location_id')
+      .eq('id', parsed.data.punchId)
+      .maybeSingle();
+
+    if (!existing || !canAccessLocation(session, existing.location_id)) {
+      return NextResponse.json({ message: 'You do not have access to this punch.' }, { status: 403 });
+    }
 
     const { error } = await supabase
       .from('time_punch_events')
@@ -59,11 +63,12 @@ export async function POST(request: Request) {
       .eq('id', parsed.data.employeeId)
       .single();
 
-    if (employeeError || !employee) {
-      return NextResponse.json({ message: 'Employee was not found.' }, { status: 404 });
+    if (employeeError || !employee) return NextResponse.json({ message: 'Employee was not found.' }, { status: 404 });
+    if (!canAccessLocation(session, employee.primary_location_id)) {
+      return NextResponse.json({ message: 'You do not have access to this employee.' }, { status: 403 });
     }
 
-    const { data: kiosk, error: kioskError } = await supabase
+    const { data: kiosk } = await supabase
       .from('time_kiosks')
       .select('id')
       .eq('location_id', employee.primary_location_id)
@@ -71,9 +76,7 @@ export async function POST(request: Request) {
       .limit(1)
       .maybeSingle();
 
-    if (kioskError || !kiosk) {
-      return NextResponse.json({ message: 'No active kiosk exists for this employee location.' }, { status: 400 });
-    }
+    if (!kiosk) return NextResponse.json({ message: 'No active kiosk exists for this employee location.' }, { status: 400 });
 
     const { error } = await supabase.from('time_punch_events').insert({
       employee_id: parsed.data.employeeId,
@@ -86,30 +89,37 @@ export async function POST(request: Request) {
     if (error) return NextResponse.json({ message: error.message }, { status: 500 });
   }
 
-  return loadWeek(supabase, base.data.weekStart);
+  return loadWeek(supabase, base.data.weekStart, session);
 }
 
-async function loadWeek(supabase: ReturnType<typeof getAdminClient>, weekStart: string) {
-  if (!supabase) return NextResponse.json({ message: 'Supabase is not configured.' }, { status: 503 });
+function canAccessLocation(session: TimeUserSession, locationId: string) {
+  return session.role === 'admin' || session.allLocations || session.locationId === locationId;
+}
 
+async function loadWeek(supabase: NonNullable<ReturnType<typeof getAdminClient>>, weekStart: string, session: TimeUserSession) {
   const start = new Date(`${weekStart}T00:00:00-04:00`);
   const end = new Date(start);
   end.setDate(end.getDate() + 7);
 
-  const [{ data, error }, { data: employees, error: employeesError }] = await Promise.all([
-    supabase
-      .from('time_punch_events')
-      .select('id,action,occurred_at,time_employees!time_punch_events_employee_id_fkey(id,employee_number,first_name,last_name),time_locations!time_punch_events_location_id_fkey(name)')
-      .gte('occurred_at', start.toISOString())
-      .lt('occurred_at', end.toISOString())
-      .order('occurred_at', { ascending: true }),
-    supabase
-      .from('time_employees')
-      .select('id,employee_number,first_name,last_name')
-      .eq('active', true)
-      .order('last_name'),
-  ]);
+  let punchQuery = supabase
+    .from('time_punch_events')
+    .select('id,action,occurred_at,location_id,time_employees!time_punch_events_employee_id_fkey(id,employee_number,first_name,last_name),time_locations!time_punch_events_location_id_fkey(name)')
+    .gte('occurred_at', start.toISOString())
+    .lt('occurred_at', end.toISOString())
+    .order('occurred_at', { ascending: true });
 
+  let employeeQuery = supabase
+    .from('time_employees')
+    .select('id,employee_number,first_name,last_name,primary_location_id')
+    .eq('active', true)
+    .order('last_name');
+
+  if (session.role !== 'admin' && !session.allLocations && session.locationId) {
+    punchQuery = punchQuery.eq('location_id', session.locationId);
+    employeeQuery = employeeQuery.eq('primary_location_id', session.locationId);
+  }
+
+  const [{ data, error }, { data: employees, error: employeesError }] = await Promise.all([punchQuery, employeeQuery]);
   if (error) return NextResponse.json({ message: error.message }, { status: 500 });
   if (employeesError) return NextResponse.json({ message: employeesError.message }, { status: 500 });
 
@@ -133,16 +143,13 @@ async function loadWeek(supabase: ReturnType<typeof getAdminClient>, weekStart: 
   const summaries = Array.from(grouped.values()).map((employeePunches) => {
     let totalMs = 0;
     let openClockIn: Date | null = null;
-
     for (const punch of employeePunches) {
-      if (punch.action === 'clock_in') {
-        openClockIn = new Date(punch.occurredAt);
-      } else if (punch.action === 'clock_out' && openClockIn) {
+      if (punch.action === 'clock_in') openClockIn = new Date(punch.occurredAt);
+      else if (punch.action === 'clock_out' && openClockIn) {
         totalMs += new Date(punch.occurredAt).getTime() - openClockIn.getTime();
         openClockIn = null;
       }
     }
-
     const first = employeePunches[0];
     return {
       employeeId: first.employeeId,
@@ -159,6 +166,12 @@ async function loadWeek(supabase: ReturnType<typeof getAdminClient>, weekStart: 
     weekEnd: end.toISOString().slice(0, 10),
     punches,
     summaries,
+    user: {
+      name: session.name,
+      role: session.role,
+      locationName: session.locationName,
+      allLocations: session.allLocations,
+    },
     employees: (employees || []).map((employee: any) => ({
       id: employee.id,
       employeeNumber: employee.employee_number,
