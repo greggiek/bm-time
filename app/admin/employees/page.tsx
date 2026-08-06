@@ -52,11 +52,13 @@ export default function EmployeesPage() {
 
   async function addEmployee(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    const formElement = event.currentTarget;
+    const form = new FormData(formElement);
+
     setLoading(true);
     setError('');
     setMessage('');
 
-    const form = new FormData(event.currentTarget);
     try {
       await request({
         action: 'create',
@@ -67,7 +69,7 @@ export default function EmployeesPage() {
         locationId: form.get('locationId'),
         jobTitleId: form.get('jobTitleId') || null,
       });
-      event.currentTarget.reset();
+      formElement.reset();
       setMessage('Employee added.');
       await load();
     } catch (err) {
