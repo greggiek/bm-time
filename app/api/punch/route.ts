@@ -14,11 +14,8 @@ const RequestSchema = z.object({
 export async function POST(request: Request) {
   const parsed = RequestSchema.safeParse(await request.json().catch(() => null));
   if (!parsed.success) return NextResponse.json({ message: 'Enter a valid 4-digit PIN.' }, { status: 400 });
-  if (parsed.data.kioskToken !== process.env.KIOSK_TOKEN) return NextResponse.json({ message: 'This kiosk is not registered.' }, { status: 401 });
 
-  const location = process.env.NEXT_PUBLIC_KIOSK_LOCATION || 'Unregistered';
   const demo = process.env.NEXT_PUBLIC_DEMO_MODE === 'true';
-
   if (demo) {
     const employee = findDemoEmployee(parsed.data.pin);
     if (!employee) return NextResponse.json({ message: 'PIN not recognized.' }, { status: 404 });
@@ -26,12 +23,21 @@ export async function POST(request: Request) {
     if (parsed.data.action === 'identify') return NextResponse.json({ employeeId: employee.id, firstName: employee.firstName, status });
     const expected = status === 'clocked_in' ? 'clock_out' : 'clock_in';
     if (parsed.data.action !== expected) return NextResponse.json({ message: `You are already ${status === 'clocked_in' ? 'clocked in' : 'clocked out'}.` }, { status: 409 });
-    const punch = addDemoPunch(employee.id, parsed.data.action, location);
+    const punch = addDemoPunch(employee.id, parsed.data.action, 'Demo');
     return NextResponse.json({ ok: true, firstName: employee.firstName, action: punch.action, occurredAt: punch.occurredAt });
   }
 
   const supabase = getAdminClient();
   if (!supabase) return NextResponse.json({ message: 'Supabase is not configured.' }, { status: 503 });
+
+  const { data: kiosk, error: kioskError } = await supabase
+    .from('time_kiosks')
+    .select('id,location_id,time_locations!time_kiosks_location_id_fkey(name)')
+    .eq('token', parsed.data.kioskToken)
+    .eq('active', true)
+    .maybeSingle();
+
+  if (kioskError || !kiosk) return NextResponse.json({ message: 'This kiosk is not registered.' }, { status: 401 });
 
   const { data: employees, error } = await supabase
     .from('time_employees')
@@ -51,19 +57,12 @@ export async function POST(request: Request) {
     .maybeSingle();
 
   const status = latest?.action === 'clock_in' ? 'clocked_in' : 'clocked_out';
-  if (parsed.data.action === 'identify') return NextResponse.json({ employeeId: employee.id, firstName: employee.first_name, status });
+  if (parsed.data.action === 'identify') {
+    return NextResponse.json({ employeeId: employee.id, firstName: employee.first_name, status, location: (kiosk as any).time_locations?.name || '' });
+  }
 
   const expected = status === 'clocked_in' ? 'clock_out' : 'clock_in';
   if (parsed.data.action !== expected) return NextResponse.json({ message: `You are already ${status === 'clocked_in' ? 'clocked in' : 'clocked out'}.` }, { status: 409 });
-
-  const { data: kiosk } = await supabase
-    .from('time_kiosks')
-    .select('id,location_id')
-    .eq('token', parsed.data.kioskToken)
-    .eq('active', true)
-    .maybeSingle();
-
-  if (!kiosk) return NextResponse.json({ message: 'Kiosk registration was not found.' }, { status: 401 });
 
   const { data: punch, error: punchError } = await supabase
     .from('time_punch_events')
