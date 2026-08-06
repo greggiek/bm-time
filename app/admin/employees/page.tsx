@@ -142,11 +142,34 @@ export default function EmployeesPage() {
     if (!confirm('Deactivate this employee?')) return;
     setLoading(true);
     setError('');
+    setMessage('');
     try {
       await request({ action: 'deactivate', employeeId });
+      setMessage('Employee deactivated.');
       await load();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to deactivate employee.');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function deleteEmployee(employee: Employee) {
+    const confirmed = confirm(
+      `Permanently delete ${employee.first_name} ${employee.last_name}? This is only allowed when the employee has no punch history.`,
+    );
+    if (!confirmed) return;
+
+    setLoading(true);
+    setError('');
+    setMessage('');
+    try {
+      await request({ action: 'delete', employeeId: employee.id });
+      if (editing?.employeeId === employee.id) setEditing(null);
+      setMessage('Employee permanently deleted.');
+      await load();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Unable to delete employee.');
     } finally {
       setLoading(false);
     }
@@ -207,9 +230,10 @@ export default function EmployeesPage() {
 
           <section className="managerCard">
             <h2>Employees</h2>
+            <p style={{ color: '#6b7280' }}>Delete is permanent and only works for employees with no punch history. Use Deactivate to preserve payroll records.</p>
             <div className="tableWrap">
               <table>
-                <thead><tr><th>Employee</th><th>Number</th><th>Location</th><th>Job Title</th><th>Status</th><th></th></tr></thead>
+                <thead><tr><th>Employee</th><th>Number</th><th>Location</th><th>Job Title</th><th>Status</th><th>Actions</th></tr></thead>
                 <tbody>
                   {employees.map((employee) => (
                     <tr key={employee.id}>
@@ -218,7 +242,11 @@ export default function EmployeesPage() {
                       <td>{employee.time_locations?.name || '—'}</td>
                       <td>{employee.time_job_titles?.name || '—'}</td>
                       <td>{employee.active ? 'Active' : 'Inactive'}</td>
-                      <td><button type="button" onClick={() => startEdit(employee)}>Edit</button>{employee.active && <> <button type="button" onClick={() => deactivate(employee.id)}>Deactivate</button></>}</td>
+                      <td>
+                        <button type="button" onClick={() => startEdit(employee)}>Edit</button>
+                        {employee.active && <> <button type="button" onClick={() => deactivate(employee.id)}>Deactivate</button></>}
+                        {' '}<button type="button" onClick={() => deleteEmployee(employee)} disabled={loading} style={{ color: '#b42318' }}>Delete</button>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
