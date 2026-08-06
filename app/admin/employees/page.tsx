@@ -22,6 +22,7 @@ export default function EmployeesPage() {
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
   const [unlocked, setUnlocked] = useState(false);
+  const [formKey, setFormKey] = useState(0);
 
   async function request(body: Record<string, unknown>) {
     const response = await fetch('/api/admin/employees', {
@@ -52,8 +53,7 @@ export default function EmployeesPage() {
 
   async function addEmployee(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const formElement = event.currentTarget;
-    const form = new FormData(formElement);
+    const form = new FormData(event.currentTarget);
 
     setLoading(true);
     setError('');
@@ -69,7 +69,7 @@ export default function EmployeesPage() {
         locationId: form.get('locationId'),
         jobTitleId: form.get('jobTitleId') || null,
       });
-      formElement.reset();
+      setFormKey((value) => value + 1);
       setMessage('Employee added.');
       await load();
     } catch (err) {
@@ -100,7 +100,7 @@ export default function EmployeesPage() {
           <div className="brand">BM TIME</div>
           <div className="location">Employees</div>
         </div>
-        <div><a href="/admin">Dashboard</a> · <a href="/kiosk">Kiosk</a></div>
+        <div><a href="/admin">Dashboard</a> · <a href="/admin/timecards">Timecards</a> · <a href="/kiosk">Kiosk</a></div>
       </header>
 
       {!unlocked ? (
@@ -122,7 +122,7 @@ export default function EmployeesPage() {
         <div style={{ display: 'grid', gap: 20 }}>
           <section className="managerCard">
             <h2>Add Employee</h2>
-            <form onSubmit={addEmployee} style={{ display: 'grid', gap: 12 }}>
+            <form key={formKey} onSubmit={addEmployee} style={{ display: 'grid', gap: 12 }}>
               <input name="employeeNumber" placeholder="Employee number" required />
               <input name="firstName" placeholder="First name" required />
               <input name="lastName" placeholder="Last name" required />
