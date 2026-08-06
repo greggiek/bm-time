@@ -40,7 +40,7 @@ export default function AdminPage() {
           <div className="brand">BM TIME</div>
           <div className="location">Admin Dashboard</div>
         </div>
-        <div><a href="/admin/employees">Employees</a> · <a href="/admin/timecards">Timecards</a> · <a href="/kiosk">Kiosk</a></div>
+        <div><a href="/admin/employees">Employees</a> · <a href="/admin/managers">Managers</a> · <a href="/admin/timecards">Timecards</a> · <a href="/kiosk">Kiosk</a></div>
       </header>
 
       <section className="managerCard">
