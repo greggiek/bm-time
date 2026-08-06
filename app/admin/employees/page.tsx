@@ -13,6 +13,17 @@ type Employee = {
   time_job_titles: Option | null;
 };
 
+type EditState = {
+  employeeId: string;
+  employeeNumber: string;
+  firstName: string;
+  lastName: string;
+  locationId: string;
+  jobTitleId: string;
+  pin: string;
+  active: boolean;
+};
+
 export default function EmployeesPage() {
   const [password, setPassword] = useState('');
   const [employees, setEmployees] = useState<Employee[]>([]);
@@ -23,6 +34,7 @@ export default function EmployeesPage() {
   const [loading, setLoading] = useState(false);
   const [unlocked, setUnlocked] = useState(false);
   const [formKey, setFormKey] = useState(0);
+  const [editing, setEditing] = useState<EditState | null>(null);
 
   async function request(body: Record<string, unknown>) {
     const response = await fetch('/api/admin/employees', {
@@ -54,7 +66,6 @@ export default function EmployeesPage() {
   async function addEmployee(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = new FormData(event.currentTarget);
-
     setLoading(true);
     setError('');
     setMessage('');
@@ -74,6 +85,50 @@ export default function EmployeesPage() {
       await load();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to add employee.');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function startEdit(employee: Employee) {
+    setEditing({
+      employeeId: employee.id,
+      employeeNumber: employee.employee_number,
+      firstName: employee.first_name,
+      lastName: employee.last_name,
+      locationId: employee.time_locations?.id || '',
+      jobTitleId: employee.time_job_titles?.id || '',
+      pin: '',
+      active: employee.active,
+    });
+    setError('');
+    setMessage('');
+  }
+
+  async function saveEdit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!editing) return;
+    setLoading(true);
+    setError('');
+    setMessage('');
+
+    try {
+      await request({
+        action: 'update',
+        employeeId: editing.employeeId,
+        employeeNumber: editing.employeeNumber,
+        firstName: editing.firstName,
+        lastName: editing.lastName,
+        locationId: editing.locationId,
+        jobTitleId: editing.jobTitleId || null,
+        pin: editing.pin,
+        active: editing.active,
+      });
+      setEditing(null);
+      setMessage('Employee updated.');
+      await load();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Unable to update employee.');
     } finally {
       setLoading(false);
     }
@@ -106,16 +161,8 @@ export default function EmployeesPage() {
       {!unlocked ? (
         <section className="managerCard loginBox">
           <h1>Admin Login</h1>
-          <input
-            type="password"
-            placeholder="Admin password"
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-            onKeyDown={(event) => event.key === 'Enter' && load()}
-          />
-          <button className="primary" disabled={!password || loading} onClick={load}>
-            {loading ? 'Loading…' : 'Open Employees'}
-          </button>
+          <input type="password" placeholder="Admin password" value={password} onChange={(event) => setPassword(event.target.value)} onKeyDown={(event) => event.key === 'Enter' && load()} />
+          <button className="primary" disabled={!password || loading} onClick={load}>{loading ? 'Loading…' : 'Open Employees'}</button>
           {error && <div className="error">{error}</div>}
         </section>
       ) : (
@@ -127,19 +174,32 @@ export default function EmployeesPage() {
               <input name="firstName" placeholder="First name" required />
               <input name="lastName" placeholder="Last name" required />
               <input name="pin" placeholder="4-digit PIN" inputMode="numeric" pattern="\d{4}" maxLength={4} required />
-              <select name="locationId" required defaultValue="">
-                <option value="" disabled>Select location</option>
-                {locations.map((location) => <option key={location.id} value={location.id}>{location.name}</option>)}
-              </select>
-              <select name="jobTitleId" defaultValue="">
-                <option value="">No job title</option>
-                {jobTitles.map((jobTitle) => <option key={jobTitle.id} value={jobTitle.id}>{jobTitle.name}</option>)}
-              </select>
+              <select name="locationId" required defaultValue=""><option value="" disabled>Select location</option>{locations.map((location) => <option key={location.id} value={location.id}>{location.name}</option>)}</select>
+              <select name="jobTitleId" defaultValue=""><option value="">No job title</option>{jobTitles.map((jobTitle) => <option key={jobTitle.id} value={jobTitle.id}>{jobTitle.name}</option>)}</select>
               <button className="primary" disabled={loading}>{loading ? 'Saving…' : 'Add Employee'}</button>
             </form>
-            {message && <div style={{ marginTop: 12 }}>{message}</div>}
-            {error && <div className="error">{error}</div>}
           </section>
+
+          {editing && (
+            <section className="managerCard">
+              <h2>Edit Employee</h2>
+              <form onSubmit={saveEdit} style={{ display: 'grid', gap: 12 }}>
+                <input value={editing.employeeNumber} onChange={(event) => setEditing({ ...editing, employeeNumber: event.target.value })} placeholder="Employee number" required />
+                <input value={editing.firstName} onChange={(event) => setEditing({ ...editing, firstName: event.target.value })} placeholder="First name" required />
+                <input value={editing.lastName} onChange={(event) => setEditing({ ...editing, lastName: event.target.value })} placeholder="Last name" required />
+                <input value={editing.pin} onChange={(event) => setEditing({ ...editing, pin: event.target.value })} placeholder="New 4-digit PIN (optional)" inputMode="numeric" pattern="\d{4}" maxLength={4} />
+                <select value={editing.locationId} onChange={(event) => setEditing({ ...editing, locationId: event.target.value })} required>{locations.map((location) => <option key={location.id} value={location.id}>{location.name}</option>)}</select>
+                <select value={editing.jobTitleId} onChange={(event) => setEditing({ ...editing, jobTitleId: event.target.value })}><option value="">No job title</option>{jobTitles.map((jobTitle) => <option key={jobTitle.id} value={jobTitle.id}>{jobTitle.name}</option>)}</select>
+                <label><input type="checkbox" checked={editing.active} onChange={(event) => setEditing({ ...editing, active: event.target.checked })} /> Active employee</label>
+                <div style={{ display: 'flex', gap: 10 }}>
+                  <button className="primary" disabled={loading}>{loading ? 'Saving…' : 'Save Changes'}</button>
+                  <button type="button" onClick={() => setEditing(null)}>Cancel</button>
+                </div>
+              </form>
+            </section>
+          )}
+
+          {(message || error) && <section className="managerCard">{message && <div>{message}</div>}{error && <div className="error">{error}</div>}</section>}
 
           <section className="managerCard">
             <h2>Employees</h2>
@@ -154,7 +214,7 @@ export default function EmployeesPage() {
                       <td>{employee.time_locations?.name || '—'}</td>
                       <td>{employee.time_job_titles?.name || '—'}</td>
                       <td>{employee.active ? 'Active' : 'Inactive'}</td>
-                      <td>{employee.active && <button onClick={() => deactivate(employee.id)}>Deactivate</button>}</td>
+                      <td><button onClick={() => startEdit(employee)}>Edit</button>{employee.active && <> <button onClick={() => deactivate(employee.id)}>Deactivate</button></>}</td>
                     </tr>
                   ))}
                 </tbody>
