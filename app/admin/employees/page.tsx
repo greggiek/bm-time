@@ -182,7 +182,7 @@ export default function EmployeesPage() {
           <div className="brand">BM TIME</div>
           <div className="location">Employees</div>
         </div>
-        <div><a href="/admin">Dashboard</a> · <a href="/admin/timecards">Timecards</a> · <a href="/kiosk">Kiosk</a></div>
+        <div><a href="/admin">Dashboard</a> · <a href="/admin/managers">Managers</a> · <a href="/admin/timecards">Timecards</a> · <a href="/kiosk">Kiosk</a></div>
       </header>
 
       {!unlocked ? (
