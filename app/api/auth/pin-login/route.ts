@@ -17,7 +17,7 @@ export async function POST(request: Request) {
 
   const { data: users, error } = await supabase
     .from('time_users')
-    .select('id,name,pin_hash,role,location_id,all_locations,active,time_locations(name)')
+    .select('id,name,pin_hash,role,location_id,all_locations,can_manage_employees,active,time_locations(name)')
     .eq('active', true);
 
   if (error) return NextResponse.json({ message: 'Unable to read manager accounts.' }, { status: 500 });
@@ -43,6 +43,7 @@ export async function POST(request: Request) {
     locationId: matched.location_id,
     locationName,
     allLocations: Boolean(matched.all_locations),
+    canManageEmployees: Boolean(matched.can_manage_employees),
   });
 
   const response = NextResponse.json({
@@ -52,6 +53,7 @@ export async function POST(request: Request) {
       role: matched.role,
       locationName,
       allLocations: Boolean(matched.all_locations),
+      canManageEmployees: Boolean(matched.can_manage_employees),
     },
   });
 
