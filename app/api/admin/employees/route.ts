@@ -17,6 +17,18 @@ const CreateEmployeeSchema = AdminSchema.extend({
   jobTitleId: z.string().uuid().nullable().optional(),
 });
 
+const UpdateEmployeeSchema = AdminSchema.extend({
+  action: z.literal('update'),
+  employeeId: z.string().uuid(),
+  employeeNumber: z.string().min(1).max(20),
+  firstName: z.string().min(1).max(80),
+  lastName: z.string().min(1).max(80),
+  pin: z.union([z.literal(''), z.string().regex(/^\d{4}$/)]).optional(),
+  locationId: z.string().uuid(),
+  jobTitleId: z.string().uuid().nullable().optional(),
+  active: z.boolean(),
+});
+
 const DeactivateEmployeeSchema = AdminSchema.extend({
   action: z.literal('deactivate'),
   employeeId: z.string().uuid(),
@@ -72,6 +84,38 @@ export async function POST(request: Request) {
       job_title_id: parsed.data.jobTitleId || null,
       active: true,
     });
+
+    if (error) {
+      const message = error.code === '23505' ? 'Employee number already exists.' : error.message;
+      return NextResponse.json({ message }, { status: 400 });
+    }
+
+    return NextResponse.json({ ok: true });
+  }
+
+  if (body.action === 'update') {
+    const parsed = UpdateEmployeeSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json({ message: 'Complete all required employee fields.' }, { status: 400 });
+    }
+
+    const updates: Record<string, unknown> = {
+      employee_number: parsed.data.employeeNumber.trim(),
+      first_name: parsed.data.firstName.trim(),
+      last_name: parsed.data.lastName.trim(),
+      primary_location_id: parsed.data.locationId,
+      job_title_id: parsed.data.jobTitleId || null,
+      active: parsed.data.active,
+    };
+
+    if (parsed.data.pin) {
+      updates.pin_hash = await bcrypt.hash(parsed.data.pin, 10);
+    }
+
+    const { error } = await supabase
+      .from('time_employees')
+      .update(updates)
+      .eq('id', parsed.data.employeeId);
 
     if (error) {
       const message = error.code === '23505' ? 'Employee number already exists.' : error.message;
