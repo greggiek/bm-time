@@ -1,6 +1,6 @@
 'use client';
 
-import { FormEvent, useState } from 'react';
+import { FormEvent, useRef, useState } from 'react';
 
 type Option = { id: string; name: string };
 type Employee = {
@@ -35,6 +35,7 @@ export default function EmployeesPage() {
   const [unlocked, setUnlocked] = useState(false);
   const [formKey, setFormKey] = useState(0);
   const [editing, setEditing] = useState<EditState | null>(null);
+  const editSectionRef = useRef<HTMLElement | null>(null);
 
   async function request(body: Record<string, unknown>) {
     const response = await fetch('/api/admin/employees', {
@@ -103,6 +104,9 @@ export default function EmployeesPage() {
     });
     setError('');
     setMessage('');
+    window.requestAnimationFrame(() => {
+      editSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
   }
 
   async function saveEdit(event: FormEvent<HTMLFormElement>) {
@@ -181,8 +185,8 @@ export default function EmployeesPage() {
           </section>
 
           {editing && (
-            <section className="managerCard">
-              <h2>Edit Employee</h2>
+            <section ref={editSectionRef} className="managerCard" style={{ scrollMarginTop: 20, border: '2px solid #151515' }}>
+              <h2>Edit {editing.firstName} {editing.lastName}</h2>
               <form onSubmit={saveEdit} style={{ display: 'grid', gap: 12 }}>
                 <input value={editing.employeeNumber} onChange={(event) => setEditing({ ...editing, employeeNumber: event.target.value })} placeholder="Employee number" required />
                 <input value={editing.firstName} onChange={(event) => setEditing({ ...editing, firstName: event.target.value })} placeholder="First name" required />
@@ -214,7 +218,7 @@ export default function EmployeesPage() {
                       <td>{employee.time_locations?.name || '—'}</td>
                       <td>{employee.time_job_titles?.name || '—'}</td>
                       <td>{employee.active ? 'Active' : 'Inactive'}</td>
-                      <td><button onClick={() => startEdit(employee)}>Edit</button>{employee.active && <> <button onClick={() => deactivate(employee.id)}>Deactivate</button></>}</td>
+                      <td><button type="button" onClick={() => startEdit(employee)}>Edit</button>{employee.active && <> <button type="button" onClick={() => deactivate(employee.id)}>Deactivate</button></>}</td>
                     </tr>
                   ))}
                 </tbody>
