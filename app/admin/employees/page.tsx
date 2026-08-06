@@ -3,6 +3,7 @@
 import { FormEvent, useRef, useState } from 'react';
 
 type Option = { id: string; name: string };
+type User = { name: string; role: 'admin' | 'manager'; canManageEmployees: boolean };
 type Employee = {
   id: string;
   employee_number: string;
@@ -25,14 +26,14 @@ type EditState = {
 };
 
 export default function EmployeesPage() {
-  const [password, setPassword] = useState('');
+  const [pin, setPin] = useState('');
+  const [user, setUser] = useState<User | null>(null);
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [locations, setLocations] = useState<Option[]>([]);
   const [jobTitles, setJobTitles] = useState<Option[]>([]);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
-  const [unlocked, setUnlocked] = useState(false);
   const [formKey, setFormKey] = useState(0);
   const [editing, setEditing] = useState<EditState | null>(null);
   const editSectionRef = useRef<HTMLElement | null>(null);
@@ -41,9 +42,10 @@ export default function EmployeesPage() {
     const response = await fetch('/api/admin/employees', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ password, ...body }),
+      body: JSON.stringify(body),
     });
     const data = await response.json();
+    if (response.status === 401) setUser(null);
     if (!response.ok) throw new Error(data.message || 'Unable to continue.');
     return data;
   }
@@ -56,9 +58,31 @@ export default function EmployeesPage() {
       setEmployees(data.employees);
       setLocations(data.locations);
       setJobTitles(data.jobTitles);
-      setUnlocked(true);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to load employees.');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function signIn() {
+    setLoading(true);
+    setError('');
+    try {
+      const response = await fetch('/api/auth/pin-login', {
+        method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ pin }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || 'Unable to sign in.');
+      if (data.user.role !== 'admin' && !data.user.canManageEmployees) {
+        await fetch('/api/auth/logout', { method: 'POST' });
+        throw new Error('You do not have permission to manage employees.');
+      }
+      setUser(data.user);
+      setPin('');
+      await load();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Unable to sign in.');
     } finally {
       setLoading(false);
     }
@@ -182,14 +206,14 @@ export default function EmployeesPage() {
           <div className="brand">BM TIME</div>
           <div className="location">Employees</div>
         </div>
-        <div><a href="/admin">Dashboard</a> · <a href="/admin/managers">Managers</a> · <a href="/admin/timecards">Timecards</a> · <a href="/kiosk">Kiosk</a></div>
+        <div><a href="/manager">Dashboard</a>{user?.role === 'admin' && <> · <a href="/admin/managers">Managers</a></>} · <a href="/admin/timecards">Timecards</a> · <a href="/kiosk">Kiosk</a></div>
       </header>
 
-      {!unlocked ? (
+      {!user ? (
         <section className="managerCard loginBox">
-          <h1>Admin Login</h1>
-          <input type="password" placeholder="Admin password" value={password} onChange={(event) => setPassword(event.target.value)} onKeyDown={(event) => event.key === 'Enter' && load()} />
-          <button className="primary" disabled={!password || loading} onClick={load}>{loading ? 'Loading…' : 'Open Employees'}</button>
+          <h1>Manager Login</h1>
+          <input type="password" inputMode="numeric" maxLength={4} pattern="\d{4}" placeholder="4-digit PIN" value={pin} onChange={(event) => setPin(event.target.value.replace(/\D/g, '').slice(0, 4))} onKeyDown={(event) => event.key === 'Enter' && pin.length === 4 && signIn()} />
+          <button className="primary" disabled={pin.length !== 4 || loading} onClick={signIn}>{loading ? 'Signing in…' : 'Open Employees'}</button>
           {error && <div className="error">{error}</div>}
         </section>
       ) : (
