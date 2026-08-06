@@ -89,6 +89,7 @@ function sessionUser(session: TimeUserSession) {
     role: session.role,
     locationName: session.locationName,
     allLocations: session.allLocations,
+    canManageEmployees: session.canManageEmployees,
   };
 }
 
@@ -98,5 +99,6 @@ function legacyAdminUser() {
     role: 'admin' as const,
     locationName: null,
     allLocations: true,
+    canManageEmployees: true,
   };
 }

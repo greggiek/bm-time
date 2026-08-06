@@ -9,6 +9,7 @@ type Manager = {
   locationId: string | null;
   locationName: string | null;
   allLocations: boolean;
+  canManageEmployees: boolean;
   active: boolean;
 };
 type AdminUser = { name: string; role: 'admin' | 'manager' };
@@ -18,6 +19,7 @@ type EditState = {
   pin: string;
   locationId: string;
   allLocations: boolean;
+  canManageEmployees: boolean;
   active: boolean;
 };
 
@@ -84,6 +86,7 @@ export default function ManagersPage() {
         name: form.get('name'),
         pin: form.get('pin'),
         allLocations,
+        canManageEmployees: form.get('canManageEmployees') === 'on',
         locationId: allLocations ? null : form.get('locationId'),
       });
       setFormKey((value) => value + 1);
@@ -102,6 +105,7 @@ export default function ManagersPage() {
       pin: '',
       locationId: manager.locationId || '',
       allLocations: manager.allLocations,
+      canManageEmployees: manager.canManageEmployees,
       active: manager.active,
     });
     setError('');
@@ -122,6 +126,7 @@ export default function ManagersPage() {
         pin: editing.pin,
         locationId: editing.allLocations ? null : editing.locationId,
         allLocations: editing.allLocations,
+        canManageEmployees: editing.canManageEmployees,
         active: editing.active,
       });
       setEditing(null);
@@ -199,6 +204,7 @@ export default function ManagersPage() {
             <input name="name" placeholder="Manager name" required />
             <input name="pin" placeholder="4-digit PIN" inputMode="numeric" pattern="\d{4}" maxLength={4} required />
             <label><input name="allLocations" type="checkbox" /> Access to all warehouses</label>
+            <label><input name="canManageEmployees" type="checkbox" /> Can add and edit employees</label>
             <select name="locationId" defaultValue="">
               <option value="" disabled>Select assigned warehouse</option>
               {locations.map((location) => <option key={location.id} value={location.id}>{location.name}</option>)}
@@ -222,6 +228,7 @@ export default function ManagersPage() {
                 maxLength={4}
               />
               <label><input type="checkbox" checked={editing.allLocations} onChange={(event) => setEditing({ ...editing, allLocations: event.target.checked })} /> Access to all warehouses</label>
+              <label><input type="checkbox" checked={editing.canManageEmployees} onChange={(event) => setEditing({ ...editing, canManageEmployees: event.target.checked })} /> Can add and edit employees</label>
               {!editing.allLocations && (
                 <select value={editing.locationId} onChange={(event) => setEditing({ ...editing, locationId: event.target.value })} required>
                   <option value="" disabled>Select assigned warehouse</option>
@@ -243,12 +250,13 @@ export default function ManagersPage() {
           <h2>Managers</h2>
           <div className="tableWrap">
             <table>
-              <thead><tr><th>Name</th><th>Warehouse Access</th><th>Status</th><th>Actions</th></tr></thead>
+              <thead><tr><th>Name</th><th>Warehouse Access</th><th>Employee Access</th><th>Status</th><th>Actions</th></tr></thead>
               <tbody>
                 {managers.map((manager) => (
                   <tr key={manager.id}>
                     <td><strong>{manager.name}</strong></td>
                     <td>{manager.allLocations ? 'All warehouses' : manager.locationName || 'Unassigned'}</td>
+                    <td>{manager.canManageEmployees ? 'Add & edit' : 'No access'}</td>
                     <td>{manager.active ? 'Active' : 'Inactive'}</td>
                     <td>
                       <button type="button" onClick={() => startEdit(manager)}>Edit / Reset PIN</button>
@@ -256,7 +264,7 @@ export default function ManagersPage() {
                     </td>
                   </tr>
                 ))}
-                {managers.length === 0 && <tr><td colSpan={4}>No manager accounts yet.</td></tr>}
+                {managers.length === 0 && <tr><td colSpan={5}>No manager accounts yet.</td></tr>}
               </tbody>
             </table>
           </div>

@@ -7,6 +7,7 @@ export type TimeUserSession = {
   locationId: string | null;
   locationName: string | null;
   allLocations: boolean;
+  canManageEmployees: boolean;
   expiresAt: number;
 };
 

@@ -1,13 +1,10 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 import { z } from 'zod';
+import { readSessionToken, sessionCookie, TimeUserSession } from '@/lib/auth-session';
 import { getAdminClient } from '@/lib/supabase-server';
 
-const AdminSchema = z.object({
-  password: z.string().min(1),
-});
-
-const CreateEmployeeSchema = AdminSchema.extend({
+const CreateEmployeeSchema = z.object({
   action: z.literal('create'),
   employeeNumber: z.string().min(1).max(20),
   firstName: z.string().min(1).max(80),
@@ -17,7 +14,7 @@ const CreateEmployeeSchema = AdminSchema.extend({
   jobTitleId: z.string().uuid().nullable().optional(),
 });
 
-const UpdateEmployeeSchema = AdminSchema.extend({
+const UpdateEmployeeSchema = z.object({
   action: z.literal('update'),
   employeeId: z.string().uuid(),
   employeeNumber: z.string().min(1).max(20),
@@ -29,48 +26,29 @@ const UpdateEmployeeSchema = AdminSchema.extend({
   active: z.boolean(),
 });
 
-const EmployeeActionSchema = AdminSchema.extend({
+const EmployeeActionSchema = z.object({
+  action: z.enum(['deactivate', 'delete']),
   employeeId: z.string().uuid(),
 });
 
-function isAuthorized(password: string) {
-  const expected = process.env.ADMIN_PASSWORD || process.env.MANAGER_PASSWORD;
-  return Boolean(expected && password === expected);
-}
-
-export async function POST(request: Request) {
-  const body = await request.json().catch(() => null);
-  const auth = AdminSchema.safeParse(body);
-  if (!auth.success || !isAuthorized(auth.data.password)) {
-    return NextResponse.json({ message: 'Incorrect admin password.' }, { status: 401 });
+export async function POST(request: NextRequest) {
+  const session = readSessionToken(request.cookies.get(sessionCookie.name)?.value);
+  if (!session) return NextResponse.json({ message: 'Sign in with your manager PIN.' }, { status: 401 });
+  if (session.role !== 'admin' && !session.canManageEmployees) {
+    return NextResponse.json({ message: 'You do not have permission to manage employees.' }, { status: 403 });
   }
 
+  const body = await request.json().catch(() => ({}));
   const supabase = getAdminClient();
-  if (!supabase) {
-    return NextResponse.json({ message: 'Supabase is not configured.' }, { status: 503 });
-  }
+  if (!supabase) return NextResponse.json({ message: 'Supabase is not configured.' }, { status: 503 });
 
-  if (!body?.action) {
-    const [{ data: employees, error: employeeError }, { data: locations }, { data: jobTitles }] = await Promise.all([
-      supabase
-        .from('time_employees')
-        .select('id,employee_number,first_name,last_name,active,time_locations!time_employees_primary_location_id_fkey(id,name),time_job_titles(id,name)')
-        .order('last_name'),
-      supabase.from('time_locations').select('id,name').eq('active', true).order('name'),
-      supabase.from('time_job_titles').select('id,name').eq('active', true).order('name'),
-    ]);
-
-    if (employeeError) {
-      return NextResponse.json({ message: employeeError.message }, { status: 500 });
-    }
-
-    return NextResponse.json({ employees: employees || [], locations: locations || [], jobTitles: jobTitles || [] });
-  }
+  if (!body?.action) return loadEmployees(supabase, session);
 
   if (body.action === 'create') {
     const parsed = CreateEmployeeSchema.safeParse(body);
-    if (!parsed.success) {
-      return NextResponse.json({ message: 'Complete all required employee fields.' }, { status: 400 });
+    if (!parsed.success) return NextResponse.json({ message: 'Complete all required employee fields.' }, { status: 400 });
+    if (!canAccessLocation(session, parsed.data.locationId)) {
+      return NextResponse.json({ message: 'You cannot add employees to that warehouse.' }, { status: 403 });
     }
 
     const pinHash = await bcrypt.hash(parsed.data.pin, 10);
@@ -83,89 +61,69 @@ export async function POST(request: Request) {
       job_title_id: parsed.data.jobTitleId || null,
       active: true,
     });
-
-    if (error) {
-      const message = error.code === '23505' ? 'Employee number already exists.' : error.message;
-      return NextResponse.json({ message }, { status: 400 });
-    }
-
-    return NextResponse.json({ ok: true });
+    if (error) return NextResponse.json({ message: error.code === '23505' ? 'Employee number already exists.' : error.message }, { status: 400 });
   }
 
   if (body.action === 'update') {
     const parsed = UpdateEmployeeSchema.safeParse(body);
-    if (!parsed.success) {
-      return NextResponse.json({ message: 'Complete all required employee fields.' }, { status: 400 });
+    if (!parsed.success) return NextResponse.json({ message: 'Complete all required employee fields.' }, { status: 400 });
+    if (!await canAccessEmployee(supabase, session, parsed.data.employeeId) || !canAccessLocation(session, parsed.data.locationId)) {
+      return NextResponse.json({ message: 'You do not have access to this employee.' }, { status: 403 });
     }
 
     const updates: Record<string, unknown> = {
-      employee_number: parsed.data.employeeNumber.trim(),
-      first_name: parsed.data.firstName.trim(),
-      last_name: parsed.data.lastName.trim(),
-      primary_location_id: parsed.data.locationId,
-      job_title_id: parsed.data.jobTitleId || null,
-      active: parsed.data.active,
+      employee_number: parsed.data.employeeNumber.trim(), first_name: parsed.data.firstName.trim(),
+      last_name: parsed.data.lastName.trim(), primary_location_id: parsed.data.locationId,
+      job_title_id: parsed.data.jobTitleId || null, active: parsed.data.active,
     };
-
-    if (parsed.data.pin) {
-      updates.pin_hash = await bcrypt.hash(parsed.data.pin, 10);
-    }
-
-    const { error } = await supabase
-      .from('time_employees')
-      .update(updates)
-      .eq('id', parsed.data.employeeId);
-
-    if (error) {
-      const message = error.code === '23505' ? 'Employee number already exists.' : error.message;
-      return NextResponse.json({ message }, { status: 400 });
-    }
-
-    return NextResponse.json({ ok: true });
+    if (parsed.data.pin) updates.pin_hash = await bcrypt.hash(parsed.data.pin, 10);
+    const { error } = await supabase.from('time_employees').update(updates).eq('id', parsed.data.employeeId);
+    if (error) return NextResponse.json({ message: error.code === '23505' ? 'Employee number already exists.' : error.message }, { status: 400 });
   }
 
-  if (body.action === 'deactivate') {
+  if (body.action === 'deactivate' || body.action === 'delete') {
     const parsed = EmployeeActionSchema.safeParse(body);
-    if (!parsed.success) {
-      return NextResponse.json({ message: 'Invalid employee.' }, { status: 400 });
+    if (!parsed.success) return NextResponse.json({ message: 'Invalid employee.' }, { status: 400 });
+    if (!await canAccessEmployee(supabase, session, parsed.data.employeeId)) {
+      return NextResponse.json({ message: 'You do not have access to this employee.' }, { status: 403 });
     }
 
-    const { error } = await supabase
-      .from('time_employees')
-      .update({ active: false })
-      .eq('id', parsed.data.employeeId);
-
-    if (error) return NextResponse.json({ message: error.message }, { status: 500 });
-    return NextResponse.json({ ok: true });
+    if (body.action === 'deactivate') {
+      const { error } = await supabase.from('time_employees').update({ active: false }).eq('id', parsed.data.employeeId);
+      if (error) return NextResponse.json({ message: error.message }, { status: 500 });
+    } else {
+      const { count, error: countError } = await supabase.from('time_punch_events').select('id', { count: 'exact', head: true }).eq('employee_id', parsed.data.employeeId);
+      if (countError) return NextResponse.json({ message: countError.message }, { status: 500 });
+      if ((count || 0) > 0) return NextResponse.json({ message: 'This employee has punch history and cannot be permanently deleted. Deactivate them instead.' }, { status: 409 });
+      const { error } = await supabase.from('time_employees').delete().eq('id', parsed.data.employeeId);
+      if (error) return NextResponse.json({ message: error.message }, { status: 500 });
+    }
   }
 
-  if (body.action === 'delete') {
-    const parsed = EmployeeActionSchema.safeParse(body);
-    if (!parsed.success) {
-      return NextResponse.json({ message: 'Invalid employee.' }, { status: 400 });
-    }
+  return loadEmployees(supabase, session);
+}
 
-    const { count, error: countError } = await supabase
-      .from('time_punch_events')
-      .select('id', { count: 'exact', head: true })
-      .eq('employee_id', parsed.data.employeeId);
+function canAccessLocation(session: TimeUserSession, locationId: string) {
+  return session.role === 'admin' || session.allLocations || session.locationId === locationId;
+}
 
-    if (countError) return NextResponse.json({ message: countError.message }, { status: 500 });
-    if ((count || 0) > 0) {
-      return NextResponse.json(
-        { message: 'This employee has punch history and cannot be permanently deleted. Deactivate them instead.' },
-        { status: 409 },
-      );
-    }
+async function canAccessEmployee(supabase: NonNullable<ReturnType<typeof getAdminClient>>, session: TimeUserSession, employeeId: string) {
+  const { data } = await supabase.from('time_employees').select('primary_location_id').eq('id', employeeId).maybeSingle();
+  return Boolean(data && canAccessLocation(session, data.primary_location_id));
+}
 
-    const { error } = await supabase
-      .from('time_employees')
-      .delete()
-      .eq('id', parsed.data.employeeId);
-
-    if (error) return NextResponse.json({ message: error.message }, { status: 500 });
-    return NextResponse.json({ ok: true });
+async function loadEmployees(supabase: NonNullable<ReturnType<typeof getAdminClient>>, session: TimeUserSession) {
+  let employeeQuery = supabase.from('time_employees')
+    .select('id,employee_number,first_name,last_name,active,primary_location_id,time_locations!time_employees_primary_location_id_fkey(id,name),time_job_titles(id,name)')
+    .order('last_name');
+  let locationQuery = supabase.from('time_locations').select('id,name').eq('active', true).order('name');
+  if (session.role !== 'admin' && !session.allLocations && session.locationId) {
+    employeeQuery = employeeQuery.eq('primary_location_id', session.locationId);
+    locationQuery = locationQuery.eq('id', session.locationId);
   }
-
-  return NextResponse.json({ message: 'Unsupported action.' }, { status: 400 });
+  const [{ data: employees, error }, { data: locations }, { data: jobTitles }] = await Promise.all([
+    employeeQuery, locationQuery, supabase.from('time_job_titles').select('id,name').eq('active', true).order('name'),
+  ]);
+  if (error) return NextResponse.json({ message: error.message }, { status: 500 });
+  return NextResponse.json({ employees: employees || [], locations: locations || [], jobTitles: jobTitles || [] });
 }

@@ -14,6 +14,7 @@ const CreateSchema = z.object({
   pin: z.string().regex(/^\d{4}$/),
   locationId: z.string().uuid().nullable(),
   allLocations: z.boolean(),
+  canManageEmployees: z.boolean(),
 });
 
 const UpdateSchema = z.object({
@@ -23,6 +24,7 @@ const UpdateSchema = z.object({
   pin: z.union([z.literal(''), z.string().regex(/^\d{4}$/)]).optional(),
   locationId: z.string().uuid().nullable(),
   allLocations: z.boolean(),
+  canManageEmployees: z.boolean(),
   active: z.boolean(),
 });
 
@@ -68,6 +70,7 @@ export async function POST(request: NextRequest) {
       role: 'manager',
       location_id: parsed.data.allLocations ? null : parsed.data.locationId,
       all_locations: parsed.data.allLocations,
+      can_manage_employees: parsed.data.canManageEmployees,
       active: true,
     });
 
@@ -84,6 +87,7 @@ export async function POST(request: NextRequest) {
       name: parsed.data.name,
       location_id: parsed.data.allLocations ? null : parsed.data.locationId,
       all_locations: parsed.data.allLocations,
+      can_manage_employees: parsed.data.canManageEmployees,
       active: parsed.data.active,
     };
 
@@ -142,7 +146,7 @@ async function loadManagers(
   const [{ data: managers, error }, { data: locations, error: locationsError }] = await Promise.all([
     supabase
       .from('time_users')
-      .select('id,name,role,location_id,all_locations,active,time_locations(name)')
+      .select('id,name,role,location_id,all_locations,can_manage_employees,active,time_locations(name)')
       .eq('role', 'manager')
       .order('name'),
     supabase.from('time_locations').select('id,name').eq('active', true).order('name'),
@@ -161,6 +165,7 @@ async function loadManagers(
         ? manager.time_locations[0]?.name || null
         : manager.time_locations?.name || null,
       allLocations: Boolean(manager.all_locations),
+      canManageEmployees: Boolean(manager.can_manage_employees),
       active: Boolean(manager.active),
     })),
     locations: locations || [],

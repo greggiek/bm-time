@@ -16,6 +16,7 @@ type User = {
   role: 'admin' | 'manager';
   locationName: string | null;
   allLocations: boolean;
+  canManageEmployees: boolean;
 };
 
 export default function ManagerPage() {
@@ -120,7 +121,8 @@ export default function ManagerPage() {
         </div>
         <div>
           <a href="/admin/timecards">Timecards</a>
-          {user.role === 'admin' && <> · <a href="/admin/employees">Employees</a> · <a href="/admin/managers">Managers</a></>}
+          {(user.role === 'admin' || user.canManageEmployees) && <> · <a href="/admin/employees">Employees</a></>}
+          {user.role === 'admin' && <> · <a href="/admin/managers">Managers</a></>}
           {' · '}<a href="/kiosk">Kiosk</a> · <button type="button" onClick={logout}>Log Out</button>
         </div>
       </header>
