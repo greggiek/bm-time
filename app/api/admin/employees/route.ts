@@ -29,8 +29,7 @@ const UpdateEmployeeSchema = AdminSchema.extend({
   active: z.boolean(),
 });
 
-const DeactivateEmployeeSchema = AdminSchema.extend({
-  action: z.literal('deactivate'),
+const EmployeeActionSchema = AdminSchema.extend({
   employeeId: z.string().uuid(),
 });
 
@@ -126,7 +125,7 @@ export async function POST(request: Request) {
   }
 
   if (body.action === 'deactivate') {
-    const parsed = DeactivateEmployeeSchema.safeParse(body);
+    const parsed = EmployeeActionSchema.safeParse(body);
     if (!parsed.success) {
       return NextResponse.json({ message: 'Invalid employee.' }, { status: 400 });
     }
@@ -134,6 +133,34 @@ export async function POST(request: Request) {
     const { error } = await supabase
       .from('time_employees')
       .update({ active: false })
+      .eq('id', parsed.data.employeeId);
+
+    if (error) return NextResponse.json({ message: error.message }, { status: 500 });
+    return NextResponse.json({ ok: true });
+  }
+
+  if (body.action === 'delete') {
+    const parsed = EmployeeActionSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json({ message: 'Invalid employee.' }, { status: 400 });
+    }
+
+    const { count, error: countError } = await supabase
+      .from('time_punch_events')
+      .select('id', { count: 'exact', head: true })
+      .eq('employee_id', parsed.data.employeeId);
+
+    if (countError) return NextResponse.json({ message: countError.message }, { status: 500 });
+    if ((count || 0) > 0) {
+      return NextResponse.json(
+        { message: 'This employee has punch history and cannot be permanently deleted. Deactivate them instead.' },
+        { status: 409 },
+      );
+    }
+
+    const { error } = await supabase
+      .from('time_employees')
+      .delete()
       .eq('id', parsed.data.employeeId);
 
     if (error) return NextResponse.json({ message: error.message }, { status: 500 });
