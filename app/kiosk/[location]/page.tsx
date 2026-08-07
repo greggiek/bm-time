@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import Link from 'next/link';
 import { useParams } from 'next/navigation';
 
 type EmployeeState = { employeeId: string; firstName: string; status: 'clocked_in' | 'clocked_out' };
@@ -87,5 +88,6 @@ export default function BranchKioskPage() {
     </> : <div className="employeePanel"><p className="welcome">Welcome, <strong>{employee.firstName}</strong></p><div className="status">Status: <strong>{employee.status === 'clocked_in' ? 'Clocked In' : 'Clocked Out'}</strong></div><button className={employee.status === 'clocked_in' ? 'danger' : 'primary'} disabled={busy} onClick={() => send(employee.status === 'clocked_in' ? 'clock_out' : 'clock_in')}>{busy ? 'Saving…' : employee.status === 'clocked_in' ? 'Clock Out' : 'Clock In'}</button><button className="cancel" onClick={reset}>Cancel</button></div>}
     {message && <div className="error">{message}</div>}
     <div className="demoNote">Branch kiosk: {kiosk.name}</div>
+    {!employee && <div className="kioskManagerExit"><Link href="/manager">Manager Portal</Link><span>Manager PIN required</span></div>}
   </section></main>;
 }
