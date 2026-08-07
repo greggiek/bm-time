@@ -156,6 +156,10 @@ td button[style*="color"] { border-color: #ffd4d4; background: var(--danger-soft
 
 .warehousePicker { display: grid; gap: 7px; margin-top: 22px; color: var(--muted); font-size: 13px; font-weight: 800; }
 .warehousePicker select { background: #fff; }
+.kioskManagerExit { display: flex; align-items: center; justify-content: center; gap: 9px; margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--border); color: var(--muted); font-size: 12px; }
+.kioskManagerExit a { border-radius: 8px; padding: 7px 10px; color: var(--navy); background: var(--surface-muted); font-size: 13px; font-weight: 800; text-decoration: none; transition: .15s ease; }
+.kioskManagerExit a:hover { color: var(--blue); background: var(--blue-soft); }
+.kioskManagerExit span::before { content: "\2022"; margin-right: 9px; color: #a7b6c5; }
 
 @media (max-width: 760px) {
   .managerShell { padding: 16px 13px 40px; }
