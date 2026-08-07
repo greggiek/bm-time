@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import Link from 'next/link';
 
 type EmployeeState = {
   employeeId: string;
@@ -216,6 +217,12 @@ export default function KioskPage() {
         <div className="demoNote">
           {process.env.NEXT_PUBLIC_DEMO_MODE === 'true' ? 'Demo PINs: 1234, 2468, 7300' : ''}
         </div>
+        {!employee && (
+          <div className="kioskManagerExit">
+            <Link href="/manager">Manager Portal</Link>
+            <span>Manager PIN required</span>
+          </div>
+        )}
       </section>
     </main>
   );
