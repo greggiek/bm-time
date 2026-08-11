@@ -1,6 +1,7 @@
 'use client';
 
-import { FormEvent, useMemo, useState } from 'react';
+import { FormEvent, useEffect, useMemo, useState } from 'react';
+import ManagerShell from '@/components/manager-shell';
 
 type Punch = { id:string; employeeId:string; employeeNumber:string; employeeName:string; location:string; action:'clock_in'|'clock_out'; occurredAt:string };
 type Summary = { employeeId:string; employeeNumber:string; employeeName:string; location:string; totalHours:number; incomplete:boolean };
@@ -23,7 +24,10 @@ export default function TimecardsPage(){
   const [message,setMessage]=useState('');
   const [loading,setLoading]=useState(false);
   const [loaded,setLoaded]=useState(false);
+  const [checking,setChecking]=useState(true);
   const totalHours=useMemo(()=>summaries.reduce((sum,row)=>sum+row.totalHours,0),[summaries]);
+
+  useEffect(()=>{fetch('/api/auth/session').then(async response=>{if(response.ok){const data=await response.json();setUser(data.user)}}).finally(()=>setChecking(false))},[]);
 
   async function signIn(){
     setLoading(true);setError('');
@@ -53,10 +57,10 @@ export default function TimecardsPage(){
     const csv=lines.map(row=>row.map((cell:any)=>csvCell(cell??'')).join(',')).join('\r\n');const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});const url=URL.createObjectURL(blob);const link=document.createElement('a');link.href=url;link.download=`bm-time-${weekStart}.csv`;document.body.appendChild(link);link.click();link.remove();URL.revokeObjectURL(url);
   }
 
-  if(!user)return <main className="managerShell"><header className="managerHeader"><div><div className="brand">BM TIME</div><div className="location">Manager Login</div></div><a href="/kiosk">Kiosk</a></header><section className="managerCard loginBox"><h1>Enter Manager PIN</h1><input type="password" inputMode="numeric" maxLength={4} pattern="\d{4}" placeholder="4-digit PIN" value={pin} onChange={e=>setPin(e.target.value.replace(/\D/g,'').slice(0,4))} onKeyDown={e=>e.key==='Enter'&&pin.length===4&&signIn()}/><button className="primary" disabled={pin.length!==4||loading} onClick={signIn}>{loading?'Signing in…':'Sign In'}</button>{error&&<div className="error">{error}</div>}</section></main>;
+  if(checking)return <main className="managerShell"><section className="managerCard loginBox">Loading management portal…</section></main>;
+  if(!user)return <main className="managerShell"><section className="managerCard loginBox"><h1>Enter Manager PIN</h1><input type="password" inputMode="numeric" maxLength={4} pattern="\d{4}" placeholder="4-digit PIN" value={pin} onChange={e=>setPin(e.target.value.replace(/\D/g,'').slice(0,4))} onKeyDown={e=>e.key==='Enter'&&pin.length===4&&signIn()}/><button className="primary" disabled={pin.length!==4||loading} onClick={signIn}>{loading?'Signing in…':'Sign In'}</button>{error&&<div className="error">{error}</div>}</section></main>;
 
-  return <main className="managerShell">
-    <header className="managerHeader"><div><div className="brand">BM TIME</div><div className="location">Weekly Timecards · {user.name}{user.role==='manager'&&!user.allLocations?` · ${user.locationName}`:''}</div></div><div>{user.role==='admin'&&<><a href="/admin/employees">Employees</a> · <a href="/admin/managers">Managers</a> · </>}<a href="/kiosk">Kiosk</a> · <button type="button" onClick={logout}>Log Out</button></div></header>
+  return <ManagerShell brand="BM TIME" title="Weekly Timecards" user={user}>
     <section className="managerCard">
       <div className="loginBox" style={{margin:0,maxWidth:620}}><h1>Weekly Timecards</h1><label>Week starting Monday<input type="date" value={weekStart} onChange={e=>setWeekStart(e.target.value)}/></label><button className="primary" onClick={loadWeek} disabled={!weekStart||loading}>{loading?'Loading…':'Load Week'}</button>{message&&<div style={{marginTop:12}}>{message}</div>}{error&&<div className="error">{error}</div>}</div>
       {loaded&&<div style={{marginTop:30,display:'grid',gap:24}}>
@@ -67,7 +71,7 @@ export default function TimecardsPage(){
         <section><h2>Punch Detail</h2><div className="tableWrap"><table><thead><tr><th>Employee</th><th>Action</th><th>Date & Time</th><th></th></tr></thead><tbody>{punches.map(p=><PunchRow key={p.id} punch={p} loading={loading} onSave={updatePunch}/>)}{punches.length===0&&<tr><td colSpan={4}>No punches found for this week.</td></tr>}</tbody></table></div></section>
       </div>}
     </section>
-  </main>
+  </ManagerShell>
 }
 
 function PunchRow({punch,loading,onSave}:{punch:Punch;loading:boolean;onSave:(id:string,occurredAt:string)=>void}){const[value,setValue]=useState(toLocalInput(punch.occurredAt));return <tr><td><strong>{punch.employeeName}</strong><br/>#{punch.employeeNumber}</td><td>{punch.action==='clock_in'?'Clock In':'Clock Out'}</td><td><input type="datetime-local" value={value} onChange={e=>setValue(e.target.value)}/></td><td><button disabled={loading||!value} onClick={()=>onSave(punch.id,value)}>Save</button></td></tr>}
