@@ -8,14 +8,14 @@ type Summary = { employeeId:string; employeeNumber:string; employeeName:string; 
 type EmployeeOption = { id:string; employeeNumber:string; name:string };
 type User = { name:string; role:'admin'|'manager'; locationName:string|null; allLocations:boolean };
 
-function currentMonday(){const d=new Date();const day=d.getDay();d.setDate(d.getDate()+(day===0?-6:1-day));return d.toISOString().slice(0,10)}
+function currentThursday(){const d=new Date();d.setDate(d.getDate()-((d.getDay()+3)%7));const p=(v:number)=>String(v).padStart(2,'0');return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}`}
 function csvCell(value:string|number|boolean){return `"${String(value).replaceAll('"','""')}"`}
 function toLocalInput(iso:string){const d=new Date(iso);const p=(v:number)=>String(v).padStart(2,'0');return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`}
 
 export default function TimecardsPage(){
   const [pin,setPin]=useState('');
   const [user,setUser]=useState<User|null>(null);
-  const [weekStart,setWeekStart]=useState(currentMonday());
+  const [weekStart,setWeekStart]=useState(currentThursday());
   const [punches,setPunches]=useState<Punch[]>([]);
   const [summaries,setSummaries]=useState<Summary[]>([]);
   const [employees,setEmployees]=useState<EmployeeOption[]>([]);
@@ -62,7 +62,7 @@ export default function TimecardsPage(){
 
   return <ManagerShell brand="BM TIME" title="Weekly Timecards" user={user}>
     <section className="managerCard">
-      <div className="loginBox" style={{margin:0,maxWidth:620}}><h1>Weekly Timecards</h1><label>Week starting Monday<input type="date" value={weekStart} onChange={e=>setWeekStart(e.target.value)}/></label><button className="primary" onClick={loadWeek} disabled={!weekStart||loading}>{loading?'Loading…':'Load Week'}</button>{message&&<div style={{marginTop:12}}>{message}</div>}{error&&<div className="error">{error}</div>}</div>
+      <div className="loginBox" style={{margin:0,maxWidth:620}}><h1>Weekly Timecards</h1><label>Pay period starting Thursday<input type="date" value={weekStart} onChange={e=>setWeekStart(e.target.value)}/></label><button className="primary" onClick={loadWeek} disabled={!weekStart||loading}>{loading?'Loading…':'Load Pay Period'}</button>{message&&<div style={{marginTop:12}}>{message}</div>}{error&&<div className="error">{error}</div>}</div>
       {loaded&&<div style={{marginTop:30,display:'grid',gap:24}}>
         <div className="summary"><div><strong>{summaries.length}</strong><span>Employees</span></div><div><strong>{totalHours.toFixed(2)}</strong><span>Total Hours</span></div><div><strong>{summaries.filter(r=>r.incomplete).length}</strong><span>Incomplete</span></div></div>
         <button className="primary" onClick={exportCsv} disabled={punches.length===0}>Download CSV</button>
