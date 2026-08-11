@@ -1,6 +1,7 @@
 'use client';
 
-import { FormEvent, useRef, useState } from 'react';
+import { FormEvent, useEffect, useRef, useState } from 'react';
+import ManagerShell from '@/components/manager-shell';
 
 type Option = { id: string; name: string };
 type User = { name: string; role: 'admin' | 'manager'; canManageEmployees: boolean };
@@ -37,6 +38,15 @@ export default function EmployeesPage() {
   const [formKey, setFormKey] = useState(0);
   const [editing, setEditing] = useState<EditState | null>(null);
   const editSectionRef = useRef<HTMLElement | null>(null);
+  const [checking, setChecking] = useState(true);
+
+  useEffect(() => {
+    fetch('/api/auth/session').then(async response => {
+      if (!response.ok) return;
+      const data = await response.json();
+      if (data.user.role === 'admin' || data.user.canManageEmployees) { setUser(data.user); await load(); }
+    }).finally(() => setChecking(false));
+  }, []);
 
   async function request(body: Record<string, unknown>) {
     const response = await fetch('/api/admin/employees', {
@@ -199,24 +209,21 @@ export default function EmployeesPage() {
     }
   }
 
-  return (
-    <main className="managerShell">
-      <header className="managerHeader">
-        <div>
-          <div className="brand">BM TIME</div>
-          <div className="location">Employees</div>
-        </div>
-        <div><a href="/manager">Dashboard</a>{user?.role === 'admin' && <> · <a href="/admin/managers">Managers</a></>} · <a href="/admin/timecards">Timecards</a> · <a href="/kiosk">Kiosk</a></div>
-      </header>
+  if (checking) return <main className="managerShell"><section className="managerCard loginBox">Loading management portal…</section></main>;
 
-      {!user ? (
+  if (!user) return (
+    <main className="managerShell">
         <section className="managerCard loginBox">
           <h1>Manager Login</h1>
           <input type="password" inputMode="numeric" maxLength={4} pattern="\d{4}" placeholder="4-digit PIN" value={pin} onChange={(event) => setPin(event.target.value.replace(/\D/g, '').slice(0, 4))} onKeyDown={(event) => event.key === 'Enter' && pin.length === 4 && signIn()} />
           <button className="primary" disabled={pin.length !== 4 || loading} onClick={signIn}>{loading ? 'Signing in…' : 'Open Employees'}</button>
           {error && <div className="error">{error}</div>}
         </section>
-      ) : (
+    </main>
+  );
+
+  return (
+    <ManagerShell brand="BM TIME" title="Employees" user={user}>
         <div style={{ display: 'grid', gap: 20 }}>
           <section className="managerCard">
             <h2>Add Employee</h2>
@@ -278,7 +285,6 @@ export default function EmployeesPage() {
             </div>
           </section>
         </div>
-      )}
-    </main>
+    </ManagerShell>
   );
 }
