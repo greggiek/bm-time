@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import ManagerShell from '@/components/manager-shell';
 
 type Row = {
   id: string;
@@ -25,6 +26,11 @@ export default function ManagerPage() {
   const [rows, setRows] = useState<Row[]>([]);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [checking, setChecking] = useState(true);
+
+  useEffect(() => {
+    loadDashboard().catch(() => undefined).finally(() => setChecking(false));
+  }, []);
 
   async function signIn() {
     setLoading(true);
@@ -79,6 +85,8 @@ export default function ManagerPage() {
     setError('');
   }
 
+  if (checking) return <main className="managerShell"><section className="managerCard loginBox">Loading management portal…</section></main>;
+
   if (!user) {
     return (
       <main className="managerShell">
@@ -110,23 +118,7 @@ export default function ManagerPage() {
   }
 
   return (
-    <main className="managerShell">
-      <header className="managerHeader">
-        <div>
-          <div className="brand">BM TIME</div>
-          <div className="location">
-            Manager Dashboard · {user.name}
-            {user.role === 'manager' && !user.allLocations && user.locationName ? ` · ${user.locationName}` : ''}
-          </div>
-        </div>
-        <div>
-          <a href="/admin/timecards">Timecards</a>
-          {(user.role === 'admin' || user.canManageEmployees) && <> · <a href="/admin/employees">Employees</a></>}
-          {user.role === 'admin' && <> · <a href="/admin/managers">Managers</a></>}
-          {' · '}<a href="/kiosk">Kiosk</a> · <button type="button" onClick={logout}>Log Out</button>
-        </div>
-      </header>
-
+    <ManagerShell brand="BM TIME" title="Dashboard" user={user}>
       <section className="managerCard">
         <div className="summary">
           <div><strong>{rows.filter((row) => row.status === 'clocked_in').length}</strong><span>Clocked In</span></div>
@@ -154,6 +146,6 @@ export default function ManagerPage() {
         <button className="refresh" onClick={refresh} disabled={loading}>{loading ? 'Refreshing…' : 'Refresh'}</button>
         {error && <div className="error">{error}</div>}
       </section>
-    </main>
+    </ManagerShell>
   );
 }
