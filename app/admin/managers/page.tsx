@@ -1,6 +1,7 @@
 'use client';
 
-import { FormEvent, useState } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
+import ManagerShell from '@/components/manager-shell';
 
 type Location = { id: string; name: string };
 type Manager = {
@@ -33,6 +34,15 @@ export default function ManagersPage() {
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
   const [formKey, setFormKey] = useState(0);
+  const [checking, setChecking] = useState(true);
+
+  useEffect(() => {
+    fetch('/api/auth/session').then(async response => {
+      if (!response.ok) return;
+      const data = await response.json();
+      if (data.user.role === 'admin') { setUser(data.user); await managerRequest(); }
+    }).finally(() => setChecking(false));
+  }, []);
 
   async function managerRequest(body: Record<string, unknown> = {}) {
     const response = await fetch('/api/admin/managers', {
@@ -162,6 +172,8 @@ export default function ManagersPage() {
     setEditing(null);
   }
 
+  if (checking) return <main className="managerShell"><section className="managerCard loginBox">Loading management portal…</section></main>;
+
   if (!user) {
     return (
       <main className="managerShell">
@@ -191,12 +203,7 @@ export default function ManagersPage() {
   }
 
   return (
-    <main className="managerShell">
-      <header className="managerHeader">
-        <div><div className="brand">BM TIME</div><div className="location">Manager Accounts · {user.name}</div></div>
-        <div><a href="/admin/timecards">Timecards</a> · <a href="/admin/employees">Employees</a> · <a href="/kiosk">Kiosk</a> · <button onClick={logout}>Log Out</button></div>
-      </header>
-
+    <ManagerShell brand="BM TIME" title="Managers" user={user}>
       <div style={{ display: 'grid', gap: 20 }}>
         <section className="managerCard">
           <h2>Add Manager</h2>
@@ -270,6 +277,6 @@ export default function ManagersPage() {
           </div>
         </section>
       </div>
-    </main>
+    </ManagerShell>
   );
 }
