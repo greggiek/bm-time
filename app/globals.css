@@ -121,6 +121,20 @@ h2 { font-size: 21px; }
 .managerHeader button { padding: 7px 10px; color: var(--muted); background: transparent; }
 .managerCard { border-radius: var(--radius-md); padding: 26px; }
 .managerCard + .managerCard { margin-top: 20px; }
+.managerApp { min-height: 100vh; display: grid; grid-template-columns: 240px minmax(0, 1fr); background: #f5f7fa; }
+.managerSidebar { position: sticky; top: 0; height: 100vh; padding: 28px 20px; display: flex; flex-direction: column; gap: 28px; color: white; background: var(--navy); }
+.managerSidebar .brand { color: white; }
+.sidebarLabel { margin-top: 5px; color: #a9bad0; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; }
+.managerSidebar nav { display: grid; gap: 7px; }
+.managerSidebar a, .managerSidebar button { width: 100%; padding: 11px 13px; border: 0; border-radius: 9px; color: #dbe7f5; background: transparent; font: inherit; font-weight: 700; text-align: left; text-decoration: none; }
+.managerSidebar nav a:hover, .managerSidebar nav a.active { color: white; background: rgba(255,255,255,.13); }
+.sidebarFooter { margin-top: auto; display: grid; gap: 7px; }
+.sidebarFooter > a:hover, .sidebarFooter > button:hover { color: white; background: rgba(255,255,255,.1); }
+.signedInAs { padding: 0 13px 12px; display: grid; gap: 3px; color: white; }
+.signedInAs span { color: #a9bad0; font-size: 13px; }
+.managerContent { min-width: 0; padding: 34px 38px 60px; }
+.contentHeader { margin-bottom: 22px; }
+.contentHeader h1 { margin: 0; color: var(--navy); font-size: 28px; }
 
 .loginBox { width: min(450px, 100%); margin: 64px auto; }
 .loginBox h1 { margin-bottom: 8px; }
@@ -162,6 +176,13 @@ td button[style*="color"] { border-color: #ffd4d4; background: var(--danger-soft
 .kioskManagerExit span::before { content: "\2022"; margin-right: 9px; color: #a7b6c5; }
 
 @media (max-width: 760px) {
+  .managerApp { display: block; }
+  .managerSidebar { position: static; width: 100%; height: auto; padding: 18px; gap: 16px; }
+  .managerSidebar nav { display: flex; overflow-x: auto; }
+  .managerSidebar nav a { width: auto; white-space: nowrap; }
+  .sidebarFooter { margin-top: 0; grid-template-columns: 1fr auto auto; align-items: center; }
+  .signedInAs { padding: 0; }
+  .managerContent { padding: 22px 13px 40px; }
   .managerShell { padding: 16px 13px 40px; }
   .managerHeader { align-items: flex-start; flex-direction: column; padding: 17px; }
   .managerHeader > div:last-child { justify-content: flex-start; }
