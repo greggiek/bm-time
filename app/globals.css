@@ -144,6 +144,8 @@ h2 { font-size: 21px; }
 .countBadge { display: grid; place-items: center; min-width: 34px; height: 34px; border-radius: 999px; color: #9a6700; background: #fff2c7; font-weight: 850; }
 .hoursBadge { display: inline-block; min-width: 58px; border-radius: 999px; padding: 6px 10px; color: #9a6700; background: #fff2c7; font-weight: 850; text-align: center; }
 .hoursBadge.over { color: var(--danger); background: var(--danger-soft); }
+.summarySort { display: flex; align-items: center; gap: 9px; color: var(--muted); font-size: 13px; font-weight: 750; }
+.summarySort select { min-width: 190px; padding: 9px 34px 9px 11px; background: white; }
 
 .loginBox { width: min(450px, 100%); margin: 64px auto; }
 .loginBox h1 { margin-bottom: 8px; }
@@ -186,6 +188,9 @@ td button[style*="color"] { border-color: #ffd4d4; background: var(--danger-soft
 
 @media (max-width: 760px) {
   .dashboardGrid { grid-template-columns: 1fr; }
+  .sectionHeading { flex-direction: column; }
+  .summarySort { width: 100%; align-items: flex-start; flex-direction: column; }
+  .summarySort select { width: 100%; }
   .managerApp { display: block; }
   .managerSidebar { position: static; width: 100%; height: auto; padding: 18px; gap: 16px; }
   .managerSidebar nav { display: flex; overflow-x: auto; }
