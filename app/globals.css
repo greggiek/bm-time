@@ -146,6 +146,9 @@ h2 { font-size: 21px; }
 .hoursBadge.over { color: var(--danger); background: var(--danger-soft); }
 .summarySort { display: flex; align-items: center; gap: 9px; color: var(--muted); font-size: 13px; font-weight: 750; }
 .summarySort select { min-width: 190px; padding: 9px 34px 9px 11px; background: white; }
+.timecardTools { display: flex; align-items: flex-end; justify-content: flex-end; flex-wrap: wrap; gap: 12px; }
+.employeeSearch { display: grid; gap: 6px; color: var(--muted); font-size: 13px; font-weight: 750; }
+.employeeSearch input { width: min(260px, 100%); padding: 9px 11px; background: white; }
 
 .loginBox { width: min(450px, 100%); margin: 64px auto; }
 .loginBox h1 { margin-bottom: 8px; }
@@ -191,6 +194,8 @@ td button[style*="color"] { border-color: #ffd4d4; background: var(--danger-soft
   .sectionHeading { flex-direction: column; }
   .summarySort { width: 100%; align-items: flex-start; flex-direction: column; }
   .summarySort select { width: 100%; }
+  .timecardTools { width: 100%; align-items: stretch; flex-direction: column; }
+  .employeeSearch input { width: 100%; }
   .managerApp { display: block; }
   .managerSidebar { position: static; width: 100%; height: auto; padding: 18px; gap: 16px; }
   .managerSidebar nav { display: flex; overflow-x: auto; }
