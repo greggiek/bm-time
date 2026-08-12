@@ -20,6 +20,10 @@ type User = {
   canManageEmployees: boolean;
 };
 
+type OvertimeEmployee = { id: string; name: string; location: string; jobTitle: string; totalHours: number };
+type BranchPositionHours = { location: string; jobTitle: string; totalHours: number; employeeCount: number };
+type PayPeriod = { start: string; end: string };
+
 export default function ManagerPage() {
   const [pin, setPin] = useState('');
   const [user, setUser] = useState<User | null>(null);
@@ -27,6 +31,9 @@ export default function ManagerPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [checking, setChecking] = useState(true);
+  const [overtimeWatch, setOvertimeWatch] = useState<OvertimeEmployee[]>([]);
+  const [hoursByBranchPosition, setHoursByBranchPosition] = useState<BranchPositionHours[]>([]);
+  const [payPeriod, setPayPeriod] = useState<PayPeriod | null>(null);
 
   useEffect(() => {
     loadDashboard().catch(() => undefined).finally(() => setChecking(false));
@@ -62,6 +69,9 @@ export default function ManagerPage() {
     if (response.status === 401) setUser(null);
     if (!response.ok) throw new Error(data.message || 'Unable to load the dashboard.');
     setRows(data.rows || []);
+    setOvertimeWatch(data.overtimeWatch || []);
+    setHoursByBranchPosition(data.hoursByBranchPosition || []);
+    setPayPeriod(data.payPeriod || null);
     setUser(data.user);
   }
 
@@ -119,7 +129,27 @@ export default function ManagerPage() {
 
   return (
     <ManagerShell brand="BM TIME" title="Dashboard" user={user}>
+      <div className="dashboardPeriod">Current pay period: <strong>{payPeriod ? `${formatDate(payPeriod.start)} – ${formatDate(payPeriod.end)}` : 'Thursday – Wednesday'}</strong></div>
+      <div className="dashboardGrid">
+        <section className="managerCard">
+          <div className="sectionHeading"><div><h2>Overtime Watch</h2><p>Employees at 35 hours or more</p></div><span className="countBadge">{overtimeWatch.length}</span></div>
+          <div className="tableWrap"><table><thead><tr><th>Employee</th><th>Branch</th><th>Position</th><th>Hours</th></tr></thead><tbody>
+            {overtimeWatch.map(employee => <tr key={employee.id}><td><strong>{employee.name}</strong></td><td>{employee.location}</td><td>{employee.jobTitle || '—'}</td><td><span className={`hoursBadge ${employee.totalHours >= 40 ? 'over' : ''}`}>{employee.totalHours.toFixed(2)}</span></td></tr>)}
+            {overtimeWatch.length === 0 && <tr><td colSpan={4}>No employees are approaching overtime.</td></tr>}
+          </tbody></table></div>
+        </section>
+
+        <section className="managerCard">
+          <div className="sectionHeading"><div><h2>Hours by Branch & Position</h2><p>Current pay-period totals</p></div></div>
+          <div className="tableWrap"><table><thead><tr><th>Branch</th><th>Position</th><th>Employees</th><th>Hours</th></tr></thead><tbody>
+            {hoursByBranchPosition.map(group => <tr key={`${group.location}-${group.jobTitle}`}><td><strong>{group.location}</strong></td><td>{group.jobTitle}</td><td>{group.employeeCount}</td><td><strong>{group.totalHours.toFixed(2)}</strong></td></tr>)}
+            {hoursByBranchPosition.length === 0 && <tr><td colSpan={4}>No completed hours in this pay period yet.</td></tr>}
+          </tbody></table></div>
+        </section>
+      </div>
+
       <section className="managerCard">
+        <div className="sectionHeading"><div><h2>Employee Status</h2><p>Current clock status across your branches</p></div></div>
         <div className="summary">
           <div><strong>{rows.filter((row) => row.status === 'clocked_in').length}</strong><span>Clocked In</span></div>
           <div><strong>{rows.length}</strong><span>Active Employees</span></div>
@@ -148,4 +178,8 @@ export default function ManagerPage() {
       </section>
     </ManagerShell>
   );
+}
+
+function formatDate(value: string) {
+  return new Date(`${value}T12:00:00`).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
 }
