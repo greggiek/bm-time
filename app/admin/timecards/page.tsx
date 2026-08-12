@@ -27,6 +27,7 @@ export default function TimecardsPage(){
   const [loaded,setLoaded]=useState(false);
   const [checking,setChecking]=useState(true);
   const [summarySort,setSummarySort]=useState<SummarySort>('employee-asc');
+  const [employeeSearch,setEmployeeSearch]=useState('');
   const totalHours=useMemo(()=>summaries.reduce((sum,row)=>sum+row.totalHours,0),[summaries]);
   const sortedSummaries=useMemo(()=>[...summaries].sort((a,b)=>{
     if(summarySort==='employee-desc')return b.employeeName.localeCompare(a.employeeName);
@@ -36,6 +37,9 @@ export default function TimecardsPage(){
     if(summarySort==='incomplete')return Number(b.incomplete)-Number(a.incomplete)||a.employeeName.localeCompare(b.employeeName);
     return a.employeeName.localeCompare(b.employeeName);
   }),[summaries,summarySort]);
+  const searchTerm=employeeSearch.trim().toLowerCase();
+  const filteredSummaries=useMemo(()=>sortedSummaries.filter(row=>!searchTerm||row.employeeName.toLowerCase().includes(searchTerm)||row.employeeNumber.toLowerCase().includes(searchTerm)),[sortedSummaries,searchTerm]);
+  const filteredPunches=useMemo(()=>punches.filter(row=>!searchTerm||row.employeeName.toLowerCase().includes(searchTerm)||row.employeeNumber.toLowerCase().includes(searchTerm)),[punches,searchTerm]);
 
   useEffect(()=>{fetch('/api/auth/session').then(async response=>{if(response.ok){const data=await response.json();setUser(data.user)}}).finally(()=>setChecking(false))},[]);
 
@@ -63,7 +67,7 @@ export default function TimecardsPage(){
   async function logout(){await fetch('/api/auth/logout',{method:'POST'});setUser(null);setLoaded(false);setPunches([]);setSummaries([]);setEmployees([])}
 
   function exportCsv(){
-    const lines:any[][]=[['Weekly Summary'],['Week Start',weekStart],['Week End',weekEnd],[],['Employee Number','Employee','Location','Total Hours','Incomplete Punch'],...sortedSummaries.map(r=>[r.employeeNumber,r.employeeName,r.location,r.totalHours.toFixed(2),r.incomplete?'Yes':'No']),[],['Punch Detail'],['Employee Number','Employee','Location','Action','Date','Time'],...punches.map(p=>{const d=new Date(p.occurredAt);return[p.employeeNumber,p.employeeName,p.location,p.action==='clock_in'?'Clock In':'Clock Out',d.toLocaleDateString(),d.toLocaleTimeString([],{hour:'numeric',minute:'2-digit'})]})];
+    const lines:any[][]=[['Weekly Summary'],['Week Start',weekStart],['Week End',weekEnd],[],['Employee Number','Employee','Location','Total Hours','Incomplete Punch'],...filteredSummaries.map(r=>[r.employeeNumber,r.employeeName,r.location,r.totalHours.toFixed(2),r.incomplete?'Yes':'No']),[],['Punch Detail'],['Employee Number','Employee','Location','Action','Date','Time'],...filteredPunches.map(p=>{const d=new Date(p.occurredAt);return[p.employeeNumber,p.employeeName,p.location,p.action==='clock_in'?'Clock In':'Clock Out',d.toLocaleDateString(),d.toLocaleTimeString([],{hour:'numeric',minute:'2-digit'})]})];
     const csv=lines.map(row=>row.map((cell:any)=>csvCell(cell??'')).join(',')).join('\r\n');const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});const url=URL.createObjectURL(blob);const link=document.createElement('a');link.href=url;link.download=`bm-time-${weekStart}.csv`;document.body.appendChild(link);link.click();link.remove();URL.revokeObjectURL(url);
   }
 
@@ -77,8 +81,8 @@ export default function TimecardsPage(){
         <div className="summary"><div><strong>{summaries.length}</strong><span>Employees</span></div><div><strong>{totalHours.toFixed(2)}</strong><span>Total Hours</span></div><div><strong>{summaries.filter(r=>r.incomplete).length}</strong><span>Incomplete</span></div></div>
         <button className="primary" onClick={exportCsv} disabled={punches.length===0}>Download CSV</button>
         <section><h2>Add Missing Punch</h2><form onSubmit={addPunch} style={{display:'grid',gap:10,maxWidth:620}}><select name="employeeId" required defaultValue=""><option value="" disabled>Select employee</option>{employees.map(e=><option key={e.id} value={e.id}>{e.name} (#{e.employeeNumber})</option>)}</select><select name="punchAction" required defaultValue="clock_in"><option value="clock_in">Clock In</option><option value="clock_out">Clock Out</option></select><input name="occurredAt" type="datetime-local" required/><button className="primary" disabled={loading}>{loading?'Saving…':'Add Punch'}</button></form></section>
-        <section><div className="sectionHeading"><h2>Weekly Summary</h2><label className="summarySort">Sort by<select value={summarySort} onChange={e=>setSummarySort(e.target.value as SummarySort)}><option value="employee-asc">Employee A–Z</option><option value="employee-desc">Employee Z–A</option><option value="location-asc">Branch</option><option value="hours-desc">Hours: highest first</option><option value="hours-asc">Hours: lowest first</option><option value="incomplete">Incomplete punches first</option></select></label></div><div className="tableWrap"><table><thead><tr><th>Employee</th><th>Location</th><th>Hours</th><th>Status</th></tr></thead><tbody>{sortedSummaries.map(r=><tr key={r.employeeId}><td><strong>{r.employeeName}</strong><br/>#{r.employeeNumber}</td><td>{r.location}</td><td>{r.totalHours.toFixed(2)}</td><td>{r.incomplete?'Incomplete punch':'Complete'}</td></tr>)}{summaries.length===0&&<tr><td colSpan={4}>No punches found for this pay period.</td></tr>}</tbody></table></div></section>
-        <section><h2>Punch Detail</h2><div className="tableWrap"><table><thead><tr><th>Employee</th><th>Action</th><th>Date & Time</th><th></th></tr></thead><tbody>{punches.map(p=><PunchRow key={p.id} punch={p} loading={loading} onSave={updatePunch}/>)}{punches.length===0&&<tr><td colSpan={4}>No punches found for this week.</td></tr>}</tbody></table></div></section>
+        <section><div className="sectionHeading"><h2>Weekly Summary</h2><div className="timecardTools"><label className="employeeSearch"><span>Search employee</span><input type="search" placeholder="Name or employee number" value={employeeSearch} onChange={e=>setEmployeeSearch(e.target.value)} /></label><label className="summarySort">Sort by<select value={summarySort} onChange={e=>setSummarySort(e.target.value as SummarySort)}><option value="employee-asc">Employee A–Z</option><option value="employee-desc">Employee Z–A</option><option value="location-asc">Branch</option><option value="hours-desc">Hours: highest first</option><option value="hours-asc">Hours: lowest first</option><option value="incomplete">Incomplete punches first</option></select></label></div></div><div className="tableWrap"><table><thead><tr><th>Employee</th><th>Location</th><th>Hours</th><th>Status</th></tr></thead><tbody>{filteredSummaries.map(r=><tr key={r.employeeId}><td><strong>{r.employeeName}</strong><br/>#{r.employeeNumber}</td><td>{r.location}</td><td>{r.totalHours.toFixed(2)}</td><td>{r.incomplete?'Incomplete punch':'Complete'}</td></tr>)}{filteredSummaries.length===0&&<tr><td colSpan={4}>{searchTerm?'No employee matches your search.':'No punches found for this pay period.'}</td></tr>}</tbody></table></div></section>
+        <section><h2>Punch Detail</h2><div className="tableWrap"><table><thead><tr><th>Employee</th><th>Action</th><th>Date & Time</th><th></th></tr></thead><tbody>{filteredPunches.map(p=><PunchRow key={p.id} punch={p} loading={loading} onSave={updatePunch}/>)}{filteredPunches.length===0&&<tr><td colSpan={4}>{searchTerm?'No punches match this employee search.':'No punches found for this pay period.'}</td></tr>}</tbody></table></div></section>
       </div>}
     </section>
   </ManagerShell>
