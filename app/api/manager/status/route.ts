@@ -27,6 +27,9 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       rows: demoRows,
+      payPeriod: currentPayPeriod(),
+      overtimeWatch: [],
+      hoursByBranchPosition: [],
       user: session ? sessionUser(session) : legacyAdminUser(),
     });
   }
@@ -72,10 +75,74 @@ export async function POST(request: NextRequest) {
     };
   });
 
+  const payPeriod = currentPayPeriod();
+  const periodStart = new Date(`${payPeriod.start}T00:00:00-04:00`);
+  const periodEnd = new Date(`${payPeriod.end}T23:59:59.999-04:00`);
+  const now = new Date();
+  const hoursByBranchPositionMap = new Map<string, { location: string; jobTitle: string; totalHours: number; employeeIds: Set<string> }>();
+  const overtimeWatch: Array<{ id: string; name: string; location: string; jobTitle: string; totalHours: number }> = [];
+
+  for (const employee of data || []) {
+    const location = relationName(employee.time_locations) || 'Unassigned';
+    const jobTitle = relationName(employee.time_job_titles) || 'No Position';
+    const events = [...(employee.time_punch_events || [])]
+      .filter((event: any) => {
+        const occurredAt = new Date(event.occurred_at);
+        return occurredAt >= periodStart && occurredAt <= periodEnd;
+      })
+      .sort((a: any, b: any) => a.occurred_at.localeCompare(b.occurred_at));
+    const totalHours = calculateHours(events, now);
+    if (totalHours > 0) {
+      const key = `${location}\u0000${jobTitle}`;
+      const group = hoursByBranchPositionMap.get(key) || { location, jobTitle, totalHours: 0, employeeIds: new Set<string>() };
+      group.totalHours += totalHours;
+      group.employeeIds.add(employee.id);
+      hoursByBranchPositionMap.set(key, group);
+    }
+    if (totalHours >= 35) overtimeWatch.push({ id: employee.id, name: `${employee.first_name} ${employee.last_name}`, location, jobTitle, totalHours });
+  }
+
+  const hoursByBranchPosition = Array.from(hoursByBranchPositionMap.values())
+    .filter((group) => group.totalHours > 0)
+    .map((group) => ({ location: group.location, jobTitle: group.jobTitle, totalHours: roundHours(group.totalHours), employeeCount: group.employeeIds.size }))
+    .sort((a, b) => a.location.localeCompare(b.location) || b.totalHours - a.totalHours);
+
   return NextResponse.json({
     rows,
+    payPeriod,
+    overtimeWatch: overtimeWatch.map((employee) => ({ ...employee, totalHours: roundHours(employee.totalHours) })).sort((a, b) => b.totalHours - a.totalHours),
+    hoursByBranchPosition,
     user: session ? sessionUser(session) : legacyAdminUser(),
   });
+}
+
+function relationName(relation: any) {
+  return Array.isArray(relation) ? relation[0]?.name || '' : relation?.name || '';
+}
+
+function calculateHours(events: Array<{ action: string; occurred_at: string }>, now: Date) {
+  let totalMs = 0;
+  let clockIn: Date | null = null;
+  for (const event of events) {
+    if (event.action === 'clock_in') clockIn = new Date(event.occurred_at);
+    else if (event.action === 'clock_out' && clockIn) { totalMs += new Date(event.occurred_at).getTime() - clockIn.getTime(); clockIn = null; }
+  }
+  if (clockIn && now > clockIn) totalMs += now.getTime() - clockIn.getTime();
+  return totalMs / 36e5;
+}
+
+function roundHours(hours: number) { return Math.round(hours * 100) / 100; }
+
+function currentPayPeriod() {
+  const parts = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/New_York', year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(new Date());
+  const value = (type: Intl.DateTimeFormatPartTypes) => Number(parts.find((part) => part.type === type)?.value);
+  const today = new Date(value('year'), value('month') - 1, value('day'), 12);
+  const start = new Date(today);
+  start.setDate(today.getDate() - ((today.getDay() + 3) % 7));
+  const end = new Date(start);
+  end.setDate(start.getDate() + 6);
+  const format = (date: Date) => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+  return { start: format(start), end: format(end) };
 }
 
 function canAccessLocation(session: TimeUserSession | null, locationName: string) {
