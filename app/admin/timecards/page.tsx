@@ -10,17 +10,18 @@ type User = { name:string; role:'admin'|'manager'; locationName:string|null; all
 type SummarySort = 'employee-asc'|'employee-desc'|'location-asc'|'hours-desc'|'hours-asc'|'incomplete';
 
 function currentThursday(){const d=new Date();d.setDate(d.getDate()-((d.getDay()+3)%7));const p=(v:number)=>String(v).padStart(2,'0');return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}`}
+function addDays(value:string,days:number){const d=new Date(`${value}T12:00:00`);d.setDate(d.getDate()+days);const p=(v:number)=>String(v).padStart(2,'0');return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}`}
 function csvCell(value:string|number|boolean){return `"${String(value).replaceAll('"','""')}"`}
 function toLocalInput(iso:string){const d=new Date(iso);const p=(v:number)=>String(v).padStart(2,'0');return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`}
 
 export default function TimecardsPage(){
   const [pin,setPin]=useState('');
   const [user,setUser]=useState<User|null>(null);
-  const [weekStart,setWeekStart]=useState(currentThursday());
+  const [startDate,setStartDate]=useState(currentThursday());
+  const [endDate,setEndDate]=useState(()=>addDays(currentThursday(),6));
   const [punches,setPunches]=useState<Punch[]>([]);
   const [summaries,setSummaries]=useState<Summary[]>([]);
   const [employees,setEmployees]=useState<EmployeeOption[]>([]);
-  const [weekEnd,setWeekEnd]=useState('');
   const [error,setError]=useState('');
   const [message,setMessage]=useState('');
   const [loading,setLoading]=useState(false);
@@ -54,11 +55,11 @@ export default function TimecardsPage(){
   }
 
   async function request(body:Record<string,unknown>={}){
-    const response=await fetch('/api/admin/timecards',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({weekStart,...body})});
+    const response=await fetch('/api/admin/timecards',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({startDate,endDate,...body})});
     const data=await response.json();
     if(response.status===401){setUser(null);throw new Error(data.message||'Please sign in again.');}
     if(!response.ok)throw new Error(data.message||'Unable to update timecards.');
-    setPunches(data.punches||[]);setSummaries(data.summaries||[]);setEmployees(data.employees||[]);setWeekEnd(data.weekEnd||'');setUser(data.user||user);setLoaded(true);
+    setPunches(data.punches||[]);setSummaries(data.summaries||[]);setEmployees(data.employees||[]);setUser(data.user||user);setLoaded(true);
   }
 
   async function loadWeek(){setLoading(true);setError('');setMessage('');try{await request()}catch(err){setError(err instanceof Error?err.message:'Unable to load timecards.')}finally{setLoading(false)}}
@@ -67,8 +68,8 @@ export default function TimecardsPage(){
   async function logout(){await fetch('/api/auth/logout',{method:'POST'});setUser(null);setLoaded(false);setPunches([]);setSummaries([]);setEmployees([])}
 
   function exportCsv(){
-    const lines:any[][]=[['Weekly Summary'],['Week Start',weekStart],['Week End',weekEnd],[],['Employee Number','Employee','Location','Total Hours','Incomplete Punch'],...filteredSummaries.map(r=>[r.employeeNumber,r.employeeName,r.location,r.totalHours.toFixed(2),r.incomplete?'Yes':'No']),[],['Punch Detail'],['Employee Number','Employee','Location','Action','Date','Time'],...filteredPunches.map(p=>{const d=new Date(p.occurredAt);return[p.employeeNumber,p.employeeName,p.location,p.action==='clock_in'?'Clock In':'Clock Out',d.toLocaleDateString(),d.toLocaleTimeString([],{hour:'numeric',minute:'2-digit'})]})];
-    const csv=lines.map(row=>row.map((cell:any)=>csvCell(cell??'')).join(',')).join('\r\n');const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});const url=URL.createObjectURL(blob);const link=document.createElement('a');link.href=url;link.download=`bm-time-${weekStart}.csv`;document.body.appendChild(link);link.click();link.remove();URL.revokeObjectURL(url);
+    const lines:any[][]=[['Timecard Summary'],['From',startDate],['Through',endDate],[],['Employee Number','Employee','Location','Total Hours','Incomplete Punch'],...filteredSummaries.map(r=>[r.employeeNumber,r.employeeName,r.location,r.totalHours.toFixed(2),r.incomplete?'Yes':'No']),[],['Punch Detail'],['Employee Number','Employee','Location','Action','Date','Time'],...filteredPunches.map(p=>{const d=new Date(p.occurredAt);return[p.employeeNumber,p.employeeName,p.location,p.action==='clock_in'?'Clock In':'Clock Out',d.toLocaleDateString(),d.toLocaleTimeString([],{hour:'numeric',minute:'2-digit'})]})];
+    const csv=lines.map(row=>row.map((cell:any)=>csvCell(cell??'')).join(',')).join('\r\n');const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});const url=URL.createObjectURL(blob);const link=document.createElement('a');link.href=url;link.download=`bm-time-${startDate}-to-${endDate}.csv`;document.body.appendChild(link);link.click();link.remove();URL.revokeObjectURL(url);
   }
 
   if(checking)return <main className="managerShell"><section className="managerCard loginBox">Loading management portal…</section></main>;
@@ -76,7 +77,7 @@ export default function TimecardsPage(){
 
   return <ManagerShell brand="BM TIME" title="Weekly Timecards" user={user}>
     <section className="managerCard">
-      <div className="loginBox" style={{margin:0,maxWidth:620}}><h1>Weekly Timecards</h1><label>Pay period starting Thursday<input type="date" value={weekStart} onChange={e=>setWeekStart(e.target.value)}/></label><button className="primary" onClick={loadWeek} disabled={!weekStart||loading}>{loading?'Loading…':'Load Pay Period'}</button>{message&&<div style={{marginTop:12}}>{message}</div>}{error&&<div className="error">{error}</div>}</div>
+      <div className="loginBox" style={{margin:0,maxWidth:620}}><h1>Timecards</h1><div className="dateRange"><label>From<input type="date" value={startDate} max={endDate} onChange={e=>setStartDate(e.target.value)}/></label><label>Through<input type="date" value={endDate} min={startDate} onChange={e=>setEndDate(e.target.value)}/></label></div><button className="primary" onClick={loadWeek} disabled={!startDate||!endDate||endDate<startDate||loading}>{loading?'Loading…':'Load Date Range'}</button>{message&&<div style={{marginTop:12}}>{message}</div>}{error&&<div className="error">{error}</div>}</div>
       {loaded&&<div style={{marginTop:30,display:'grid',gap:24}}>
         <div className="summary"><div><strong>{summaries.length}</strong><span>Employees</span></div><div><strong>{totalHours.toFixed(2)}</strong><span>Total Hours</span></div><div><strong>{summaries.filter(r=>r.incomplete).length}</strong><span>Incomplete</span></div></div>
         <button className="primary" onClick={exportCsv} disabled={punches.length===0}>Download CSV</button>
