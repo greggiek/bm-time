@@ -26,6 +26,15 @@ const CreateSchema = BaseSchema.extend({
   occurredAt: z.string().datetime(),
 });
 
+const PaidTimeOffSchema = BaseSchema.extend({
+  action: z.literal('create_paid_time_off'),
+  employeeId: z.string().uuid(),
+  entryType: z.enum(['vacation', 'sick']),
+  entryDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  hours: z.coerce.number().positive().max(24),
+  note: z.string().trim().max(250).optional().default(''),
+});
+
 export async function POST(request: NextRequest) {
   const session = readSessionToken(request.cookies.get(sessionCookie.name)?.value);
   if (!session) return NextResponse.json({ message: 'Please sign in with your manager PIN.' }, { status: 401 });
@@ -109,6 +118,16 @@ export async function POST(request: NextRequest) {
     if (error) return NextResponse.json({ message: error.message }, { status: 500 });
   }
 
+  if (body?.action === 'create_paid_time_off') {
+    const parsed = PaidTimeOffSchema.safeParse(body);
+    if (!parsed.success) return NextResponse.json({ message: 'Enter a valid time-off date and number of hours.' }, { status: 400 });
+    const { data: employee, error: employeeError } = await supabase.from('time_employees').select('primary_location_id').eq('id', parsed.data.employeeId).single();
+    if (employeeError || !employee) return NextResponse.json({ message: 'Employee was not found.' }, { status: 404 });
+    if (!canAccessLocation(session, employee.primary_location_id)) return NextResponse.json({ message: 'You do not have access to this employee.' }, { status: 403 });
+    const { error } = await supabase.from('time_paid_time_off').insert({ employee_id: parsed.data.employeeId, location_id: employee.primary_location_id, entry_type: parsed.data.entryType, entry_date: parsed.data.entryDate, hours: parsed.data.hours, note: parsed.data.note, created_by: session.userId });
+    if (error) return NextResponse.json({ message: error.message }, { status: 500 });
+  }
+
   return loadRange(supabase, base.data.startDate, base.data.endDate, session);
 }
 
@@ -133,15 +152,18 @@ async function loadRange(supabase: NonNullable<ReturnType<typeof getAdminClient>
     .select('id,employee_number,first_name,last_name,primary_location_id')
     .eq('active', true)
     .order('last_name');
+  let paidTimeOffQuery = supabase.from('time_paid_time_off').select('id,entry_type,entry_date,hours,note,location_id,time_employees(id,employee_number,first_name,last_name),time_locations(name)').gte('entry_date', startDate).lte('entry_date', endDate).order('entry_date', { ascending: true });
 
   if (session.role !== 'admin' && !session.allLocations && session.locationId) {
     punchQuery = punchQuery.eq('location_id', session.locationId);
     employeeQuery = employeeQuery.eq('primary_location_id', session.locationId);
+    paidTimeOffQuery = paidTimeOffQuery.eq('location_id', session.locationId);
   }
 
-  const [{ data, error }, { data: employees, error: employeesError }] = await Promise.all([punchQuery, employeeQuery]);
+  const [{ data, error }, { data: employees, error: employeesError }, { data: paidTimeOff, error: paidTimeOffError }] = await Promise.all([punchQuery, employeeQuery, paidTimeOffQuery]);
   if (error) return NextResponse.json({ message: error.message }, { status: 500 });
   if (employeesError) return NextResponse.json({ message: employeesError.message }, { status: 500 });
+  if (paidTimeOffError) return NextResponse.json({ message: paidTimeOffError.message }, { status: 500 });
 
   const punches = (data || []).map((row: any) => ({
     id: row.id,
@@ -186,6 +208,7 @@ async function loadRange(supabase: NonNullable<ReturnType<typeof getAdminClient>
     endDate,
     punches,
     summaries,
+    paidTimeOff: (paidTimeOff || []).map((entry: any) => ({ id: entry.id, employeeId: entry.time_employees?.id || '', employeeNumber: entry.time_employees?.employee_number || '', employeeName: `${entry.time_employees?.first_name || ''} ${entry.time_employees?.last_name || ''}`.trim(), location: entry.time_locations?.name || '', entryType: entry.entry_type, entryDate: entry.entry_date, hours: Number(entry.hours), note: entry.note || '' })),
     user: {
       name: session.name,
       role: session.role,
