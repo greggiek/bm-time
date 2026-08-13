@@ -4,7 +4,8 @@ import { readSessionToken, sessionCookie, TimeUserSession } from '@/lib/auth-ses
 import { getAdminClient } from '@/lib/supabase-server';
 
 const BaseSchema = z.object({
-  weekStart: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  startDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  endDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
 });
 
 const UpdateSchema = BaseSchema.extend({
@@ -26,7 +27,8 @@ export async function POST(request: NextRequest) {
 
   const body = await request.json().catch(() => null);
   const base = BaseSchema.safeParse(body);
-  if (!base.success) return NextResponse.json({ message: 'Choose a valid week.' }, { status: 400 });
+  if (!base.success) return NextResponse.json({ message: base.error.issues[0]?.message || 'Choose a valid date range.' }, { status: 400 });
+  if (base.data.endDate < base.data.startDate) return NextResponse.json({ message: 'End date must be on or after start date.' }, { status: 400 });
 
   const supabase = getAdminClient();
   if (!supabase) return NextResponse.json({ message: 'Supabase is not configured.' }, { status: 503 });
@@ -89,17 +91,17 @@ export async function POST(request: NextRequest) {
     if (error) return NextResponse.json({ message: error.message }, { status: 500 });
   }
 
-  return loadWeek(supabase, base.data.weekStart, session);
+  return loadRange(supabase, base.data.startDate, base.data.endDate, session);
 }
 
 function canAccessLocation(session: TimeUserSession, locationId: string) {
   return session.role === 'admin' || session.allLocations || session.locationId === locationId;
 }
 
-async function loadWeek(supabase: NonNullable<ReturnType<typeof getAdminClient>>, weekStart: string, session: TimeUserSession) {
-  const start = new Date(`${weekStart}T00:00:00-04:00`);
-  const end = new Date(start);
-  end.setDate(end.getDate() + 7);
+async function loadRange(supabase: NonNullable<ReturnType<typeof getAdminClient>>, startDate: string, endDate: string, session: TimeUserSession) {
+  const start = new Date(`${startDate}T00:00:00-04:00`);
+  const end = new Date(`${endDate}T00:00:00-04:00`);
+  end.setDate(end.getDate() + 1);
 
   let punchQuery = supabase
     .from('time_punch_events')
@@ -162,8 +164,8 @@ async function loadWeek(supabase: NonNullable<ReturnType<typeof getAdminClient>>
   });
 
   return NextResponse.json({
-    weekStart,
-    weekEnd: end.toISOString().slice(0, 10),
+    startDate,
+    endDate,
     punches,
     summaries,
     user: {
