@@ -152,6 +152,7 @@ h2 { font-size: 21px; }
 .dateRange { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 12px 0 16px; }
 .dateRange label { display: grid; gap: 6px; color: var(--muted); font-size: 13px; font-weight: 750; }
 .dateRange input { margin: 0; }
+.paidTimeOffForm { display: grid; grid-template-columns: 2fr 1fr 1fr .7fr 2fr auto; gap: 10px; align-items: end; }
 
 .loginBox { width: min(450px, 100%); margin: 64px auto; }
 .loginBox h1 { margin-bottom: 8px; }
@@ -201,6 +202,7 @@ td button[style*="color"] { border-color: #ffd4d4; background: var(--danger-soft
   .timecardTools { width: 100%; align-items: stretch; flex-direction: column; }
   .employeeSearch input { width: 100%; }
   .dateRange { grid-template-columns: 1fr; }
+  .paidTimeOffForm { grid-template-columns: 1fr; }
   .managerApp { display: block; }
   .managerSidebar { position: static; width: 100%; height: auto; padding: 18px; gap: 16px; }
   .managerSidebar nav { display: flex; overflow-x: auto; }
