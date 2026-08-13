@@ -14,6 +14,11 @@ const UpdateSchema = BaseSchema.extend({
   occurredAt: z.string().datetime(),
 });
 
+const DeleteSchema = BaseSchema.extend({
+  action: z.literal('delete_punch'),
+  punchId: z.string().uuid(),
+});
+
 const CreateSchema = BaseSchema.extend({
   action: z.literal('create_punch'),
   employeeId: z.string().uuid(),
@@ -52,6 +57,19 @@ export async function POST(request: NextRequest) {
       .update({ occurred_at: parsed.data.occurredAt })
       .eq('id', parsed.data.punchId);
 
+    if (error) return NextResponse.json({ message: error.message }, { status: 500 });
+  }
+
+  if (body?.action === 'delete_punch') {
+    const parsed = DeleteSchema.safeParse(body);
+    if (!parsed.success) return NextResponse.json({ message: 'Invalid punch deletion.' }, { status: 400 });
+
+    const { data: existing } = await supabase.from('time_punch_events').select('location_id').eq('id', parsed.data.punchId).maybeSingle();
+    if (!existing || !canAccessLocation(session, existing.location_id)) {
+      return NextResponse.json({ message: 'You do not have access to this punch.' }, { status: 403 });
+    }
+
+    const { error } = await supabase.from('time_punch_events').delete().eq('id', parsed.data.punchId).eq('location_id', existing.location_id);
     if (error) return NextResponse.json({ message: error.message }, { status: 500 });
   }
 
