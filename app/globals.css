@@ -103,6 +103,12 @@ h2 { font-size: 21px; }
 .danger:hover:not(:disabled) { background: var(--danger-hover); }
 
 .employeePanel { padding-top: 28px; text-align: center; }
+.breakStart, .breakEnd { width: 100%; min-height: 50px; border: 0; border-radius: 12px; padding: 13px 18px; color: #fff; font-size: 16px; font-weight: 800; margin-top: 12px; }
+.breakStart { background: #d97706; }
+.breakEnd { background: #059669; }
+.breakTimer { margin: 0 0 18px; border: 2px solid #f59e0b; border-radius: var(--radius-md); padding: 18px; background: #fffbeb; color: #92400e; display: grid; gap: 4px; }
+.breakTimer span { font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; }
+.breakTimer strong { font-size: 40px; font-variant-numeric: tabular-nums; }
 .welcome { font-size: 28px; }
 .status { margin: 22px 0; border: 1px solid var(--border); border-radius: var(--radius-md); padding: 18px; background: var(--surface-muted); font-size: 18px; }
 .cancel, .refresh { margin-top: 18px; border: 0; background: transparent; color: var(--blue); text-decoration: none; }
