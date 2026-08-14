@@ -6,7 +6,7 @@ import { getAdminClient } from '@/lib/supabase-server';
 
 const RequestSchema = z.object({
   pin: z.string().regex(/^\d{4}$/),
-  action: z.enum(['identify', 'clock_in', 'clock_out']),
+  action: z.enum(['identify', 'clock_in', 'clock_out', 'start_break', 'end_break']),
   employeeId: z.string().optional(),
   kioskToken: z.string().min(8),
   kioskId: z.string().uuid().optional(),
@@ -42,6 +42,9 @@ export async function POST(request: Request) {
       });
     }
 
+    if (parsed.data.action === 'start_break' || parsed.data.action === 'end_break') {
+      return NextResponse.json({ message: 'Breaks are unavailable in demo mode.' }, { status: 409 });
+    }
     const expected = status === 'clocked_in' ? 'clock_out' : 'clock_in';
     if (parsed.data.action !== expected) {
       return NextResponse.json({
@@ -110,13 +113,59 @@ export async function POST(request: Request) {
     .maybeSingle();
 
   const status = latest?.action === 'clock_in' ? 'clocked_in' : 'clocked_out';
+  const { data: openBreak, error: breakReadError } = await supabase
+    .from('time_breaks')
+    .select('id,started_at')
+    .eq('employee_id', employee.id)
+    .is('ended_at', null)
+    .maybeSingle();
+
+  if (breakReadError) {
+    return NextResponse.json({ message: 'Unable to read break status.' }, { status: 500 });
+  }
+
   if (parsed.data.action === 'identify') {
     return NextResponse.json({
       employeeId: employee.id,
       firstName: employee.first_name,
       status,
+      breakStartedAt: openBreak?.started_at ?? null,
       location: (kiosk as any).time_locations?.name || '',
     });
+  }
+
+  if (parsed.data.action === 'start_break') {
+    if (status !== 'clocked_in') {
+      return NextResponse.json({ message: 'Clock in before starting a break.' }, { status: 409 });
+    }
+    if (openBreak) {
+      return NextResponse.json({ message: 'You are already on break.' }, { status: 409 });
+    }
+    const { data: newBreak, error: breakError } = await supabase
+      .from('time_breaks')
+      .insert({ employee_id: employee.id, location_id: kiosk.location_id, kiosk_id: kiosk.id })
+      .select('started_at')
+      .single();
+    if (breakError) return NextResponse.json({ message: 'Break could not be started.' }, { status: 500 });
+    return NextResponse.json({ ok: true, firstName: employee.first_name, action: 'start_break', occurredAt: newBreak.started_at, breakStartedAt: newBreak.started_at });
+  }
+
+  if (parsed.data.action === 'end_break') {
+    if (!openBreak) {
+      return NextResponse.json({ message: 'You do not have an active break.' }, { status: 409 });
+    }
+    const endedAt = new Date().toISOString();
+    const { error: breakError } = await supabase
+      .from('time_breaks')
+      .update({ ended_at: endedAt })
+      .eq('id', openBreak.id)
+      .is('ended_at', null);
+    if (breakError) return NextResponse.json({ message: 'Break could not be ended.' }, { status: 500 });
+    return NextResponse.json({ ok: true, firstName: employee.first_name, action: 'end_break', occurredAt: endedAt });
+  }
+
+  if (openBreak) {
+    return NextResponse.json({ message: 'End your break before clocking out.' }, { status: 409 });
   }
 
   const expected = status === 'clocked_in' ? 'clock_out' : 'clock_in';
