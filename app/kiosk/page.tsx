@@ -7,6 +7,7 @@ type EmployeeState = {
   employeeId: string;
   firstName: string;
   status: 'clocked_in' | 'clocked_out';
+  breakStartedAt: string | null;
 };
 
 type Warehouse = {
@@ -82,7 +83,7 @@ export default function KioskPage() {
     setBusy(false);
   }
 
-  async function send(action: 'identify' | 'clock_in' | 'clock_out') {
+  async function send(action: 'identify' | 'clock_in' | 'clock_out' | 'start_break' | 'end_break') {
     if (!selectedKioskId) {
       setMessage('Select a warehouse before continuing.');
       return;
@@ -105,9 +106,10 @@ export default function KioskPage() {
       const data = await response.json();
       if (!response.ok) throw new Error(data.message || 'Unable to continue.');
       if (action === 'identify') setEmployee(data);
+      else if (action === 'start_break') setEmployee((current) => current ? { ...current, breakStartedAt: data.breakStartedAt } : current);
       else {
         setSuccess({
-          title: action === 'clock_in' ? 'CLOCKED IN' : 'CLOCKED OUT',
+          title: action === 'clock_in' ? 'CLOCKED IN' : action === 'end_break' ? 'BREAK ENDED' : 'CLOCKED OUT',
           time: new Date(data.occurredAt).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }),
         });
       }
@@ -120,6 +122,14 @@ export default function KioskPage() {
 
   function digit(value: string) {
     if (!employee && pin.length < 4) setPin(pin + value);
+  }
+
+  function breakTime(startedAt: string) {
+    const seconds = Math.max(0, Math.floor((now.getTime() - new Date(startedAt).getTime()) / 1000));
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const remainder = seconds % 60;
+    return hours > 0 ? `${hours}:${String(minutes).padStart(2, '0')}:${String(remainder).padStart(2, '0')}` : `${minutes}:${String(remainder).padStart(2, '0')}`;
   }
 
   if (success) {
@@ -200,15 +210,15 @@ export default function KioskPage() {
           <div className="employeePanel">
             <p className="welcome">Welcome, <strong>{employee.firstName}</strong></p>
             <div className="status">
-              Status: <strong>{employee.status === 'clocked_in' ? 'Clocked In' : 'Clocked Out'}</strong>
+              Status: <strong>{employee.breakStartedAt ? 'On Break' : employee.status === 'clocked_in' ? 'Clocked In' : 'Clocked Out'}</strong>
             </div>
-            <button
+            {employee.breakStartedAt ? <><div className="breakTimer"><span>Break time</span><strong>{breakTime(employee.breakStartedAt)}</strong></div><button className="breakEnd" disabled={busy} onClick={() => send('end_break')}>{busy ? 'Saving…' : 'End Break'}</button></> : <><button
               className={employee.status === 'clocked_in' ? 'danger' : 'primary'}
               disabled={busy}
               onClick={() => send(employee.status === 'clocked_in' ? 'clock_out' : 'clock_in')}
             >
               {busy ? 'Saving…' : employee.status === 'clocked_in' ? 'Clock Out' : 'Clock In'}
-            </button>
+            </button>{employee.status === 'clocked_in' && <button className="breakStart" disabled={busy} onClick={() => send('start_break')}>Start Break</button>}</>}
             <button className="cancel" onClick={reset}>Cancel</button>
           </div>
         )}
