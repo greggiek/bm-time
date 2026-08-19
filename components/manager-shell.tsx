@@ -13,6 +13,7 @@ export default function ManagerShell({ brand, title, user, children }: { brand: 
     { href: '/admin/timecards', label: 'Timecards', show: true },
     { href: '/admin/employees', label: 'Employees', show: user.role === 'admin' || Boolean(user.canManageEmployees) },
     { href: '/admin/managers', label: 'Managers', show: user.role === 'admin' },
+    { href: '/admin/access', label: 'Identity & Access', show: user.role === 'admin' },
   ];
   async function logout() { await fetch('/api/auth/logout', { method: 'POST' }); router.push('/manager'); router.refresh(); }
   return <main className="managerApp"><aside className="managerSidebar">
