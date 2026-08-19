@@ -66,7 +66,7 @@ export default function AccessPage() {
 
       <section className="managerCard">
         <div className="sectionHeading">
-          <div><h2>Effective Access</h2><p>Read-only development audit. Roles can overlap and permissions are combined.</p></div>
+          <div><h2>Effective Access</h2><p>Read-only development audit. Roster selections gate system permissions; job roles control access within each selected system.</p></div>
           <div className="accessTools">
             <input value={search} onChange={event => setSearch(event.target.value)} placeholder="Search people, roles or permissions" />
             <select value={loginFilter} onChange={event => setLoginFilter(event.target.value)}>
