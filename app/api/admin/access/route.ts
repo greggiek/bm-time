@@ -4,6 +4,18 @@ import { getAdminClient } from '@/lib/supabase-server';
 
 type Assignment = { identity_id: string; role_id: string; scope_type: string; scope_ids: string[] | null };
 
+const systemAccessRoleByNamespace: Record<string, string> = {
+  warehouse: 'warehouse_access',
+  sales: 'sales_access',
+  prospecting: 'prospecting_access',
+};
+
+function isPermissionAllowedByRoster(permission: string, assignedRoleCodes: Set<string>) {
+  const namespace = permission.split('.', 1)[0];
+  const requiredAccessRole = systemAccessRoleByNamespace[namespace];
+  return !requiredAccessRole || assignedRoleCodes.has(requiredAccessRole);
+}
+
 export async function GET(request: NextRequest) {
   const session = readSessionToken(request.cookies.get(sessionCookie.name)?.value);
   if (!session) return NextResponse.json({ message: 'Sign in with your manager PIN.' }, { status: 401 });
@@ -50,7 +62,14 @@ export async function GET(request: NextRequest) {
     const roleNames = assignments
       .map((assignment) => roles.get(assignment.role_id)?.name)
       .filter((name): name is string => Boolean(name));
-    const effectivePermissions = Array.from(new Set(assignments.flatMap((assignment) => permissionsByRole.get(assignment.role_id) || []))).sort();
+    const assignedRoleCodes = new Set(assignments
+      .map((assignment) => roles.get(assignment.role_id)?.code)
+      .filter((code): code is string => Boolean(code)));
+    const effectivePermissions = Array.from(new Set(
+      assignments
+        .flatMap((assignment) => permissionsByRole.get(assignment.role_id) || [])
+        .filter((permission) => isPermissionAllowedByRoster(permission, assignedRoleCodes)),
+    )).sort();
     const scopes = Array.from(new Set(assignments.map((assignment) => {
       if (assignment.scope_type === 'company') return 'Company-wide';
       if (assignment.scope_type === 'self') return 'Self';
