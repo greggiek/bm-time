@@ -6,7 +6,7 @@ const RequestSchema = z.object({
   kioskToken: z.string().min(8),
 });
 
-const demoWarehouses = [
+const demoLocations = [
   { kioskId: '00000000-0000-4000-8000-000000000336', name: 'Amityville' },
   { kioskId: '00000000-0000-4000-8000-000000001611', name: 'Bohemia' },
   { kioskId: '00000000-0000-4000-8000-000000001133', name: 'Riverhead' },
@@ -21,8 +21,8 @@ export async function POST(request: Request) {
 
   if (process.env.NEXT_PUBLIC_DEMO_MODE === 'true') {
     return NextResponse.json({
-      warehouses: demoWarehouses,
-      defaultKioskId: demoWarehouses[0].kioskId,
+      warehouses: demoLocations,
+      defaultKioskId: demoLocations[0].kioskId,
     });
   }
 
@@ -48,7 +48,7 @@ export async function POST(request: Request) {
     .eq('active', true);
 
   if (error) {
-    return NextResponse.json({ message: 'Unable to load warehouses.' }, { status: 500 });
+    return NextResponse.json({ message: 'Unable to load locations.' }, { status: 500 });
   }
 
   const byLocation = new Map<string, { kioskId: string; name: string }>();
@@ -61,7 +61,7 @@ export async function POST(request: Request) {
     if (!byLocation.has(kiosk.location_id)) {
       byLocation.set(kiosk.location_id, {
         kioskId: kiosk.id,
-        name: kiosk.time_locations?.name || 'Unnamed warehouse',
+        name: kiosk.time_locations?.name || 'Unnamed location',
       });
     }
   }
