@@ -10,7 +10,7 @@ type EmployeeState = {
   breakStartedAt: string | null;
 };
 
-type Warehouse = {
+type Location = {
   kioskId: string;
   name: string;
 };
@@ -22,14 +22,14 @@ export default function KioskPage() {
   const [message, setMessage] = useState('');
   const [busy, setBusy] = useState(false);
   const [success, setSuccess] = useState<{ title: string; time: string } | null>(null);
-  const [warehouses, setWarehouses] = useState<Warehouse[]>([]);
+  const [locations, setLocations] = useState<Location[]>([]);
   const [selectedKioskId, setSelectedKioskId] = useState('');
-  const [loadingWarehouses, setLoadingWarehouses] = useState(true);
+  const [loadingLocations, setLoadingLocations] = useState(true);
   const kioskToken = process.env.NEXT_PUBLIC_KIOSK_TOKEN || '';
 
-  const selectedWarehouse = useMemo(
-    () => warehouses.find((warehouse) => warehouse.kioskId === selectedKioskId),
-    [selectedKioskId, warehouses],
+  const selectedLocation = useMemo(
+    () => locations.find((location) => location.kioskId === selectedKioskId),
+    [selectedKioskId, locations],
   );
 
   useEffect(() => {
@@ -40,8 +40,8 @@ export default function KioskPage() {
   useEffect(() => {
     let cancelled = false;
 
-    async function loadWarehouses() {
-      setLoadingWarehouses(true);
+    async function loadLocations() {
+      setLoadingLocations(true);
       setMessage('');
       try {
         const response = await fetch('/api/kiosks', {
@@ -50,20 +50,20 @@ export default function KioskPage() {
           body: JSON.stringify({ kioskToken }),
         });
         const data = await response.json();
-        if (!response.ok) throw new Error(data.message || 'Unable to load warehouses.');
+        if (!response.ok) throw new Error(data.message || 'Unable to load locations.');
         if (cancelled) return;
-        setWarehouses(data.warehouses || []);
+        setLocations(data.warehouses || []);
         setSelectedKioskId(data.defaultKioskId || data.warehouses?.[0]?.kioskId || '');
       } catch (error) {
         if (!cancelled) {
-          setMessage(error instanceof Error ? error.message : 'Unable to load warehouses.');
+          setMessage(error instanceof Error ? error.message : 'Unable to load locations.');
         }
       } finally {
-        if (!cancelled) setLoadingWarehouses(false);
+        if (!cancelled) setLoadingLocations(false);
       }
     }
 
-    loadWarehouses();
+    loadLocations();
     return () => {
       cancelled = true;
     };
@@ -85,7 +85,7 @@ export default function KioskPage() {
 
   async function send(action: 'identify' | 'clock_in' | 'clock_out' | 'start_break' | 'end_break') {
     if (!selectedKioskId) {
-      setMessage('Select a warehouse before continuing.');
+      setMessage('Select a location before continuing.');
       return;
     }
 
@@ -139,7 +139,7 @@ export default function KioskPage() {
           <div className="check">✓</div>
           <h1>{success.title}</h1>
           <div className="successTime">{success.time}</div>
-          <p>{selectedWarehouse?.name}</p>
+          <p>{selectedLocation?.name}</p>
           <p>Have a good {success.title === 'CLOCKED IN' ? 'shift' : 'day'}.</p>
         </section>
       </main>
@@ -152,7 +152,7 @@ export default function KioskPage() {
         <div className="topline">
           <div>
             <div className="brand">BM TIME</div>
-            <div className="location">{selectedWarehouse?.name || 'Select warehouse'}</div>
+            <div className="location">{selectedLocation?.name || 'Select location'}</div>
           </div>
           <div className="date">
             {now.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' })}
@@ -167,14 +167,14 @@ export default function KioskPage() {
               reset();
               setSelectedKioskId(event.target.value);
             }}
-            disabled={loadingWarehouses || busy || Boolean(employee)}
+            disabled={loadingLocations || busy || Boolean(employee)}
           >
             <option value="" disabled>
-              {loadingWarehouses ? 'Loading warehouses…' : 'Select warehouse'}
+              {loadingLocations ? 'Loading locations…' : 'Select location'}
             </option>
-            {warehouses.map((warehouse) => (
-              <option key={warehouse.kioskId} value={warehouse.kioskId}>
-                {warehouse.name}
+            {locations.map((location) => (
+              <option key={location.kioskId} value={location.kioskId}>
+                {location.name}
               </option>
             ))}
           </select>
