@@ -160,7 +160,7 @@ export default function KioskPage() {
         </div>
 
         <label className="warehousePicker">
-          Warehouse
+          Location
           <select
             value={selectedKioskId}
             onChange={(event) => {
