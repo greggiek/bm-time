@@ -11,6 +11,7 @@ export default function ManagerShell({ brand, title, user, children }: { brand: 
   const links = [
     { href: user.role === 'admin' ? '/admin' : '/manager', label: user.role === 'admin' ? 'BM OS Overview' : 'Dashboard', show: true },
     { href: '/manager', label: 'BM Time', show: user.role === 'admin' },
+    { href: '/admin/academy', label: 'BM Academy', show: user.role === 'admin' },
     { href: '/admin/timecards', label: 'Timecards', show: true },
     { href: '/admin/employees', label: 'Employees', show: user.role === 'admin' || Boolean(user.canManageEmployees) },
     { href: '/admin/managers', label: 'Managers', show: user.role === 'admin' },
