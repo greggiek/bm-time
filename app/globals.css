@@ -186,6 +186,7 @@ td button[style*="color"] { border-color: #ffd4d4; background: var(--danger-soft
 .pill::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
 .clocked_in { color: var(--success); background: var(--success-soft); }
 .clocked_out { color: #66798c; background: #edf2f7; }
+.on_break { color: #9a6700; background: #fff2c7; }
 
 .homeCard { text-align: center; }
 .homeCard p { color: var(--muted); }
