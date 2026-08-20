@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
 
   let query = supabase
     .from('time_employees')
-    .select('id,first_name,last_name,primary_location_id,time_locations!time_employees_primary_location_id_fkey(name),time_job_titles(name),time_punch_events(action,occurred_at)')
+    .select('id,first_name,last_name,primary_location_id,time_locations!time_employees_primary_location_id_fkey(name),time_job_titles(name),time_punch_events(action,occurred_at),time_breaks(started_at,ended_at)')
     .eq('active', true)
     .order('last_name');
 
@@ -70,7 +70,9 @@ export async function POST(request: NextRequest) {
       name: `${employee.first_name} ${employee.last_name}`,
       location,
       jobTitle,
-      status: events[0]?.action === 'clock_in' ? 'clocked_in' : 'clocked_out',
+      status: employee.time_breaks?.some((entry: any) => !entry.ended_at)
+        ? 'on_break'
+        : events[0]?.action === 'clock_in' ? 'clocked_in' : 'clocked_out',
       latest: events[0]?.occurred_at || null,
     };
   });
@@ -91,7 +93,13 @@ export async function POST(request: NextRequest) {
         return occurredAt >= periodStart && occurredAt <= periodEnd;
       })
       .sort((a: any, b: any) => a.occurred_at.localeCompare(b.occurred_at));
-    const totalHours = calculateHours(events, now);
+    const breaks = [...(employee.time_breaks || [])]
+      .filter((entry: any) => {
+        const startedAt = new Date(entry.started_at);
+        const endedAt = entry.ended_at ? new Date(entry.ended_at) : now;
+        return startedAt <= periodEnd && endedAt >= periodStart;
+      });
+    const totalHours = calculateHours(events, breaks, now);
     if (totalHours > 0) {
       const key = `${location}\u0000${jobTitle}`;
       const group = hoursByBranchPositionMap.get(key) || { location, jobTitle, totalHours: 0, employeeIds: new Set<string>() };
@@ -120,15 +128,33 @@ function relationName(relation: any) {
   return Array.isArray(relation) ? relation[0]?.name || '' : relation?.name || '';
 }
 
-function calculateHours(events: Array<{ action: string; occurred_at: string }>, now: Date) {
-  let totalMs = 0;
+function calculateHours(
+  events: Array<{ action: string; occurred_at: string }>,
+  breaks: Array<{ started_at: string; ended_at: string | null }>,
+  now: Date,
+) {
+  const intervals: Array<{ start: Date; end: Date }> = [];
   let clockIn: Date | null = null;
   for (const event of events) {
     if (event.action === 'clock_in') clockIn = new Date(event.occurred_at);
-    else if (event.action === 'clock_out' && clockIn) { totalMs += new Date(event.occurred_at).getTime() - clockIn.getTime(); clockIn = null; }
+    else if (event.action === 'clock_out' && clockIn) {
+      intervals.push({ start: clockIn, end: new Date(event.occurred_at) });
+      clockIn = null;
+    }
   }
-  if (clockIn && now > clockIn) totalMs += now.getTime() - clockIn.getTime();
-  return totalMs / 36e5;
+  if (clockIn && now > clockIn) intervals.push({ start: clockIn, end: now });
+
+  let paidMs = intervals.reduce((sum, interval) => sum + Math.max(0, interval.end.getTime() - interval.start.getTime()), 0);
+  for (const entry of breaks) {
+    const breakStart = new Date(entry.started_at);
+    const breakEnd = entry.ended_at ? new Date(entry.ended_at) : now;
+    for (const interval of intervals) {
+      const overlapStart = Math.max(interval.start.getTime(), breakStart.getTime());
+      const overlapEnd = Math.min(interval.end.getTime(), breakEnd.getTime());
+      if (overlapEnd > overlapStart) paidMs -= overlapEnd - overlapStart;
+    }
+  }
+  return Math.max(0, paidMs) / 36e5;
 }
 
 function roundHours(hours: number) { return Math.round(hours * 100) / 100; }
