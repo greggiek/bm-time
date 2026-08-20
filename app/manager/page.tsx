@@ -8,7 +8,7 @@ type Row = {
   name: string;
   location: string;
   jobTitle: string;
-  status: string;
+  status: 'clocked_in' | 'clocked_out' | 'on_break';
   latest: string | null;
 };
 
@@ -152,6 +152,7 @@ export default function ManagerPage() {
         <div className="sectionHeading"><div><h2>Employee Status</h2><p>Current clock status across your branches</p></div></div>
         <div className="summary">
           <div><strong>{rows.filter((row) => row.status === 'clocked_in').length}</strong><span>Clocked In</span></div>
+          <div><strong>{rows.filter((row) => row.status === 'on_break').length}</strong><span>On Break</span></div>
           <div><strong>{rows.length}</strong><span>Active Employees</span></div>
         </div>
 
@@ -164,7 +165,7 @@ export default function ManagerPage() {
                   <td><strong>{row.name}</strong></td>
                   <td>{row.location}</td>
                   <td>{row.jobTitle}</td>
-                  <td><span className={`pill ${row.status}`}>{row.status === 'clocked_in' ? 'Clocked In' : 'Clocked Out'}</span></td>
+                  <td><span className={`pill ${row.status}`}>{row.status === 'on_break' ? 'On Break' : row.status === 'clocked_in' ? 'Clocked In' : 'Clocked Out'}</span></td>
                   <td>{row.latest ? new Date(row.latest).toLocaleString() : '—'}</td>
                 </tr>
               ))}
