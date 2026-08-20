@@ -1,109 +1,64 @@
 'use client';
-import { useState } from 'react';
 
-type Row = {
-  id: string;
-  name: string;
-  location: string;
-  jobTitle: string;
-  status: string;
-  latest: string | null;
+import Link from 'next/link';
+import { useEffect, useState } from 'react';
+import ManagerShell from '@/components/manager-shell';
+
+type User = { name: string; role: 'admin' | 'manager'; locationName?: string | null; allLocations?: boolean; canManageEmployees?: boolean };
+type Overview = {
+  identities: number; activeEmployees: number; clockedIn: number; onBreak: number;
+  systems: Record<'time' | 'academy' | 'warehouse' | 'sales' | 'prospecting', number>;
 };
+const emptyOverview: Overview = { identities: 0, activeEmployees: 0, clockedIn: 0, onBreak: 0, systems: { time: 0, academy: 0, warehouse: 0, sales: 0, prospecting: 0 } };
+const systems = [
+  { key: 'time', name: 'BM Time', description: 'Time clock, breaks, timecards and labor visibility.', href: '/manager', action: 'Open Time' },
+  { key: 'academy', name: 'BM Academy', description: 'Employee onboarding, training and assigned learning.', href: null, action: 'Integration queued' },
+  { key: 'warehouse', name: 'BM Warehouse', description: 'Purchasing, transfers, receiving and fulfillment.', href: null, action: 'Integration queued' },
+  { key: 'sales', name: 'BM Sales', description: 'Customer, quote, order and approval workflows.', href: null, action: 'Integration queued' },
+  { key: 'prospecting', name: 'BM Prospecting', description: 'Field prospecting, activity and new-business tracking.', href: null, action: 'Integration queued' },
+] as const;
 
 export default function AdminPage() {
-  const [password, setPassword] = useState('');
-  const [rows, setRows] = useState<Row[]>([]);
+  const [user, setUser] = useState<User | null>(null);
+  const [overview, setOverview] = useState<Overview>(emptyOverview);
+  const [checking, setChecking] = useState(true);
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
 
-  async function load() {
-    setLoading(true);
-    setError('');
+  useEffect(() => {
+    Promise.all([fetch('/api/auth/session'), fetch('/api/admin/overview')])
+      .then(async ([sessionResponse, overviewResponse]) => {
+        const sessionData = await sessionResponse.json();
+        if (!sessionResponse.ok || sessionData.user?.role !== 'admin') return;
+        setUser(sessionData.user);
+        const overviewData = await overviewResponse.json();
+        if (!overviewResponse.ok) throw new Error(overviewData.message || 'Unable to load BM OS.');
+        setOverview(overviewData);
+      })
+      .catch(err => setError(err instanceof Error ? err.message : 'Unable to load BM OS.'))
+      .finally(() => setChecking(false));
+  }, []);
 
-    const response = await fetch('/api/manager/status', {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ password }),
-    });
-    const data = await response.json();
+  if (checking) return <main className="managerShell"><section className="managerCard loginBox">Loading BM OS…</section></main>;
+  if (!user) return <main className="managerShell"><section className="managerCard loginBox"><h1>Administrator Access Required</h1><p>Sign in through the Manager Dashboard with an administrator PIN.</p></section></main>;
 
-    if (!response.ok) setError(data.message);
-    else setRows(data.rows);
-
-    setLoading(false);
-  }
-
-  return (
-    <main className="managerShell">
-      <header className="managerHeader">
-        <div>
-          <div className="brand">BM TIME</div>
-          <div className="location">Admin Dashboard</div>
-        </div>
-        <div><a href="/admin/employees">Employees</a> · <a href="/admin/managers">Managers</a> · <a href="/admin/timecards">Timecards</a> · <a href="/kiosk">Kiosk</a></div>
-      </header>
-
-      <section className="managerCard">
-        {rows.length === 0 ? (
-          <div className="loginBox">
-            <h1>Admin Login</h1>
-            <input
-              type="password"
-              placeholder="Admin password"
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-              onKeyDown={(event) => event.key === 'Enter' && load()}
-            />
-            <button className="primary" onClick={load} disabled={!password || loading}>
-              {loading ? 'Loading…' : 'View Time Clock'}
-            </button>
-            {error && <div className="error">{error}</div>}
-          </div>
-        ) : (
-          <>
-            <div className="summary">
-              <div>
-                <strong>{rows.filter((row) => row.status === 'clocked_in').length}</strong>
-                <span>Clocked In</span>
-              </div>
-              <div>
-                <strong>{rows.length}</strong>
-                <span>Active Employees</span>
-              </div>
-            </div>
-
-            <div className="tableWrap">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Employee</th>
-                    <th>Location</th>
-                    <th>Job Title</th>
-                    <th>Status</th>
-                    <th>Last Punch</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {rows.map((row) => (
-                    <tr key={row.id}>
-                      <td><strong>{row.name}</strong></td>
-                      <td>{row.location}</td>
-                      <td>{row.jobTitle}</td>
-                      <td>
-                        <span className={`pill ${row.status}`}>
-                          {row.status === 'clocked_in' ? 'Clocked In' : 'Clocked Out'}
-                        </span>
-                      </td>
-                      <td>{row.latest ? new Date(row.latest).toLocaleString() : '—'}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            <button className="refresh" onClick={load}>Refresh</button>
-          </>
-        )}
-      </section>
-    </main>
-  );
+  return <ManagerShell brand="BM OS" title="Company Overview" user={user}>
+    <div className="osWelcome">
+      <div><span className="osEyebrow">Bargain Moulding operating system</span><h2>Good afternoon, {user.name.split(' ')[0]}.</h2><p>One place to see your people, systems and day-to-day operation.</p></div>
+      <Link className="osAccessLink" href="/admin/access">Manage Identity &amp; Access</Link>
+    </div>
+    <div className="summary osSummary">
+      <div><strong>{overview.identities}</strong><span>Company Identities</span></div>
+      <div><strong>{overview.activeEmployees}</strong><span>Active Employees</span></div>
+      <div><strong>{overview.clockedIn}</strong><span>Working Now</span></div>
+      <div><strong>{overview.onBreak}</strong><span>On Break</span></div>
+    </div>
+    {error ? <div className="error">{error}</div> : null}
+    <section className="managerCard">
+      <div className="sectionHeading"><div><h2>Your Systems</h2><p>Live access totals from the BM OS identity roster.</p></div><span className="osLive"><i /> Live development data</span></div>
+      <div className="systemCardGrid">{systems.map(system => {
+        const content = <><div className={`systemMark ${system.key}`}>{system.name.replace('BM ', '').slice(0, 1)}</div><div className="systemCardTop"><h3>{system.name}</h3><span>{overview.systems[system.key]} users</span></div><p>{system.description}</p><div className={`systemCardAction ${system.href ? 'ready' : ''}`}>{system.action}<span>→</span></div></>;
+        return system.href ? <Link key={system.key} href={system.href} className="systemCard">{content}</Link> : <div key={system.key} className="systemCard systemCardPending">{content}</div>;
+      })}</div>
+    </section>
+  </ManagerShell>;
 }

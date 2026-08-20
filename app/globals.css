@@ -266,3 +266,35 @@ details summary { cursor: pointer; color: var(--blue); font-weight: 750; }
 .systemAccess > span:last-child { color: var(--muted); font-size: 11px; font-weight: 650; }
 .accessGranted { color: var(--success); background: var(--success-soft); }
 .accessNone { color: #a8b4c0; font-weight: 750; }
+
+/* BM OS company overview */
+.osWelcome { display: flex; align-items: center; justify-content: space-between; gap: 24px; margin-bottom: 22px; border-radius: 18px; padding: 26px 28px; color: white; background: linear-gradient(125deg, #0b2238, #163e63 68%, #245b91); box-shadow: var(--shadow-md); }
+.osWelcome h2 { margin: 5px 0 2px; color: white; font-size: 28px; }
+.osWelcome p { margin: 0; color: #c8d9ea; }
+.osEyebrow { color: #75aaff; font-size: 11px; font-weight: 850; letter-spacing: .11em; text-transform: uppercase; }
+.osAccessLink { flex: 0 0 auto; border: 1px solid rgba(255,255,255,.24); border-radius: 10px; padding: 11px 14px; color: white; background: rgba(255,255,255,.08); font-size: 13px; font-weight: 800; text-decoration: none; }
+.osAccessLink:hover { background: rgba(255,255,255,.15); }
+.osSummary { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.osLive { display: inline-flex; align-items: center; gap: 7px; color: var(--success); font-size: 12px; font-weight: 800; }
+.osLive i { width: 8px; height: 8px; border-radius: 50%; background: #10b981; box-shadow: 0 0 0 4px rgba(16,185,129,.12); }
+.systemCardGrid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.systemCard { position: relative; overflow: hidden; min-height: 205px; border: 1px solid var(--border); border-radius: 15px; padding: 19px; color: var(--text); background: linear-gradient(145deg, white, #f7f9fc); text-decoration: none; transition: transform .16s ease, border-color .16s ease, box-shadow .16s ease; }
+a.systemCard:hover { border-color: #9dbce0; box-shadow: 0 10px 28px rgba(16,42,67,.1); transform: translateY(-2px); }
+.systemCardPending { background: #fafbfd; }
+.systemMark { display: grid; place-items: center; width: 39px; height: 39px; margin-bottom: 20px; border-radius: 11px; color: white; background: #2563eb; font-weight: 900; }
+.systemMark.academy { background: #7c3aed; }
+.systemMark.warehouse { background: #d97706; }
+.systemMark.sales { background: #059669; }
+.systemMark.prospecting { background: #db2777; }
+.systemCardTop { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.systemCard h3 { margin: 0; color: var(--navy-deep); font-size: 18px; }
+.systemCardTop span { color: var(--muted); font-size: 12px; font-weight: 800; }
+.systemCard p { min-height: 42px; margin: 7px 0 17px; color: var(--muted); font-size: 13px; }
+.systemCardAction { display: flex; align-items: center; justify-content: space-between; padding-top: 13px; border-top: 1px solid var(--border); color: #8998a8; font-size: 12px; font-weight: 800; }
+.systemCardAction.ready { color: var(--blue); }
+
+@media (max-width: 760px) {
+  .osWelcome { align-items: flex-start; flex-direction: column; }
+  .osSummary { grid-template-columns: 1fr 1fr; }
+  .systemCardGrid { grid-template-columns: 1fr; }
+}
