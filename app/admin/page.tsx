@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import ManagerShell from '@/components/manager-shell';
 
 type User = { name: string; role: 'admin' | 'manager'; locationName?: string | null; allLocations?: boolean; canManageEmployees?: boolean };
@@ -19,6 +20,7 @@ const systems = [
 ] as const;
 
 export default function AdminPage() {
+  const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [overview, setOverview] = useState<Overview>(emptyOverview);
   const [checking, setChecking] = useState(true);
@@ -28,7 +30,10 @@ export default function AdminPage() {
     Promise.all([fetch('/api/auth/session'), fetch('/api/admin/overview')])
       .then(async ([sessionResponse, overviewResponse]) => {
         const sessionData = await sessionResponse.json();
-        if (!sessionResponse.ok || sessionData.user?.role !== 'admin') return;
+        if (!sessionResponse.ok || sessionData.user?.role !== 'admin') {
+          router.replace('/manager?next=/admin');
+          return;
+        }
         setUser(sessionData.user);
         const overviewData = await overviewResponse.json();
         if (!overviewResponse.ok) throw new Error(overviewData.message || 'Unable to load BM OS.');
@@ -36,10 +41,10 @@ export default function AdminPage() {
       })
       .catch(err => setError(err instanceof Error ? err.message : 'Unable to load BM OS.'))
       .finally(() => setChecking(false));
-  }, []);
+  }, [router]);
 
   if (checking) return <main className="managerShell"><section className="managerCard loginBox">Loading BM OS…</section></main>;
-  if (!user) return <main className="managerShell"><section className="managerCard loginBox"><h1>Administrator Access Required</h1><p>Sign in through the Manager Dashboard with an administrator PIN.</p></section></main>;
+  if (!user) return <main className="managerShell"><section className="managerCard loginBox">Taking you to administrator sign in…</section></main>;
 
   return <ManagerShell brand="BM OS" title="Company Overview" user={user}>
     <div className="osWelcome">

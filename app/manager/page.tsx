@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import ManagerShell from '@/components/manager-shell';
 
 type Row = {
@@ -25,6 +26,7 @@ type BranchPositionHours = { location: string; jobTitle: string; totalHours: num
 type PayPeriod = { start: string; end: string };
 
 export default function ManagerPage() {
+  const router = useRouter();
   const [pin, setPin] = useState('');
   const [user, setUser] = useState<User | null>(null);
   const [rows, setRows] = useState<Row[]>([]);
@@ -51,6 +53,12 @@ export default function ManagerPage() {
       const data = await response.json();
       if (!response.ok) throw new Error(data.message || 'Unable to sign in.');
       setPin('');
+      const next = new URLSearchParams(window.location.search).get('next');
+      if (data.user?.role === 'admin' && next && /^\/admin(?:\/|$)/.test(next)) {
+        router.push(next);
+        router.refresh();
+        return;
+      }
       await loadDashboard();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to sign in.');
