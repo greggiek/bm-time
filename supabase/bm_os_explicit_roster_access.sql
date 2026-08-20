@@ -157,6 +157,45 @@ join public.bm_roles r on r.code=w.role_code
 join public.bm_identities i on i.id=w.identity_id
 left join public.time_employees e on e.id=i.employee_id;
 
+-- A job title can set the level only inside a roster-approved system.
+-- Remove materialized job-role assignments when the matching X is absent.
+delete from public.bm_identity_roles ir
+using public.bm_roles r
+where ir.role_id=r.id
+  and ir.reason like 'Default access from job title:%'
+  and (
+    (
+      r.code in ('warehouse','driver','door_shop','warehouse_manager','door_shop_manager')
+      and not exists (
+        select 1
+        from public.bm_identity_roles access_ir
+        join public.bm_roles access_role on access_role.id=access_ir.role_id
+        where access_ir.identity_id=ir.identity_id
+          and access_role.code='warehouse_access'
+      )
+    )
+    or
+    (
+      r.code='sales'
+      and not exists (
+        select 1
+        from public.bm_identity_roles access_ir
+        join public.bm_roles access_role on access_role.id=access_ir.role_id
+        where access_ir.identity_id=ir.identity_id
+          and access_role.code='sales_access'
+      )
+    )
+  );
+
+-- Remove the obsolete manual assignment superseded by the roster and current job title.
+delete from public.bm_identity_roles ir
+using public.bm_roles r, public.bm_identities i
+where ir.role_id=r.id
+  and ir.identity_id=i.id
+  and r.code='branch_manager'
+  and lower(coalesce(i.google_email,''))='jay@bargainmoulding.com'
+  and ir.reason='Initial Amityville Branch Manager assignment';
+
 commit;
 
 select
