@@ -4,6 +4,12 @@ import { getAdminClient } from '@/lib/supabase-server';
 
 type Assignment = { identity_id: string; role_id: string; scope_type: string; scope_ids: string[] | null };
 
+type SystemAccess = {
+  enabled: boolean;
+  level: string;
+  scope: string;
+};
+
 const systemAccessRoleByNamespace: Record<string, string> = {
   warehouse: 'warehouse_access',
   sales: 'sales_access',
@@ -14,6 +20,34 @@ function isPermissionAllowedByRoster(permission: string, assignedRoleCodes: Set<
   const namespace = permission.split('.', 1)[0];
   const requiredAccessRole = systemAccessRoleByNamespace[namespace];
   return !requiredAccessRole || assignedRoleCodes.has(requiredAccessRole);
+}
+
+function getScope(assignments: Assignment[], locations: Map<string, string>, roleIds?: Set<string>) {
+  const relevant = roleIds
+    ? assignments.filter((assignment) => roleIds.has(assignment.role_id))
+    : assignments;
+
+  if (relevant.some((assignment) => assignment.scope_type === 'company')) return 'Company';
+  const locationNames = Array.from(new Set(
+    relevant
+      .filter((assignment) => assignment.scope_type === 'location')
+      .flatMap((assignment) => assignment.scope_ids || [])
+      .map((id) => locations.get(id))
+      .filter((name): name is string => Boolean(name)),
+  ));
+  if (locationNames.length) return locationNames.join(', ');
+  return relevant.length ? 'Self' : '—';
+}
+
+function getSystemAccess(
+  enabled: boolean,
+  permissions: Set<string>,
+  scope: string,
+  levels: Array<{ permission: string; label: string }>,
+): SystemAccess {
+  if (!enabled) return { enabled: false, level: 'No access', scope: '—' };
+  const level = levels.find(({ permission }) => permissions.has(permission))?.label || 'User';
+  return { enabled: true, level, scope };
 }
 
 export async function GET(request: NextRequest) {
@@ -59,24 +93,79 @@ export async function GET(request: NextRequest) {
   const rows = (identitiesResult.data || []).map((identity) => {
     const employee = identity.employee_id ? employees.get(identity.employee_id) : null;
     const assignments = assignmentsByIdentity.get(identity.id) || [];
-    const roleNames = assignments
-      .map((assignment) => roles.get(assignment.role_id)?.name)
-      .filter((name): name is string => Boolean(name));
     const assignedRoleCodes = new Set(assignments
       .map((assignment) => roles.get(assignment.role_id)?.code)
       .filter((code): code is string => Boolean(code)));
-    const effectivePermissions = Array.from(new Set(
+    const effectivePermissions = new Set(
       assignments
         .flatMap((assignment) => permissionsByRole.get(assignment.role_id) || [])
         .filter((permission) => isPermissionAllowedByRoster(permission, assignedRoleCodes)),
-    )).sort();
-    const scopes = Array.from(new Set(assignments.map((assignment) => {
-      if (assignment.scope_type === 'company') return 'Company-wide';
-      if (assignment.scope_type === 'self') return 'Self';
-      const names = (assignment.scope_ids || []).map((id: string) => locations.get(id)).filter(Boolean);
-      return names.length ? names.join(', ') : 'Location';
-    })));
+    );
+    const accessRoleIds = new Map(
+      assignments
+        .map((assignment) => [roles.get(assignment.role_id)?.code, assignment.role_id] as const)
+        .filter(([code]) => code?.endsWith('_access')),
+    );
     const loginMethod = employee && identity.google_email ? 'Google + PIN' : employee ? 'PIN' : identity.google_email ? 'Google' : 'None';
+    const defaultScope = getScope(assignments, locations);
+    const accessScope = (roleCode: string) => {
+      const roleId = accessRoleIds.get(roleCode);
+      return roleId ? getScope(assignments, locations, new Set([roleId])) : '—';
+    };
+
+    const systems = {
+      time: getSystemAccess(
+        assignedRoleCodes.has('time_clock_user') || Array.from(effectivePermissions).some((permission) => permission.startsWith('time.')),
+        effectivePermissions,
+        defaultScope,
+        [
+          { permission: 'time.manage_company', label: 'Company admin' },
+          { permission: 'time.manage_location', label: 'Location manager' },
+          { permission: 'time.clock', label: 'Employee' },
+        ],
+      ),
+      academy: getSystemAccess(
+        Array.from(effectivePermissions).some((permission) => permission.startsWith('academy.')),
+        effectivePermissions,
+        defaultScope,
+        [
+          { permission: 'academy.manage', label: 'Company admin' },
+          { permission: 'academy.assign_location', label: 'Location manager' },
+          { permission: 'academy.learn', label: 'Learner' },
+        ],
+      ),
+      warehouse: getSystemAccess(
+        assignedRoleCodes.has('warehouse_access'),
+        effectivePermissions,
+        accessScope('warehouse_access'),
+        [
+          { permission: 'warehouse.manage_company', label: 'Company manager' },
+          { permission: 'warehouse.manage_location', label: 'Location manager' },
+          { permission: 'warehouse.delivery', label: 'Driver' },
+          { permission: 'warehouse.manufacturing', label: 'Door shop' },
+          { permission: 'warehouse.use', label: 'User' },
+        ],
+      ),
+      sales: getSystemAccess(
+        assignedRoleCodes.has('sales_access'),
+        effectivePermissions,
+        accessScope('sales_access'),
+        [
+          { permission: 'sales.manage_company', label: 'Company manager' },
+          { permission: 'sales.manage_location', label: 'Location manager' },
+          { permission: 'sales.use', label: 'User' },
+        ],
+      ),
+      prospecting: getSystemAccess(
+        assignedRoleCodes.has('prospecting_access'),
+        effectivePermissions,
+        accessScope('prospecting_access'),
+        [
+          { permission: 'prospecting.manage', label: 'Manager' },
+          { permission: 'prospecting.use', label: 'User' },
+        ],
+      ),
+    };
 
     return {
       id: identity.id,
@@ -86,9 +175,7 @@ export async function GET(request: NextRequest) {
       location: employee ? locations.get(employee.primary_location_id) || null : null,
       loginMethod,
       active: identity.active && (employee ? employee.active : true),
-      roles: Array.from(new Set(roleNames)).sort(),
-      scopes,
-      permissions: effectivePermissions,
+      systems,
     };
   });
 
@@ -96,9 +183,9 @@ export async function GET(request: NextRequest) {
     rows,
     summary: {
       identities: rows.length,
-      pinUsers: rows.filter((row) => row.loginMethod.includes('PIN')).length,
-      googleUsers: rows.filter((row) => row.loginMethod.includes('Google')).length,
-      administrators: rows.filter((row) => row.roles.includes('Company Administrator')).length,
+      warehouseUsers: rows.filter((row) => row.systems.warehouse.enabled).length,
+      salesUsers: rows.filter((row) => row.systems.sales.enabled).length,
+      prospectingUsers: rows.filter((row) => row.systems.prospecting.enabled).length,
     },
   });
 }
