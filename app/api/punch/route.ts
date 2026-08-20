@@ -26,6 +26,7 @@ export async function POST(request: Request) {
   }
 
   const demo = process.env.NEXT_PUBLIC_DEMO_MODE === 'true';
+  console.info('[api/punch] request', { action: parsed.data.action, kioskId: parsed.data.kioskId || null, demo });
   if (demo) {
     const location = parsed.data.kioskId ? demoWarehouseNames[parsed.data.kioskId] : 'Amityville';
     if (!location) return NextResponse.json({ message: 'Select a valid warehouse.' }, { status: 400 });
@@ -146,7 +147,11 @@ export async function POST(request: Request) {
       .insert({ employee_id: employee.id, location_id: kiosk.location_id, kiosk_id: kiosk.id })
       .select('started_at')
       .single();
-    if (breakError) return NextResponse.json({ message: 'Break could not be started.' }, { status: 500 });
+    if (breakError) {
+      console.error('[api/punch] start break failed', { employeeId: employee.id, code: breakError.code, message: breakError.message });
+      return NextResponse.json({ message: 'Break could not be started.' }, { status: 500 });
+    }
+    console.info('[api/punch] break started', { employeeId: employee.id, startedAt: newBreak.started_at });
     return NextResponse.json({ ok: true, firstName: employee.first_name, action: 'start_break', occurredAt: newBreak.started_at, breakStartedAt: newBreak.started_at });
   }
 
@@ -155,13 +160,19 @@ export async function POST(request: Request) {
       return NextResponse.json({ message: 'You do not have an active break.' }, { status: 409 });
     }
     const endedAt = new Date().toISOString();
-    const { error: breakError } = await supabase
+    const { data: endedBreak, error: breakError } = await supabase
       .from('time_breaks')
       .update({ ended_at: endedAt })
       .eq('id', openBreak.id)
-      .is('ended_at', null);
-    if (breakError) return NextResponse.json({ message: 'Break could not be ended.' }, { status: 500 });
-    return NextResponse.json({ ok: true, firstName: employee.first_name, action: 'end_break', occurredAt: endedAt });
+      .is('ended_at', null)
+      .select('ended_at')
+      .single();
+    if (breakError || !endedBreak) {
+      console.error('[api/punch] end break failed', { employeeId: employee.id, code: breakError?.code, message: breakError?.message });
+      return NextResponse.json({ message: 'Break could not be ended.' }, { status: 500 });
+    }
+    console.info('[api/punch] break ended', { employeeId: employee.id, endedAt: endedBreak.ended_at });
+    return NextResponse.json({ ok: true, firstName: employee.first_name, action: 'end_break', occurredAt: endedBreak.ended_at });
   }
 
   if (openBreak) {
