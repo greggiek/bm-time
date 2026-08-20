@@ -251,3 +251,17 @@ td button[style*="color"] { border-color: #ffd4d4; background: var(--danger-soft
 .permissionList { display: grid; gap: 5px; max-height: 220px; margin-top: 9px; overflow: auto; }
 .permissionList code { border-radius: 6px; padding: 5px 7px; color: #334155; background: #f1f5f9; font-size: 11px; }
 details summary { cursor: pointer; color: var(--blue); font-weight: 750; }
+
+
+/* BM OS system access matrix */
+.accessTableWrap { max-height: calc(100vh - 330px); }
+.accessMatrix { min-width: 1320px; }
+.accessMatrix td { vertical-align: middle; }
+.accessMatrix th:first-child,
+.accessMatrix td:first-child { position: sticky; left: 0; z-index: 2; background: white; }
+.accessMatrix th:first-child { z-index: 3; background: #f4f7fa; }
+.accessMatrix tbody tr:hover td:first-child { background: #f8fbff; }
+.systemAccess { display: grid; gap: 4px; justify-items: start; }
+.systemAccess > span:last-child { color: var(--muted); font-size: 11px; font-weight: 650; }
+.accessGranted { color: var(--success); background: var(--success-soft); }
+.accessNone { color: #a8b4c0; font-weight: 750; }
