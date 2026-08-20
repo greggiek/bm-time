@@ -12,7 +12,7 @@ type Overview = {
 const emptyOverview: Overview = { identities: 0, activeEmployees: 0, clockedIn: 0, onBreak: 0, systems: { time: 0, academy: 0, warehouse: 0, sales: 0, prospecting: 0 } };
 const systems = [
   { key: 'time', name: 'BM Time', description: 'Time clock, breaks, timecards and labor visibility.', href: '/manager', action: 'Open Time' },
-  { key: 'academy', name: 'BM Academy', description: 'Employee onboarding, training and assigned learning.', href: null, action: 'Integration queued' },
+  { key: 'academy', name: 'BM Academy', description: 'Employee onboarding, training and assigned learning.', href: 'https://bargain-academy.vercel.app', action: 'Open Academy' },
   { key: 'warehouse', name: 'BM Warehouse', description: 'Purchasing, transfers, receiving and fulfillment.', href: null, action: 'Integration queued' },
   { key: 'sales', name: 'BM Sales', description: 'Customer, quote, order and approval workflows.', href: null, action: 'Integration queued' },
   { key: 'prospecting', name: 'BM Prospecting', description: 'Field prospecting, activity and new-business tracking.', href: null, action: 'Integration queued' },
