@@ -153,17 +153,38 @@ async function loadRange(supabase: NonNullable<ReturnType<typeof getAdminClient>
     .eq('active', true)
     .order('last_name');
   let paidTimeOffQuery = supabase.from('time_paid_time_off').select('id,entry_type,entry_date,hours,note,location_id,time_employees(id,employee_number,first_name,last_name),time_locations(name)').gte('entry_date', startDate).lte('entry_date', endDate).order('entry_date', { ascending: true });
+  let breakQuery = supabase
+    .from('time_breaks')
+    .select('id,employee_id,location_id,started_at,ended_at')
+    .lt('started_at', end.toISOString())
+    .or(`ended_at.is.null,ended_at.gte.${start.toISOString()}`)
+    .order('started_at', { ascending: true });
 
   if (session.role !== 'admin' && !session.allLocations && session.locationId) {
     punchQuery = punchQuery.eq('location_id', session.locationId);
     employeeQuery = employeeQuery.eq('primary_location_id', session.locationId);
     paidTimeOffQuery = paidTimeOffQuery.eq('location_id', session.locationId);
+    breakQuery = breakQuery.eq('location_id', session.locationId);
   }
 
-  const [{ data, error }, { data: employees, error: employeesError }, { data: paidTimeOff, error: paidTimeOffError }] = await Promise.all([punchQuery, employeeQuery, paidTimeOffQuery]);
+  const [
+    { data, error },
+    { data: employees, error: employeesError },
+    { data: paidTimeOff, error: paidTimeOffError },
+    { data: breakRows, error: breaksError },
+  ] = await Promise.all([punchQuery, employeeQuery, paidTimeOffQuery, breakQuery]);
   if (error) return NextResponse.json({ message: error.message }, { status: 500 });
   if (employeesError) return NextResponse.json({ message: employeesError.message }, { status: 500 });
   if (paidTimeOffError) return NextResponse.json({ message: paidTimeOffError.message }, { status: 500 });
+  if (breaksError) return NextResponse.json({ message: breaksError.message }, { status: 500 });
+
+  const breaks = (breakRows || []).map((entry: any) => ({
+    id: entry.id,
+    employeeId: entry.employee_id,
+    locationId: entry.location_id,
+    startedAt: entry.started_at,
+    endedAt: entry.ended_at,
+  }));
 
   const punches = (data || []).map((row: any) => ({
     id: row.id,
@@ -182,16 +203,31 @@ async function loadRange(supabase: NonNullable<ReturnType<typeof getAdminClient>
     grouped.set(punch.employeeId, list);
   }
 
+  const now = new Date();
   const summaries = Array.from(grouped.values()).map((employeePunches) => {
-    let totalMs = 0;
+    const intervals: Array<{ start: Date; end: Date }> = [];
     let openClockIn: Date | null = null;
     for (const punch of employeePunches) {
       if (punch.action === 'clock_in') openClockIn = new Date(punch.occurredAt);
       else if (punch.action === 'clock_out' && openClockIn) {
-        totalMs += new Date(punch.occurredAt).getTime() - openClockIn.getTime();
+        intervals.push({ start: openClockIn, end: new Date(punch.occurredAt) });
         openClockIn = null;
       }
     }
+
+    let totalMs = intervals.reduce((sum, interval) => sum + Math.max(0, interval.end.getTime() - interval.start.getTime()), 0);
+    let breakMs = 0;
+    for (const entry of breaks.filter((item) => item.employeeId === employeePunches[0].employeeId)) {
+      const breakStart = new Date(entry.startedAt);
+      const breakEnd = entry.endedAt ? new Date(entry.endedAt) : now;
+      for (const interval of intervals) {
+        const overlapStart = Math.max(interval.start.getTime(), breakStart.getTime());
+        const overlapEnd = Math.min(interval.end.getTime(), breakEnd.getTime());
+        if (overlapEnd > overlapStart) breakMs += overlapEnd - overlapStart;
+      }
+    }
+    totalMs = Math.max(0, totalMs - breakMs);
+
     const first = employeePunches[0];
     return {
       employeeId: first.employeeId,
@@ -199,6 +235,7 @@ async function loadRange(supabase: NonNullable<ReturnType<typeof getAdminClient>
       employeeName: first.employeeName,
       location: first.location,
       totalHours: Math.round((totalMs / 36e5) * 100) / 100,
+      breakHours: Math.round((breakMs / 36e5) * 100) / 100,
       incomplete: Boolean(openClockIn),
     };
   });
@@ -207,6 +244,7 @@ async function loadRange(supabase: NonNullable<ReturnType<typeof getAdminClient>
     startDate,
     endDate,
     punches,
+    breaks,
     summaries,
     paidTimeOff: (paidTimeOff || []).map((entry: any) => ({ id: entry.id, employeeId: entry.time_employees?.id || '', employeeNumber: entry.time_employees?.employee_number || '', employeeName: `${entry.time_employees?.first_name || ''} ${entry.time_employees?.last_name || ''}`.trim(), location: entry.time_locations?.name || '', entryType: entry.entry_type, entryDate: entry.entry_date, hours: Number(entry.hours), note: entry.note || '' })),
     user: {
