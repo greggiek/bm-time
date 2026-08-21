@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import ManagerShell from '@/components/manager-shell';
 
 type Row = {
@@ -8,7 +9,7 @@ type Row = {
   name: string;
   location: string;
   jobTitle: string;
-  status: string;
+  status: 'clocked_in' | 'clocked_out' | 'on_break';
   latest: string | null;
 };
 
@@ -25,6 +26,7 @@ type BranchPositionHours = { location: string; jobTitle: string; totalHours: num
 type PayPeriod = { start: string; end: string };
 
 export default function ManagerPage() {
+  const router = useRouter();
   const [pin, setPin] = useState('');
   const [user, setUser] = useState<User | null>(null);
   const [rows, setRows] = useState<Row[]>([]);
@@ -51,6 +53,12 @@ export default function ManagerPage() {
       const data = await response.json();
       if (!response.ok) throw new Error(data.message || 'Unable to sign in.');
       setPin('');
+      const next = new URLSearchParams(window.location.search).get('next');
+      if (data.user?.role === 'admin' && next && /^\/admin(?:\/|$)/.test(next)) {
+        router.push(next);
+        router.refresh();
+        return;
+      }
       await loadDashboard();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to sign in.');
@@ -152,6 +160,7 @@ export default function ManagerPage() {
         <div className="sectionHeading"><div><h2>Employee Status</h2><p>Current clock status across your branches</p></div></div>
         <div className="summary">
           <div><strong>{rows.filter((row) => row.status === 'clocked_in').length}</strong><span>Clocked In</span></div>
+          <div><strong>{rows.filter((row) => row.status === 'on_break').length}</strong><span>On Break</span></div>
           <div><strong>{rows.length}</strong><span>Active Employees</span></div>
         </div>
 
@@ -164,7 +173,7 @@ export default function ManagerPage() {
                   <td><strong>{row.name}</strong></td>
                   <td>{row.location}</td>
                   <td>{row.jobTitle}</td>
-                  <td><span className={`pill ${row.status}`}>{row.status === 'clocked_in' ? 'Clocked In' : 'Clocked Out'}</span></td>
+                  <td><span className={`pill ${row.status}`}>{row.status === 'on_break' ? 'On Break' : row.status === 'clocked_in' ? 'Clocked In' : 'Clocked Out'}</span></td>
                   <td>{row.latest ? new Date(row.latest).toLocaleString() : '—'}</td>
                 </tr>
               ))}

@@ -1,0 +1,2515 @@
+[
+  {
+    "code": "door-01",
+    "school": "Door School",
+    "title": "Door Foundations",
+    "summary": "Build the vocabulary and product framework needed to talk confidently about residential doors.",
+    "sections": [
+      [
+        "Core door assembly",
+        "Identify the slab, frame or jamb, stop, sill or threshold, casing, hinges, lockset, and weatherstripping."
+      ],
+      [
+        "Interior vs. exterior",
+        "Interior units prioritize room separation and appearance. Exterior units add weather resistance, security, thresholds, and exterior-rated components."
+      ],
+      [
+        "Prehung vs. slab",
+        "A prehung door is supplied in a frame. A slab is the door panel only and must be matched and prepared for the opening."
+      ]
+    ],
+    "quiz": [
+      {
+        "question": "Which item is the door panel itself?",
+        "answers": [
+          "Slab",
+          "Casing",
+          "Stop",
+          "Sill"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "A prehung door normally includes what?",
+        "answers": [
+          "Only a lockset",
+          "A slab installed in a frame",
+          "Only casing",
+          "Only hinges"
+        ],
+        "correct": 1
+      },
+      {
+        "question": "Which unit normally needs weather resistance?",
+        "answers": [
+          "Exterior door",
+          "Closet shelf",
+          "Interior casing",
+          "Base moulding"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "What does casing primarily finish?",
+        "answers": [
+          "The wall-to-frame joint",
+          "The door glass",
+          "The lock cylinder",
+          "The threshold"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "Which is part of a typical door assembly?",
+        "answers": [
+          "Jamb",
+          "Rafter",
+          "Gutter",
+          "Joist"
+        ],
+        "correct": 0
+      }
+    ]
+  },
+  {
+    "code": "door-02",
+    "school": "Door School",
+    "title": "Door Types & Construction",
+    "summary": "Recognize common door constructions and match them to customer needs.",
+    "sections": [
+      [
+        "Hollow core",
+        "Lightweight interior construction commonly used where economy and basic privacy are priorities."
+      ],
+      [
+        "Solid core",
+        "Heavier construction that generally improves feel, durability, and sound control."
+      ],
+      [
+        "Wood, fiberglass & steel",
+        "Exterior door materials have different appearance, maintenance, durability, and performance tradeoffs."
+      ]
+    ],
+    "quiz": [
+      {
+        "question": "Which construction is commonly lightweight?",
+        "answers": [
+          "Hollow core",
+          "Solid core",
+          "Steel entry system",
+          "Masonry"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "Which typically feels heavier?",
+        "answers": [
+          "Solid core",
+          "Hollow core",
+          "Screen mesh",
+          "Casing"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "Fiberglass and steel are common choices for what?",
+        "answers": [
+          "Exterior entry doors",
+          "Baseboard",
+          "Shelving",
+          "Crown moulding"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "Door construction should be matched to what?",
+        "answers": [
+          "Application and customer priorities",
+          "Paint color only",
+          "Truck size only",
+          "Invoice number"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "Which can be a customer priority when selecting construction?",
+        "answers": [
+          "Sound control",
+          "Barcode font",
+          "Receipt length",
+          "Warehouse aisle"
+        ],
+        "correct": 0
+      }
+    ]
+  },
+  {
+    "code": "door-03",
+    "school": "Door School",
+    "title": "Sizing & Measuring",
+    "summary": "Collect the dimensions and opening information required before quoting a door.",
+    "sections": [
+      [
+        "Door size",
+        "Confirm width and height; never assume the opening from a verbal description alone."
+      ],
+      [
+        "Rough opening",
+        "A framed rough opening must provide appropriate clearance for the complete door unit and installation."
+      ],
+      [
+        "Wall thickness",
+        "Jamb depth must match the wall condition, including framing and finished surfaces."
+      ]
+    ],
+    "quiz": [
+      {
+        "question": "What two dimensions are always required for a door?",
+        "answers": [
+          "Width and height",
+          "Weight and color",
+          "Price and tax",
+          "SKU and aisle"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "Why confirm wall thickness?",
+        "answers": [
+          "To select jamb depth",
+          "To select hinge color only",
+          "To calculate tax",
+          "To choose casing profile only"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "A rough opening is measured in what?",
+        "answers": [
+          "The framed opening",
+          "The lock bore",
+          "The glass lite only",
+          "The casing face"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "Best practice before quoting is to?",
+        "answers": [
+          "Confirm actual dimensions",
+          "Guess from room type",
+          "Use the last order",
+          "Assume every opening is standard"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "Jamb depth relates most directly to?",
+        "answers": [
+          "Wall thickness",
+          "Door color",
+          "Knob style",
+          "Hinge count only"
+        ],
+        "correct": 0
+      }
+    ]
+  },
+  {
+    "code": "door-04",
+    "school": "Door School",
+    "title": "Handing & Swing",
+    "summary": "Determine swing and handing consistently so the ordered unit operates in the intended direction.",
+    "sections": [
+      [
+        "Swing direction",
+        "Establish which side the door swings toward and how the customer is viewing the opening."
+      ],
+      [
+        "Hinge side",
+        "Confirm the hinge side using the company/vendor handing convention before ordering."
+      ],
+      [
+        "Avoid assumptions",
+        "Use a sketch, photo, or physical demonstration when the customer description is ambiguous."
+      ]
+    ],
+    "quiz": [
+      {
+        "question": "What should be confirmed when determining handing?",
+        "answers": [
+          "Swing and hinge side",
+          "Paint sheen only",
+          "Price only",
+          "Casing width only"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "When handing language is unclear, what helps?",
+        "answers": [
+          "A sketch or photo",
+          "A guess",
+          "An old invoice from another job",
+          "Ignoring swing"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "Why use a consistent handing convention?",
+        "answers": [
+          "To avoid ordering the wrong unit",
+          "To change tax rate",
+          "To reduce door height",
+          "To choose moulding species"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "Handing affects what?",
+        "answers": [
+          "How the door operates in the opening",
+          "The wall paint brand",
+          "The truck route",
+          "The receipt format"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "Before finalizing an order, handing should be?",
+        "answers": [
+          "Confirmed",
+          "Assumed",
+          "Skipped",
+          "Randomized"
+        ],
+        "correct": 0
+      }
+    ]
+  },
+  {
+    "code": "door-05",
+    "school": "Door School",
+    "title": "Jambs, Sills & Components",
+    "summary": "Understand the components that turn a slab into a complete, installable door system.",
+    "sections": [
+      [
+        "Jambs and stops",
+        "Jamb legs and head form the frame; stops establish the closed position on many systems."
+      ],
+      [
+        "Exterior sill system",
+        "Exterior prehung units may include a threshold or sill, weatherstrip, sweep, and other weather-management components."
+      ],
+      [
+        "Hardware preparation",
+        "Hinge locations, lock bores, backset, and other machining must match the specified hardware and application."
+      ]
+    ],
+    "quiz": [
+      {
+        "question": "What forms the main door frame?",
+        "answers": [
+          "Jambs",
+          "Casing only",
+          "Glass only",
+          "Lockset only"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "A threshold is most associated with?",
+        "answers": [
+          "Exterior door systems",
+          "Crown moulding",
+          "Interior shelving",
+          "Window casing only"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "Weatherstrip helps manage?",
+        "answers": [
+          "Air and weather infiltration",
+          "Invoice totals",
+          "Door color",
+          "Moulding length"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "Lock preparation must match?",
+        "answers": [
+          "Specified hardware",
+          "Wall paint",
+          "Delivery route",
+          "Casing species only"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "Door stop helps establish?",
+        "answers": [
+          "The closed position",
+          "The tax rate",
+          "The rough opening width",
+          "The truck capacity"
+        ],
+        "correct": 0
+      }
+    ]
+  },
+  {
+    "code": "door-06",
+    "school": "Door School",
+    "title": "Quoting & Order Accuracy",
+    "summary": "Turn customer requirements into a complete quote with fewer callbacks and ordering errors.",
+    "sections": [
+      [
+        "Capture the full specification",
+        "Record size, construction, swing/handing, jamb, finish, hardware prep, glass/options, quantity, and job notes."
+      ],
+      [
+        "Separate facts from assumptions",
+        "Mark anything that still needs field verification instead of silently filling gaps."
+      ],
+      [
+        "Read back the order",
+        "Review the critical specifications with the customer before the order is submitted."
+      ]
+    ],
+    "quiz": [
+      {
+        "question": "Which belongs on a complete door quote?",
+        "answers": [
+          "Size and handing",
+          "Only customer name",
+          "Only price",
+          "Only delivery date"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "Unknown field conditions should be?",
+        "answers": [
+          "Flagged for verification",
+          "Guessed",
+          "Deleted",
+          "Copied from another job"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "Reading back critical specs helps?",
+        "answers": [
+          "Catch errors before ordering",
+          "Change the tax rate",
+          "Reduce wall thickness",
+          "Pick a truck"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "Quantity should be?",
+        "answers": [
+          "Explicitly recorded",
+          "Assumed to be one",
+          "Left blank",
+          "Based on price"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "A good quote distinguishes facts from?",
+        "answers": [
+          "Assumptions",
+          "Invoices",
+          "Employees",
+          "Warehouses"
+        ],
+        "correct": 0
+      }
+    ]
+  },
+  {
+    "code": "door-07",
+    "school": "Door School",
+    "title": "Selling & Customer Scenarios",
+    "summary": "Ask useful questions, explain tradeoffs, and guide customers toward a door that fits the application.",
+    "sections": [
+      [
+        "Start with the application",
+        "Ask where the door is going, what problem the customer is solving, and which requirements matter most."
+      ],
+      [
+        "Explain tradeoffs",
+        "Translate construction and option differences into practical benefits such as durability, privacy, sound control, security, maintenance, and appearance."
+      ],
+      [
+        "Confirm next steps",
+        "Make sure the customer understands what is included, what still needs verification, lead-time expectations, and who owns the next action."
+      ]
+    ],
+    "quiz": [
+      {
+        "question": "A strong door conversation starts with?",
+        "answers": [
+          "The application",
+          "The most expensive option",
+          "A random SKU",
+          "The delivery truck"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "Tradeoffs should be explained as?",
+        "answers": [
+          "Practical customer benefits",
+          "Internal jargon only",
+          "Invoice codes only",
+          "Warehouse locations"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "Which can matter to a door customer?",
+        "answers": [
+          "Privacy and durability",
+          "Receipt font",
+          "Forklift battery",
+          "Printer toner"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "Before ending the conversation, confirm?",
+        "answers": [
+          "Next steps",
+          "Nothing",
+          "Only the salesperson name",
+          "Only the color"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "If measurements are still uncertain, you should?",
+        "answers": [
+          "Say they need verification",
+          "Pretend they are confirmed",
+          "Remove them from the quote",
+          "Choose the nearest size silently"
+        ],
+        "correct": 0
+      }
+    ]
+  },
+  {
+    "code": "door-08",
+    "school": "Door School",
+    "title": "Final Review & Floor Readiness",
+    "summary": "Combine product knowledge, measuring, handing, quoting, and customer communication before certification.",
+    "sections": [
+      [
+        "Verify before submit",
+        "Slow down on the details that create expensive mistakes: size, handing, jamb depth, construction, prep, options, and quantity."
+      ],
+      [
+        "Use resources",
+        "When a specification is outside your confidence, use approved vendor literature, internal resources, or a manager rather than improvising."
+      ],
+      [
+        "Floor readiness",
+        "Certification means being able to explain the product and execute the ordering conversation—not simply memorizing vocabulary."
+      ]
+    ],
+    "quiz": [
+      {
+        "question": "Which detail can create an expensive ordering error?",
+        "answers": [
+          "Handing",
+          "Receipt font",
+          "Employee initials only",
+          "Parking space"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "When unsure about a specification, use?",
+        "answers": [
+          "Approved resources or a manager",
+          "A guess",
+          "Social media comments",
+          "An unrelated invoice"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "Certification should demonstrate?",
+        "answers": [
+          "Knowledge plus correct execution",
+          "Memorization only",
+          "Speed only",
+          "Sales volume only"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "Before submitting, verify?",
+        "answers": [
+          "Critical specifications",
+          "Only customer phone number",
+          "Only color",
+          "Nothing"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "The goal of Door School is?",
+        "answers": [
+          "Confident, accurate customer service",
+          "Random product trivia",
+          "Warehouse decoration",
+          "Changing accounting rules"
+        ],
+        "correct": 0
+      }
+    ]
+  },
+  {
+    "code": "moulding-01",
+    "school": "Moulding School",
+    "title": "Moulding Foundations",
+    "summary": "Learn what moulding does, how profiles are described, and how the major categories fit a room.",
+    "sections": [
+      [
+        "Purpose",
+        "Moulding finishes transitions, protects surfaces, frames openings, and adds architectural detail."
+      ],
+      [
+        "Profile vocabulary",
+        "Profile refers to the cross-sectional shape. Width, thickness, projection, pattern, and length all matter when matching or specifying material."
+      ],
+      [
+        "Common families",
+        "Base, casing, crown, chair rail, panel mould, stop, and miscellaneous decorative profiles serve different locations and functions."
+      ]
+    ],
+    "quiz": [
+      {
+        "question": "What does profile describe?",
+        "answers": [
+          "Cross-sectional shape",
+          "Truck route",
+          "Invoice total",
+          "Paint brand"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "Which typically finishes the wall-to-floor transition?",
+        "answers": [
+          "Base",
+          "Crown",
+          "Casing",
+          "Stop"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "Which commonly frames doors and windows?",
+        "answers": [
+          "Casing",
+          "Base",
+          "Chair rail",
+          "Sill pan"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "Moulding can add what besides protection?",
+        "answers": [
+          "Architectural detail",
+          "Door handing",
+          "Tax codes",
+          "Hardware prep"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "A complete moulding description may include?",
+        "answers": [
+          "Width and thickness",
+          "Only price",
+          "Only room name",
+          "Only quantity"
+        ],
+        "correct": 0
+      }
+    ]
+  },
+  {
+    "code": "moulding-02",
+    "school": "Moulding School",
+    "title": "Profiles & Applications",
+    "summary": "Match common moulding profiles to where and why they are used.",
+    "sections": [
+      [
+        "Base & shoe",
+        "Base finishes the bottom of the wall; shoe or base shoe can finish the joint at the floor and accommodate small irregularities."
+      ],
+      [
+        "Casing & stop",
+        "Casing trims openings. Stop can provide a functional contact surface at doors or windows depending on the assembly."
+      ],
+      [
+        "Crown & decorative trim",
+        "Crown typically addresses the wall-to-ceiling transition; panel mould and other decorative profiles create applied architectural detail."
+      ]
+    ],
+    "quiz": [
+      {
+        "question": "Crown is commonly installed at?",
+        "answers": [
+          "Wall-to-ceiling transition",
+          "Floor only",
+          "Door hinge",
+          "Threshold"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "Casing is most associated with?",
+        "answers": [
+          "Openings",
+          "Roofing",
+          "Deck framing",
+          "Plumbing"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "Base shoe is commonly used near?",
+        "answers": [
+          "The floor",
+          "The ceiling",
+          "A lock bore",
+          "A roof ridge"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "Panel mould is often used for?",
+        "answers": [
+          "Decorative applied detail",
+          "Door handing",
+          "Weatherstripping",
+          "Concrete forming"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "Profile selection should match?",
+        "answers": [
+          "Application and design intent",
+          "Invoice number",
+          "Truck color",
+          "Employee schedule"
+        ],
+        "correct": 0
+      }
+    ]
+  },
+  {
+    "code": "moulding-03",
+    "school": "Moulding School",
+    "title": "Materials & Species",
+    "summary": "Understand how wood species, finger-jointed material, MDF, and other substrates affect use and finish.",
+    "sections": [
+      [
+        "Solid wood",
+        "Species influence grain, color, hardness, machining, finishing, and price. Stain-grade work generally makes appearance especially important."
+      ],
+      [
+        "Finger-jointed & primed wood",
+        "Finger-jointed products can provide stable, economical paint-grade moulding with defects removed and shorter pieces joined."
+      ],
+      [
+        "MDF and alternatives",
+        "MDF offers a smooth paint-grade surface but must be matched to appropriate interior/moisture conditions. Other engineered or synthetic products have their own application limits."
+      ]
+    ],
+    "quiz": [
+      {
+        "question": "Species can affect?",
+        "answers": [
+          "Grain and hardness",
+          "Door swing only",
+          "Tax rate",
+          "Truck capacity"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "MDF is commonly valued for?",
+        "answers": [
+          "Smooth paint-grade surface",
+          "Exterior structural framing",
+          "Door handing",
+          "Metal hardware"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "Finger-jointed moulding is often suited to?",
+        "answers": [
+          "Paint-grade applications",
+          "Roof shingles",
+          "Concrete slabs",
+          "Locksets"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "Stain-grade selection makes what especially important?",
+        "answers": [
+          "Appearance and grain",
+          "Barcode size",
+          "Delivery route",
+          "Receipt paper"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "Material should be selected based on?",
+        "answers": [
+          "Application and finish requirements",
+          "Price alone",
+          "Random availability",
+          "Room number only"
+        ],
+        "correct": 0
+      }
+    ]
+  },
+  {
+    "code": "moulding-04",
+    "school": "Moulding School",
+    "title": "Dimensions, Lengths & Takeoffs",
+    "summary": "Read moulding dimensions correctly and calculate practical quantities for a job.",
+    "sections": [
+      [
+        "Width and thickness",
+        "Nominal profile names do not replace actual dimensions. Confirm the dimensions needed to match existing work or meet the design."
+      ],
+      [
+        "Linear footage",
+        "Moulding is commonly planned by linear footage. Add the lengths of the runs, then account for cuts, waste, and stock lengths."
+      ],
+      [
+        "Piece count",
+        "Convert required footage into realistic piece quantities using available stock lengths and a waste allowance appropriate to the job."
+      ]
+    ],
+    "quiz": [
+      {
+        "question": "Moulding quantity is commonly planned in?",
+        "answers": [
+          "Linear feet",
+          "Square yards only",
+          "Gallons",
+          "Volts"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "Why confirm actual dimensions?",
+        "answers": [
+          "To match the required profile and existing work",
+          "To choose a truck",
+          "To calculate payroll",
+          "To determine door handing"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "Takeoffs should account for?",
+        "answers": [
+          "Cuts and waste",
+          "Only perfect net footage",
+          "Tax only",
+          "Paint color only"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "Piece count depends partly on?",
+        "answers": [
+          "Available stock lengths",
+          "Door swing",
+          "Hinge finish",
+          "Weather"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "A 12 ft wall run contributes how much net footage?",
+        "answers": [
+          "12 linear ft",
+          "6 linear ft",
+          "24 square ft",
+          "144 linear ft"
+        ],
+        "correct": 0
+      }
+    ]
+  },
+  {
+    "code": "moulding-05",
+    "school": "Moulding School",
+    "title": "Corners, Returns & Installation Planning",
+    "summary": "Recognize how room geometry affects cuts, waste, and the material a customer needs.",
+    "sections": [
+      [
+        "Inside & outside corners",
+        "Corners create miters, copes, or other joints depending on the profile, material, and installer method. More corners usually mean more cuts and waste."
+      ],
+      [
+        "Returns & terminations",
+        "Exposed profile ends may need a return, block, transition, or other deliberate termination rather than a raw cut."
+      ],
+      [
+        "Long runs",
+        "Plan joints and stock lengths so seams land sensibly and material can be transported and installed."
+      ]
+    ],
+    "quiz": [
+      {
+        "question": "More corners generally create?",
+        "answers": [
+          "More cuts and waste",
+          "Less measuring",
+          "No joints",
+          "Automatic returns"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "An exposed moulding end may need?",
+        "answers": [
+          "A planned return or termination",
+          "A door threshold",
+          "Weatherstrip",
+          "A lock bore"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "Stock length matters when planning?",
+        "answers": [
+          "Long runs and seams",
+          "Door handing",
+          "Paint sheen only",
+          "Tax rate"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "Inside corners may use?",
+        "answers": [
+          "Copes or miters depending on method",
+          "Door sweeps",
+          "Lock cylinders",
+          "Sill pans"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "Installation planning helps produce?",
+        "answers": [
+          "A more realistic material order",
+          "A random piece count",
+          "A different species automatically",
+          "No waste ever"
+        ],
+        "correct": 0
+      }
+    ]
+  },
+  {
+    "code": "moulding-06",
+    "school": "Moulding School",
+    "title": "Matching Existing Moulding",
+    "summary": "Use samples, dimensions, and profile details to identify replacement or continuation material accurately.",
+    "sections": [
+      [
+        "Bring a sample",
+        "A clean cross-section or physical sample is usually more reliable than a verbal profile description."
+      ],
+      [
+        "Measure the profile",
+        "Record width and thickness and note distinctive beads, coves, steps, flats, and radii."
+      ],
+      [
+        "Set expectations",
+        "Older or custom profiles may not have an exact current match. Discuss close matches, custom options, or replacing a larger run when necessary."
+      ]
+    ],
+    "quiz": [
+      {
+        "question": "Best aid for matching an unknown profile?",
+        "answers": [
+          "Physical sample",
+          "Guessing from room name",
+          "Door schedule",
+          "Receipt"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "What should be measured?",
+        "answers": [
+          "Width and thickness",
+          "Only length",
+          "Only price",
+          "Only color"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "Distinctive profile details include?",
+        "answers": [
+          "Beads and coves",
+          "Tax codes",
+          "Truck routes",
+          "Hinge screws"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "An old profile may require?",
+        "answers": [
+          "A close match or custom solution",
+          "Automatic exact stock match",
+          "No measurement",
+          "Door handing"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "Good customer communication includes?",
+        "answers": [
+          "Setting expectations about match quality",
+          "Promising an exact match without checking",
+          "Ignoring dimensions",
+          "Choosing by price only"
+        ],
+        "correct": 0
+      }
+    ]
+  },
+  {
+    "code": "moulding-07",
+    "school": "Moulding School",
+    "title": "Quoting & Customer Scenarios",
+    "summary": "Ask the right questions and turn a moulding request into an accurate material recommendation.",
+    "sections": [
+      [
+        "Clarify the job",
+        "Ask what profile/application is needed, whether it is paint or stain grade, what material/species is desired, dimensions, footage, and whether existing work must be matched."
+      ],
+      [
+        "Calculate transparently",
+        "Show how footage, stock lengths, waste, and piece count relate so the customer understands the recommendation."
+      ],
+      [
+        "Confirm accessories",
+        "Depending on the job, discuss blocks, complementary profiles, adhesives/fasteners, finishing, or other items without assuming installer preference."
+      ]
+    ],
+    "quiz": [
+      {
+        "question": "A moulding quote should clarify?",
+        "answers": [
+          "Application and footage",
+          "Only customer name",
+          "Only tax",
+          "Only delivery time"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "Paint vs. stain grade can affect?",
+        "answers": [
+          "Material selection",
+          "Door handing",
+          "Truck size",
+          "Receipt format"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "Why explain waste allowance?",
+        "answers": [
+          "So quantity recommendation is understandable",
+          "To hide the piece count",
+          "To change species",
+          "To avoid measuring"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "Matching existing work requires special attention to?",
+        "answers": [
+          "Profile and dimensions",
+          "Door swing",
+          "Weatherstrip",
+          "Lock bore"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "Accessories should be discussed based on?",
+        "answers": [
+          "The actual job and installer needs",
+          "A fixed assumption for every job",
+          "Random choice",
+          "Invoice number"
+        ],
+        "correct": 0
+      }
+    ]
+  },
+  {
+    "code": "moulding-08",
+    "school": "Moulding School",
+    "title": "Final Review & Floor Readiness",
+    "summary": "Combine profile knowledge, material selection, takeoffs, matching, and customer communication before certification.",
+    "sections": [
+      [
+        "Verify the specification",
+        "Confirm profile, dimensions, material/species, finish intent, lengths, quantities, and match requirements before submitting."
+      ],
+      [
+        "Use approved resources",
+        "Check catalogs, samples, inventory information, vendor resources, or a manager when identification or availability is uncertain."
+      ],
+      [
+        "Sell accuracy",
+        "A good moulding transaction balances design intent with realistic quantities, material characteristics, availability, and installation needs."
+      ]
+    ],
+    "quiz": [
+      {
+        "question": "Before submitting a moulding order, verify?",
+        "answers": [
+          "Profile, material and quantity",
+          "Only price",
+          "Only customer name",
+          "Only room"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "When identification is uncertain, use?",
+        "answers": [
+          "Approved samples/resources or a manager",
+          "A guess",
+          "An unrelated SKU",
+          "Social media"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "A takeoff should be?",
+        "answers": [
+          "Realistic about waste and stock lengths",
+          "Net footage only in every case",
+          "Based on price",
+          "Unmeasured"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "Good moulding service balances?",
+        "answers": [
+          "Design and practical job requirements",
+          "Speed only",
+          "Price only",
+          "Piece count only"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "Floor readiness means?",
+        "answers": [
+          "Accurately guiding the customer from need to order",
+          "Memorizing names only",
+          "Never asking questions",
+          "Selling the longest piece every time"
+        ],
+        "correct": 0
+      }
+    ]
+  },
+  {
+    "code": "pvc-01",
+    "school": "PVC School",
+    "title": "PVC Foundations",
+    "summary": "Understand cellular PVC trim, where it fits, and why customers choose it for exterior finish work.",
+    "sections": [
+      [
+        "What PVC trim is",
+        "Cellular PVC trim is a synthetic trim material designed for applications where moisture resistance and low maintenance are important."
+      ],
+      [
+        "Common uses",
+        "Typical uses include exterior trim, fascia, soffit details, window and door surrounds, corner boards, and decorative trim."
+      ],
+      [
+        "Set expectations",
+        "PVC is not wood. Its movement, fastening, bonding, finishing, and heat behavior need to be considered when planning the job."
+      ]
+    ],
+    "quiz": [
+      {
+        "question": "PVC trim is commonly selected for?",
+        "answers": [
+          "Moisture resistance and low maintenance",
+          "Interior structural framing",
+          "Electrical wiring",
+          "Concrete reinforcement"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "Which is a common PVC trim application?",
+        "answers": [
+          "Exterior corner board",
+          "Roof rafter",
+          "Door lock cylinder",
+          "Floor joist"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "PVC should be treated exactly like wood in every detail?",
+        "answers": [
+          "No",
+          "Yes",
+          "Only when unpainted",
+          "Only in winter"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "A common exterior use is?",
+        "answers": [
+          "Window and door surrounds",
+          "Carpet padding",
+          "Drywall tape",
+          "Cabinet hinges"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "Good PVC guidance includes understanding?",
+        "answers": [
+          "Material-specific installation behavior",
+          "Only color",
+          "Only price",
+          "Only SKU"
+        ],
+        "correct": 0
+      }
+    ]
+  },
+  {
+    "code": "pvc-02",
+    "school": "PVC School",
+    "title": "Boards, Sheets & Profiles",
+    "summary": "Recognize common PVC product forms and choose dimensions that fit the application.",
+    "sections": [
+      [
+        "Trim boards",
+        "PVC trim boards are available in multiple widths, thicknesses, lengths, and surface options. Confirm actual dimensions rather than relying on a casual name."
+      ],
+      [
+        "Sheets",
+        "Sheet goods can support larger fabricated details, panels, custom trim, and other applications where a wide surface is needed."
+      ],
+      [
+        "Moulded profiles",
+        "PVC can also be supplied as moulded profiles. Match the profile and dimensions to the intended architectural detail."
+      ]
+    ],
+    "quiz": [
+      {
+        "question": "PVC trim boards vary by?",
+        "answers": [
+          "Width, thickness and length",
+          "Door handing only",
+          "Tax rate",
+          "Truck color"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "PVC sheets are useful when?",
+        "answers": [
+          "A wider fabricated surface is needed",
+          "A lock bore is needed",
+          "Choosing hinges",
+          "Calculating door swing"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "Moulded PVC should be selected by?",
+        "answers": [
+          "Profile and dimensions",
+          "Invoice number",
+          "Employee name",
+          "Delivery day only"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "Why confirm actual dimensions?",
+        "answers": [
+          "Product names may not fully describe size",
+          "To calculate payroll",
+          "To choose paint brand only",
+          "To determine door handing"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "Which forms can PVC trim take?",
+        "answers": [
+          "Boards, sheets and profiles",
+          "Only round pipe",
+          "Only flooring",
+          "Only hardware"
+        ],
+        "correct": 0
+      }
+    ]
+  },
+  {
+    "code": "pvc-03",
+    "school": "PVC School",
+    "title": "Measuring & Material Takeoffs",
+    "summary": "Calculate PVC quantities using dimensions, stock lengths, cuts, and realistic waste.",
+    "sections": [
+      [
+        "Measure the runs",
+        "Record each required trim run and the width/thickness needed. Separate unlike products rather than combining everything into one footage number."
+      ],
+      [
+        "Plan stock lengths",
+        "Choose available lengths that reduce unnecessary seams while remaining practical for transport, handling, and installation."
+      ],
+      [
+        "Allow for waste",
+        "Corners, joints, fabrication, damaged ends, and layout can increase material needs beyond perfect net footage."
+      ]
+    ],
+    "quiz": [
+      {
+        "question": "PVC trim takeoffs commonly start with?",
+        "answers": [
+          "Measured runs",
+          "A guessed piece count",
+          "Door handing",
+          "Paint color"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "Why plan stock lengths?",
+        "answers": [
+          "To manage seams and waste",
+          "To change thickness",
+          "To set tax",
+          "To choose fastener color"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "Takeoffs should include?",
+        "answers": [
+          "Reasonable waste",
+          "Only exact net footage in every case",
+          "No dimensions",
+          "Only price"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "Different widths should be?",
+        "answers": [
+          "Tracked separately",
+          "Combined without notes",
+          "Ignored",
+          "Converted to door sizes"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "Corners and fabrication can affect?",
+        "answers": [
+          "Material quantity",
+          "Employee schedule",
+          "Tax code",
+          "Door swing"
+        ],
+        "correct": 0
+      }
+    ]
+  },
+  {
+    "code": "pvc-04",
+    "school": "PVC School",
+    "title": "Cutting, Routing & Fabrication",
+    "summary": "Handle and fabricate PVC cleanly while respecting the product and tool manufacturer requirements.",
+    "sections": [
+      [
+        "Clean cuts",
+        "Sharp, appropriate woodworking tools are commonly used for PVC trim; good support and technique help produce clean edges."
+      ],
+      [
+        "Routing & shaping",
+        "PVC can be routed and shaped for many trim details. Test unfamiliar operations and follow manufacturer guidance for tooling and safe work practices."
+      ],
+      [
+        "Heat awareness",
+        "Friction and excessive heat can affect cut quality. Use appropriate feed rates, sharp tooling, and safe practices rather than forcing a cut."
+      ]
+    ],
+    "quiz": [
+      {
+        "question": "Clean PVC cuts benefit from?",
+        "answers": [
+          "Sharp appropriate tooling",
+          "Dull blades",
+          "Forcing every cut",
+          "No material support"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "PVC can commonly be?",
+        "answers": [
+          "Routed and shaped",
+          "Only painted",
+          "Only nailed",
+          "Only used as sheet"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "Excessive friction can create?",
+        "answers": [
+          "Heat and poor cut quality",
+          "A door swing",
+          "More wall thickness",
+          "A new profile automatically"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "For unfamiliar fabrication, consult?",
+        "answers": [
+          "Manufacturer guidance",
+          "A random guess",
+          "An unrelated invoice",
+          "Only the price list"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "Safe fabrication requires?",
+        "answers": [
+          "Proper tools and work practices",
+          "Ignoring tool instructions",
+          "Removing guards",
+          "Forcing material"
+        ],
+        "correct": 0
+      }
+    ]
+  },
+  {
+    "code": "pvc-05",
+    "school": "PVC School",
+    "title": "Fastening, Adhesives & Joints",
+    "summary": "Plan attachment and joints around PVC movement, substrate conditions, and approved products.",
+    "sections": [
+      [
+        "Fastening",
+        "Use fasteners appropriate for the product, exposure, substrate, and manufacturer requirements. Fastener placement and head treatment affect appearance and performance."
+      ],
+      [
+        "Adhesives",
+        "Use compatible adhesives or cements where specified. Not every construction adhesive is appropriate for every PVC application."
+      ],
+      [
+        "Joints & movement",
+        "PVC changes dimension with temperature. Long runs, joints, fastening, and installation temperature should be planned according to manufacturer guidance."
+      ]
+    ],
+    "quiz": [
+      {
+        "question": "PVC fasteners should match?",
+        "answers": [
+          "Product, exposure and substrate",
+          "Paint color only",
+          "Door handing",
+          "Invoice total"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "Any adhesive is automatically suitable for PVC?",
+        "answers": [
+          "No",
+          "Yes",
+          "Only clear ones",
+          "Only expensive ones"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "Temperature can affect PVC by causing?",
+        "answers": [
+          "Dimensional movement",
+          "Door handing",
+          "Species change",
+          "Rust in the PVC itself"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "Long runs require attention to?",
+        "answers": [
+          "Joints and movement",
+          "Only color",
+          "Only tax",
+          "Only packaging"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "Best source for exact fastening requirements?",
+        "answers": [
+          "Product manufacturer guidance",
+          "Guesswork",
+          "An unrelated catalog",
+          "A customer rumor"
+        ],
+        "correct": 0
+      }
+    ]
+  },
+  {
+    "code": "pvc-06",
+    "school": "PVC School",
+    "title": "Painting, Finishing & Care",
+    "summary": "Explain finishing options and avoid practices that can create performance or appearance problems.",
+    "sections": [
+      [
+        "Painting",
+        "Many cellular PVC products can be painted, but paint type, color limitations, preparation, and warranty requirements vary by manufacturer."
+      ],
+      [
+        "Cleaning",
+        "Use cleaning methods compatible with the finished product. Test unfamiliar cleaners and avoid damaging surfaces."
+      ],
+      [
+        "Storage & handling",
+        "Keep material supported and protected from damage or distortion. Follow manufacturer recommendations for storage, especially before installation."
+      ]
+    ],
+    "quiz": [
+      {
+        "question": "Paint requirements for PVC can vary by?",
+        "answers": [
+          "Manufacturer",
+          "Door handing",
+          "Tax rate",
+          "Customer ZIP code only"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "Before using an unfamiliar cleaner?",
+        "answers": [
+          "Confirm compatibility or test appropriately",
+          "Assume it is safe",
+          "Use the strongest chemical available",
+          "Heat the PVC"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "Storage should help prevent?",
+        "answers": [
+          "Damage and distortion",
+          "Door swing",
+          "Species changes",
+          "Invoice errors"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "Why check paint color limitations?",
+        "answers": [
+          "Some manufacturers restrict certain colors/systems",
+          "All PVC must be black",
+          "Paint changes board width instantly",
+          "Color determines fastener length"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "Warranty-sensitive finishing should follow?",
+        "answers": [
+          "Manufacturer instructions",
+          "A guess",
+          "Any social post",
+          "An unrelated wood spec"
+        ],
+        "correct": 0
+      }
+    ]
+  },
+  {
+    "code": "pvc-07",
+    "school": "PVC School",
+    "title": "Customer Scenarios & Troubleshooting",
+    "summary": "Ask the right questions and guide customers through PVC choices without overpromising.",
+    "sections": [
+      [
+        "Clarify exposure",
+        "Ask where the trim will be installed, dimensions, sun/heat exposure, substrate, finish plan, and whether it must match existing material."
+      ],
+      [
+        "Diagnose before prescribing",
+        "For movement, joint, paint, or fastening concerns, gather installation details before recommending a fix."
+      ],
+      [
+        "Know the boundary",
+        "Use approved technical literature or manufacturer support when a condition is product-specific, structural, warranty-sensitive, or outside store-level guidance."
+      ]
+    ],
+    "quiz": [
+      {
+        "question": "A PVC sales conversation should clarify?",
+        "answers": [
+          "Application and exposure",
+          "Only price",
+          "Only customer name",
+          "Only delivery day"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "Before troubleshooting a failed joint, gather?",
+        "answers": [
+          "Installation details",
+          "Only the SKU",
+          "Only the color",
+          "Nothing"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "Warranty-sensitive questions should use?",
+        "answers": [
+          "Approved technical resources",
+          "Guesswork",
+          "A different product invoice",
+          "A random forum"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "Sun and heat exposure can matter because of?",
+        "answers": [
+          "Material temperature and movement",
+          "Door handing",
+          "Wood species",
+          "Tax rate"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "Good troubleshooting avoids?",
+        "answers": [
+          "Overpromising without enough information",
+          "Asking questions",
+          "Using documentation",
+          "Checking the application"
+        ],
+        "correct": 0
+      }
+    ]
+  },
+  {
+    "code": "pvc-08",
+    "school": "PVC School",
+    "title": "Final Review & Floor Readiness",
+    "summary": "Combine product selection, takeoffs, fabrication, fastening, finishing, and customer guidance before certification.",
+    "sections": [
+      [
+        "Verify the order",
+        "Confirm product type, dimensions, surface/profile, lengths, quantities, application, finish intent, and relevant accessories."
+      ],
+      [
+        "Respect technical requirements",
+        "Installation and warranty details can vary by PVC manufacturer and product line; approved documentation outranks memory."
+      ],
+      [
+        "Floor readiness",
+        "A certified employee should confidently identify the need, recommend the right product family, calculate material, and know when to escalate technical questions."
+      ]
+    ],
+    "quiz": [
+      {
+        "question": "Before submitting a PVC order, verify?",
+        "answers": [
+          "Dimensions, quantity and application",
+          "Only price",
+          "Only customer name",
+          "Only delivery route"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "For exact technical requirements, rely on?",
+        "answers": [
+          "Approved manufacturer documentation",
+          "Memory alone",
+          "Guessing",
+          "An unrelated wood profile"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "PVC certification should include?",
+        "answers": [
+          "Product knowledge and correct customer guidance",
+          "Vocabulary only",
+          "Speed only",
+          "Price memorization only"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "When a question exceeds store-level guidance?",
+        "answers": [
+          "Escalate to approved technical support or a manager",
+          "Invent an answer",
+          "Ignore it",
+          "Change the product silently"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "The goal of PVC School is?",
+        "answers": [
+          "Accurate, application-aware PVC service",
+          "Selling PVC for every job",
+          "Avoiding measurements",
+          "Treating PVC exactly like wood"
+        ],
+        "correct": 0
+      }
+    ]
+  },
+  {
+    "code": "sop-cash",
+    "school": "SOP School",
+    "title": "Cash Handling & Daily Reconciliation",
+    "summary": "Safely handle register cash, reconcile each drawer against Shopify POS, document variances, secure funds, and follow approved deposit procedures.",
+    "sections": [
+      [
+        "Core cash policy",
+        "All cash transactions must be recorded through Shopify POS. Every register is reconciled daily; shortages and overages are documented immediately. Only authorized personnel may access the safe or prepare deposits."
+      ],
+      [
+        "Daily reconciliation",
+        "Count each register separately, leave a $500 BEGINNING BANK, compare Shopify POS EXPECTED to physical cash, use REMOVE CASH and CLOSE SESSION, print the receipt, wrap it with the cash, and secure it in the safe."
+      ],
+      [
+        "Variance & deposits",
+        "Recount and notify the Branch Manager immediately when a drawer does not balance. Deposits are generally prepared Fridays unless directed otherwise; bank runs go directly to the bank and require a validated receipt."
+      ]
+    ],
+    "quiz": [
+      {
+        "question": "How much cash should remain as the BEGINNING BANK?",
+        "answers": [
+          "$100",
+          "$250",
+          "$500",
+          "$1,000"
+        ],
+        "correct": 2
+      },
+      {
+        "question": "Where must cash transactions be recorded?",
+        "answers": [
+          "Shopify POS",
+          "A paper notebook only",
+          "Qoblex only",
+          "Email"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "If expected and actual cash do not match, what should happen?",
+        "answers": [
+          "Ignore it",
+          "Notify the Branch Manager",
+          "Change expected total",
+          "Wait until Friday"
+        ],
+        "correct": 1
+      },
+      {
+        "question": "After REMOVE CASH, what is part of closing?",
+        "answers": [
+          "CLOSE SESSION and print receipt",
+          "Leave session open",
+          "Take cash home",
+          "Discard receipt"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "Required bank-run practice?",
+        "answers": [
+          "Personal stops",
+          "Visible deposit",
+          "Go directly and get validated receipt",
+          "Leave receipt"
+        ],
+        "correct": 2
+      }
+    ],
+    "practical": [
+      "Demonstrate the $500 BEGINNING BANK and register reconciliation.",
+      "Explain variance escalation and secure cash handling."
+    ],
+    "source": "Bargain Build, Inc. SOP v1 — Cash Handling & Daily Reconciliation SOP, Version 1.0"
+  },
+  {
+    "code": "sop-delivery",
+    "school": "SOP School",
+    "title": "Delivery Procedure",
+    "summary": "Standard delivery-driver workflow from clock-in through route completion, with safe driving, accurate delivery, customer service, material care, incident response, and return-to-branch requirements.",
+    "sections": [
+      [
+        "Phase 1 — Start of day",
+        "Clock in, carry your driver license and company phone, review the delivery schedule and special notes, and ask questions before leaving when anything is unclear."
+      ],
+      [
+        "Phase 2 — Route packet",
+        "Meet with the Branch Manager and/or Warehouse Manager. Receive delivery invoices, route order, customer notes/call-ahead instructions, and confirm stop count, special handling, time-sensitive deliveries, and required equipment."
+      ],
+      [
+        "Phase 3 — Vehicle inspection",
+        "Complete the Box Truck Pre-Trip Inspection Checklist before operating any company vehicle."
+      ],
+      [
+        "Phase 4 — Load verification",
+        "Before moving the truck, verify material matches the manifest, counts are correct, customer orders are separated, fragile material is protected, doors/windows are padded, no material is loose, the lift gate is clear when applicable, and initial the manifest."
+      ],
+      [
+        "Phase 5 — Departure",
+        "Confirm sufficient fuel, review GPS, mount the phone, notify the manager, confirm the first stop, lock truck doors, adjust mirrors, and fasten the seat belt."
+      ],
+      [
+        "Phase 6 — On the road",
+        "Obey traffic laws, NEVER use handheld phones, wear seat belts AT ALL TIMES, drive defensively, maintain following distance, avoid aggressive driving, and observe roadway height/weight restrictions. Give customers about 30 minutes notice, or more if requested. Follow EasyRoutes, avoid unnecessary mileage and idle time, take the safest route, and take the 30-minute meal break. Extended delays require notification to the Branch Manager/Warehouse Manager and the customer or branch."
+      ],
+      [
+        "Phase 7 — At the delivery",
+        "Park safely, use hazards if needed, verify the address, review the delivery, unload safely, obtain a customer signature with NO EXCEPTIONS, photograph the delivery with NO EXCEPTIONS, and return the paperwork. Represent Bargain Moulding professionally: greet customers, be courteous, NEVER argue, NEVER discuss pricing, NEVER promise credits, and direct concerns to the branch."
+      ],
+      [
+        "Material handling",
+        "Carefully unload. NEVER drag doors/material across the floor or ground, NEVER throw material to a customer, do not carry more than you can safely handle, and stabilize the remaining load after each stop."
+      ],
+      [
+        "Damage, refusals & returns",
+        "If damage is discovered: stop unloading, photograph it, notify the Warehouse Manager and Branch Manager, document it on delivery paperwork, receive customer acknowledgement, then proceed with remaining material. If a customer refuses delivery, call the Branch Manager immediately, DO NOT leave material, wait for instructions, and retain the paperwork. Returned material stays on the manifest, remains secured, is inspected on return, and may return to racks if no visible damage exists."
+      ],
+      [
+        "Accidents & incidents",
+        "ANY ACCIDENT REQUIRES IMMEDIATE BRANCH NOTIFICATION. Secure the scene, call emergency services if needed, notify the manager, take photographs, complete an Incident Report, and DO NOT admit fault."
+      ],
+      [
+        "Phase 8 — Return to branch",
+        "Fuel the truck for the next day if required, unload returns, organize paperwork, discuss customer issues with the Branch Manager, report damaged material, clean the cab, remove trash, lock the truck, complete the post-route inspection, and clock out."
+      ],
+      [
+        "Code of conduct",
+        "Every driver represents Bargain Moulding from the time the truck leaves the yard until it returns. Operate safely, communicate professionally, protect company assets, and treat every customer with courtesy and respect. Delivery quality includes both accuracy and the customer experience."
+      ]
+    ],
+    "quiz": [
+      {
+        "question": "What must be completed before operating a company vehicle?",
+        "answers": [
+          "Box Truck Pre-Trip Inspection Checklist",
+          "Customer credit form",
+          "Cash reconciliation",
+          "Return authorization"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "What proof is required at every completed delivery?",
+        "answers": [
+          "Signature and photograph",
+          "Photograph only",
+          "Signature only",
+          "Verbal confirmation only"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "What should a driver do during an extended delay?",
+        "answers": [
+          "Notify management and the waiting customer/branch",
+          "Continue without telling anyone",
+          "Skip the remaining stops",
+          "Promise a credit"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "If a customer refuses a delivery, what must the driver do?",
+        "answers": [
+          "Leave material and go",
+          "Call the Branch Manager, do not leave material, and wait for instructions",
+          "Give the customer the paperwork and leave",
+          "Promise a refund"
+        ],
+        "correct": 1
+      },
+      {
+        "question": "What is required after any accident?",
+        "answers": [
+          "Immediate branch notification",
+          "Wait until returning to the branch",
+          "Admit fault to the other party",
+          "Continue the route without reporting"
+        ],
+        "correct": 0
+      }
+    ],
+    "practical": [
+      "Complete or explain the Box Truck Pre-Trip Inspection Checklist and departure checks.",
+      "Verify a sample load against the manifest and identify safe load-securing requirements.",
+      "Demonstrate the arrival, signature, photograph, and paperwork process for a delivery.",
+      "Explain the correct response to damaged material and a refused delivery.",
+      "Explain the accident/incident response and end-of-route return-to-branch process."
+    ],
+    "source": "Bargain Build, Inc. SOP v1 — Delivery Procedure SOP, Version 1.0"
+  },
+  {
+    "code": "sop-returns",
+    "school": "SOP School",
+    "title": "Customer Returns, Store Credits & Refund Authorization",
+    "summary": "Handle customer return requests with a solution-first approach while protecting sellable inventory and following approval requirements.",
+    "sections": [
+      [
+        "Our approach to returns",
+        "The goal is not to shut down a customer request. Listen to the customer, inspect the material, and work toward an appropriate resolution while protecting Bargain Moulding inventory. When appropriate, the preferred order of resolution is MATERIAL EXCHANGE → STORE CREDIT → REFUND. Employees should not lead with harsh statements such as “NO RETURNS” or “ALL SALES ARE FINAL.”"
+      ],
+      [
+        "Never promise before inspection",
+        "Never promise an exchange, store credit, or refund before the required physical inspection and approval. A good customer-facing explanation is: “We’re happy to take a look at the material and see what options are available. We need to inspect it first, and then we can determine the best way to help.”"
+      ],
+      [
+        "Responsibilities",
+        "Sales Associates receive the request, verify the customer and original order/invoice information, explain the process positively, and coordinate inspection. The Warehouse Manager physically reviews returned merchandise and determines whether it is suitable for resale. The Branch Manager resolves disputes and exceptions and handles situations requiring management approval."
+      ],
+      [
+        "Physical inspection",
+        "Every return must be physically reviewed by the Warehouse Manager before the final resolution is determined. Verify SKU/product, quantity, overall condition, packaging when applicable, cuts or modifications, paint or stain, installation/use, water or handling damage, and whether the product can reasonably return to inventory as Grade A/resalable material. No separate inspection form is required."
+      ],
+      [
+        "Generally non-returnable material",
+        "Material generally cannot be accepted when it is damaged, altered or modified, installed, painted or stained, cut, used, customer-damaged, special order, custom-made, non-stock, clearance/closeout/final sale, or otherwise unable to be resold as Grade A inventory. Do not argue with the customer; explain the issue professionally and involve management when needed."
+      ],
+      [
+        "Special-order and production doors",
+        "Production door orders require a signed Door Production Authorization Form before manufacturing. Because these doors are manufactured specifically for the customer, they are normally non-returnable and non-refundable. Retain the signed authorization with the customer order and escalate exceptional circumstances to management."
+      ],
+      [
+        "Resolution 1 — Material exchange",
+        "After inspection and approval, first consider a material exchange when suitable replacement material can solve the customer’s issue. This is especially useful when the customer needs a different product, size, profile, or other replacement material."
+      ],
+      [
+        "Resolution 2 — Store credit",
+        "If an exchange is not appropriate, offer store credit when reasonable. Locate the customer profile in Shopify, verify customer information, enter the approved credit amount, confirm the credit appears correctly, and explain the available balance to the customer."
+      ],
+      [
+        "Resolution 3 — Refund",
+        "An approved return may be refunded to the original payment method when appropriate. Verify the original payment method, process the refund through Shopify, and document the reason and required approval. Company-caused issues such as incorrect material supplied or delivered, company-caused damage, or significant fulfillment errors should receive particular consideration toward making the customer whole."
+      ],
+      [
+        "Restocking fees",
+        "Approved returns may be subject to a restocking fee of up to 10% of the purchase price based on the condition, quantity, and nature of the returned merchandise. Employees must not invent or automatically apply a fee. Follow management direction when a restocking fee may be appropriate and explain it professionally."
+      ],
+      [
+        "Company errors and exceptions",
+        "Examples requiring additional consideration include the wrong item sold, wrong item delivered, company-caused damage, manufacturer defect, significant order-fulfillment error, or another management-approved circumstance. Focus on making the situation right rather than winning an argument over policy. Unusual exceptions and resolutions must be documented."
+      ],
+      [
+        "Restocking approved material",
+        "Inspect approved material again before returning it to inventory. Return it to the correct inventory location using proper inventory procedures. Isolate damaged or questionable material and complete an inventory adjustment when required. Only material appropriate for inventory should return to sellable stock."
+      ],
+      [
+        "Documentation",
+        "Maintain the customer invoice/order, photos when needed, manager approval when required, Shopify credit/refund documentation, inventory adjustments when required, and documentation supporting unusual exceptions. A separate return inspection sheet is not required."
+      ],
+      [
+        "Customer service standard",
+        "Remain professional. NEVER argue with the customer. NEVER promise an outcome before inspection. NEVER use the return policy simply to shut down the conversation. Listen, explain the inspection process, and work through the approved resolution options. The objective is to protect company inventory while making a reasonable effort to take care of the customer."
+      ]
+    ],
+    "quiz": [
+      {
+        "question": "After material is inspected and approved, what should normally be considered first?",
+        "answers": [
+          "Material exchange",
+          "Cash refund",
+          "Reject the customer",
+          "Inventory adjustment"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "What should an employee say before material has been inspected?",
+        "answers": [
+          "We’ll inspect the material and determine what options are available.",
+          "All sales are final.",
+          "You’ll definitely receive a refund.",
+          "You automatically get store credit."
+        ],
+        "correct": 0
+      },
+      {
+        "question": "Who determines whether returned material is suitable for resale?",
+        "answers": [
+          "Warehouse Manager",
+          "Sales Associate",
+          "Customer",
+          "Delivery Driver"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "Which material is generally non-returnable?",
+        "answers": [
+          "Material cut to the customer’s specifications",
+          "Unopened Grade A stock material",
+          "Approved undamaged stock material",
+          "Resalable material in original packaging"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "What restocking fee may apply to an approved return?",
+        "answers": [
+          "Up to 10% when appropriately assessed",
+          "Always 10%",
+          "Always 25%",
+          "No restocking fee can ever apply"
+        ],
+        "correct": 0
+      }
+    ],
+    "practical": [
+      "Receive a sample return request without immediately promising or denying a return, verify the customer/order information, and explain the inspection process professionally.",
+      "Evaluate sample materials and distinguish potentially resalable Grade A material from generally non-returnable material.",
+      "Work through scenarios requiring material exchange, store credit, refund consideration, rejection, restocking-fee escalation, and management escalation.",
+      "Demonstrate the Shopify store-credit/refund workflow and identify the documentation that must be retained without using a separate inspection form."
+    ],
+    "source": "Bargain Build, Inc. SOP v1 — Returns, Credits, & Refund Authorization SOP; aligned with Bargain Moulding public refund policy and current operating practice"
+  },
+  {
+    "code": "sop-damaged",
+    "school": "SOP School",
+    "title": "Damaged Material & Claims",
+    "summary": "Identify, photograph, isolate, report, and properly resolve damaged material while preserving inventory accuracy and claim evidence.",
+    "sections": [
+      [
+        "Core workflow",
+        "Identify → Photograph → Isolate → Report → Determine Disposition → Correct Inventory if Authorized."
+      ],
+      [
+        "Non-negotiable standards",
+        "Never conceal damage. Do not return damaged material to sellable inventory without approval. Do not discard material connected to an open vendor or freight claim without authorization. Employees may not independently promise customers refunds, replacements, discounts, or store credit."
+      ],
+      [
+        "Assess facts",
+        "Identify SKU, product, quantity, and related order number. Describe observable damage. When the cause cannot reasonably be established, document facts rather than assigning blame."
+      ],
+      [
+        "Photographs",
+        "Photograph the overall product, close-up damage, SKU/label, shipment and shipping label when applicable. For freight damage, photograph before breaking down the load when practical and safe. No separate damage inspection form is required."
+      ],
+      [
+        "HOLD – DAMAGED MATERIAL",
+        "Each location will maintain a designated physical area for damaged material that is waiting for management review or final disposition. This area will be identified as HOLD – DAMAGED MATERIAL. When practical, employees should move damaged material to this area so it is physically separated from normal sellable inventory. Material in this area is NOT AVAILABLE FOR SALE unless a manager later approves it for return to sellable inventory. When practical, identify the material with useful information such as SKU, quantity, related order number, date, and reason it is being held."
+      ],
+      [
+        "Vendor / PO damage",
+        "Do not receive a damaged shipment as though everything arrived correctly. Photograph and isolate affected material, identify SKU and quantity, retain relevant packaging when practical, notify the Director of Procurement, provide PO/supporting information, and follow Procurement direction for QOBLEX receiving."
+      ],
+      [
+        "Claims documentation",
+        "Procurement may manage vendor and freight claims using photographs, email, PO information, packing slips, Bills of Lading, vendor communication, claim references, credits, replacement information, and other records appropriate to the situation. No separate claims form is required. Keep claim material available until Procurement authorizes disposition."
+      ],
+      [
+        "Transfer damage",
+        "Photograph and document affected material, notify the originating Warehouse Manager and Inventory Manager, and follow the Inventory Transfer procedure. Do not automatically assign blame or simply absorb the loss."
+      ],
+      [
+        "Warehouse-caused damage",
+        "Accidental damage must be reported immediately. Damage identified → photographed → isolated → reported → disposition determined → inventory corrected if authorized. Accidents can happen; knowingly concealing or failing to report known damage is a separate compliance issue."
+      ],
+      [
+        "Order picking",
+        "Do not knowingly provide damaged material to a customer just to complete an order. Separate it, check for replacement inventory, notify the Warehouse Manager, document it, and move damaged material to HOLD."
+      ],
+      [
+        "Delivery damage",
+        "Stop handling affected material, photograph it, notify the branch, make no unauthorized customer promise, document the issue on existing delivery paperwork, and follow branch instructions and the Delivery Procedure SOP."
+      ],
+      [
+        "Customer-reported damage",
+        "Gather customer/order/product details, description of damage, photos when available, pickup/delivery status, and discovery timing. Do not immediately assume company or customer responsibility. Management reviews the facts and follows the Returns SOP when customer resolution is needed."
+      ],
+      [
+        "Final disposition",
+        "Possible outcomes include return to vendor, vendor credit, replacement, freight claim, approved return to sellable inventory, discount/as-is sale, company use, disposal, or customer resolution. Warehouse employees and Sales Associates do not independently determine final disposition unless authorized."
+      ],
+      [
+        "Inventory adjustments",
+        "Physical damage does NOT automatically authorize an inventory adjustment. Adjust only after disposition is determined and authorization exists. Follow Inventory Adjustments & IAL."
+      ],
+      [
+        "Escalation",
+        "Immediately escalate significant losses, repeated vendor/carrier damage, customer property damage, vehicle accidents, employee injury, disputed responsibility, suspected intentional damage, large inventory discrepancies, and safety hazards."
+      ],
+      [
+        "Related SOPs",
+        "Receiving Purchase Orders; Receiving Inventory Transfers; Creating & Dispatching Inventory Transfers; Inventory Adjustments & IAL; Order Picking SOP; Delivery Procedure SOP; Customer Returns, Store Credits & Refund Authorization SOP."
+      ]
+    ],
+    "quiz": [
+      {
+        "question": "What is the correct workflow when damaged inventory is discovered?",
+        "answers": [
+          "Adjust → discard → report",
+          "Identify → photograph → isolate → report → determine disposition → correct inventory if authorized",
+          "Sell → document → adjust",
+          "Photograph → discard"
+        ],
+        "correct": 1
+      },
+      {
+        "question": "Where should damaged material awaiting a decision normally be placed?",
+        "answers": [
+          "Normal rack",
+          "Customer pickup",
+          "HOLD – DAMAGED MATERIAL",
+          "Trash"
+        ],
+        "correct": 2
+      },
+      {
+        "question": "What should happen when an employee accidentally damages material?",
+        "answers": [
+          "Hide minor damage",
+          "Adjust and dispose immediately",
+          "Report it immediately so it can be documented, isolated, and resolved",
+          "Wait to see if anyone notices"
+        ],
+        "correct": 2
+      },
+      {
+        "question": "Does physical damage automatically authorize an inventory adjustment?",
+        "answers": [
+          "Yes with photos",
+          "Yes if a manager finds it",
+          "No; disposition and authorization come first",
+          "Yes if unsellable"
+        ],
+        "correct": 2
+      },
+      {
+        "question": "What is required for vendor damage claims?",
+        "answers": [
+          "A new damage form every time",
+          "No documentation",
+          "Appropriate supporting records such as photos, emails, PO/shipping information and resolution records; no separate claim form is required",
+          "Warehouse employees negotiate directly with vendor"
+        ],
+        "correct": 2
+      }
+    ],
+    "practical": [
+      "Demonstrate the identify → photograph → isolate → report workflow.",
+      "Identify useful photos and information for a damaged vendor shipment.",
+      "Place sample material into HOLD – DAMAGED MATERIAL and explain why it cannot be sold while awaiting disposition.",
+      "Explain responses to damage during PO receiving, transfer receiving, order picking, and delivery.",
+      "Explain immediate reporting of accidental damage and why concealment is a separate compliance issue.",
+      "Explain why damage does not automatically authorize an inventory adjustment.",
+      "Explain what employees may and may not promise customers.",
+      "Identify when Procurement, Inventory Manager, Branch Manager, or another manager must be involved."
+    ],
+    "source": "Bargain Build, Inc. SOP v1 — Damaged Material & Claims SOP"
+  },
+  {
+    "code": "sop-backorders",
+    "school": "SOP School",
+    "title": "Customer Backorder Management & Resolution",
+    "summary": "Document every customer backorder, communicate proactively, investigate availability, reserve material when it arrives, prioritize fulfillment, and keep the obligation open until the customer is fulfilled.",
+    "sections": [
+      [
+        "Backorder mantra",
+        "A backorder represents an existing obligation to a customer — not a new order waiting to be scheduled. RESERVE IT. COMMUNICATE IT. DELIVER IT. CLOSE IT. Material received does not mean the backorder is resolved; customer fulfilled means the backorder is resolved."
+      ],
+      [
+        "Document every backorder",
+        "ALL backorders must be documented. Identify the customer/order, exact SKU and quantity owed, shortage, employee responsible for communication, electronic record, follow-up, and final resolution. The company computer system is the official record; the physical invoice in the Open Backorder Folder is the backup record."
+      ],
+      [
+        "Identify, verify, and notify",
+        "The Warehouse Manager verifies SKU, ordered quantity, physical quantity, normal storage and staged material before declaring a shortage. For deliveries, document SKU, description, quantity ordered, quantity delivered and quantity backordered on Driver/Route Paperwork and the Office Copy. Notify the Delivery Driver and Branch Manager before departure whenever possible."
+      ],
+      [
+        "Customer contact before delivery",
+        "The Branch Manager or designated employee makes every reasonable effort to contact the customer before an incomplete delivery arrives. Explain what is unavailable, quantity backordered, what will still arrive, that availability is being investigated, and that outstanding material from a company-created delivery backorder will be delivered FREE OF CHARGE once available."
+      ],
+      [
+        "Incomplete delivery and communication",
+        "Available material should generally continue on the scheduled route while unavailable material is managed as a backorder. Acknowledge the inconvenience, take ownership, explain what happens next, avoid speculation and unsupported promises, and never blame employees, departments, branches, vendors, manufacturers, or drivers to the customer."
+      ],
+      [
+        "Investigate and update",
+        "The Branch Manager coordinates with the Inventory Manager to investigate current inventory, other locations, transfers, incoming POs and known inbound inventory. The Director of Procurement may investigate vendors/manufacturers when needed. Never promise an arrival date without reliable support; communicate an ETA as an estimate unless confirmed. Keep the customer reasonably updated."
+      ],
+      [
+        "Review open backorders",
+        "Branch and Warehouse Managers use the computer system as the primary source. Daily review covers new backorders, expected material, immediate follow-ups, urgent project needs and orders ready for fulfillment. Weekly review covers aging orders, missing ETAs/follow-ups, newly available inventory, escalation and customer dissatisfaction."
+      ],
+      [
+        "When material becomes available",
+        "Backordered material becomes committed customer inventory and an immediate fulfillment priority. Verify SKU/quantity/customer, separate it immediately, label and stage it, notify the Branch Manager and update the electronic record. Do not return it to unrestricted stock or sell it to another customer before the existing obligation is addressed."
+      ],
+      [
+        "Fulfill with priority",
+        "Existing backorders take precedence over normal delivery scheduling. Delivery backorders go on the next practical route, are identified as BACKORDER FULFILLMENT, and receive no additional delivery fee. Pickup backorders are reserved, staged, labeled and the customer is contacted immediately."
+      ],
+      [
+        "Close only after fulfillment",
+        "Close a backorder only after the customer receives all outstanding material or another documented management/customer resolution is completed. A PO, transfer, ETA, material arrival, staging, customer contact, or scheduled delivery does NOT close it. Mark CLOSED / FULFILLED in the system, record resolution/date, then remove and retain the physical paperwork according to company procedure."
+      ]
+    ],
+    "quiz": [
+      {
+        "question": "When is a customer backorder actually resolved?",
+        "answers": [
+          "When the customer receives the outstanding material or another approved documented resolution is completed",
+          "When a purchase order is created",
+          "When the material arrives at the warehouse",
+          "When a delivery is scheduled"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "What is the official tracking record for all customer backorders?",
+        "answers": [
+          "The company computer system",
+          "A text message",
+          "The Open Backorder Folder only",
+          "The driver’s memory"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "What should happen to backordered material when it becomes available?",
+        "answers": [
+          "Immediately reserve, label and stage it for the customer owed the material",
+          "Return it to unrestricted stock",
+          "Sell it to the next customer who asks",
+          "Wait until the normal delivery schedule has space"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "What should a customer be charged for delivery of material owed from a company-created delivery backorder?",
+        "answers": [
+          "No additional delivery fee",
+          "The normal delivery fee again",
+          "A rush fee",
+          "A transfer fee"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "How should employees communicate an unconfirmed arrival date?",
+        "answers": [
+          "As an estimate only when reliable information exists, without unsupported promises",
+          "Promise the earliest possible date",
+          "Give the vendor’s date as guaranteed",
+          "Avoid all customer communication until material arrives"
+        ],
+        "correct": 0
+      }
+    ],
+    "practical": [
+      "Given a sample incomplete delivery, identify the exact SKU/quantity shortage, document it on route/office paperwork, explain who must be notified, and describe the electronic and physical records required.",
+      "Role-play the customer call before delivery, including the missing material, what will still arrive, investigation of availability, free fulfillment delivery, and professional ownership without blame.",
+      "Given sample backordered material that has just arrived, demonstrate RESERVE IT → COMMUNICATE IT → DELIVER IT → CLOSE IT, including staging, priority fulfillment and the condition required before closing the record."
+    ],
+    "source": "Bargain Moulding — SOP: Customer Backorder Management & Resolution, Revision 1.0"
+  },
+  {
+    "code": "sop-cycle-count",
+    "school": "SOP School",
+    "title": "Cycle Counts & Inventory Discrepancies",
+    "summary": "Maintain accurate Qoblex inventory through scheduled physical counts, immediate discrepancy investigation, authorized corrections, and verification.",
+    "sections": [
+      [
+        "Purpose",
+        "Cycle counts are a routine inventory-control process, not a once-a-year cleanup. Each scheduled count should leave the category as accurate as reasonably possible. The first 90 days are a pilot used to establish a reliable counting rhythm and identify categories or SKUs that need more attention."
+      ],
+      [
+        "System of Record",
+        "Qoblex is the official inventory system of record. Shopify sales update Qoblex. Material on an unfulfilled customer order may remain physically in the warehouse while Qoblex shows that quantity as allocated. Allocated material is still part of physical on-hand inventory until it is fulfilled."
+      ],
+      [
+        "Ownership",
+        "The Warehouse Manager spearheads cycle counts and assigns warehouse employees to perform the physical counts. The Warehouse Manager is responsible for making sure counts happen, verifying discrepancies, and escalating unresolved differences."
+      ],
+      [
+        "Weekly Completion Standard",
+        "The scheduled category must be fully counted, discrepancies investigated, approved corrections completed, and results verified within its assigned week. The Warehouse Manager may choose when during the week the work occurs and divide the count among warehouse employees as needed. Physical counting should be performed in concentrated blocks whenever practical to minimize inventory movement during the count. Counts should not be unnecessarily spread across several days. Once a SKU or manageable section is counted, compare and reconcile it promptly so sales, receiving, picking, transfers, and other inventory movement do not create false discrepancies. If normal operations prevent completion, the Warehouse Manager must treat that as an exception and arrange prompt catch-up rather than simply waiting for the next rotation."
+      ],
+      [
+        "Adjustment Authority",
+        "Warehouse employees and Warehouse Managers do not change Qoblex quantities simply to make the system match a count. Inventory quantity adjustments are authorized and/or made only by the Inventory Manager and/or Director of Procurement (DOP)."
+      ],
+      [
+        "Count Method",
+        "When practical, employees should perform a blind physical count without being shown the expected Qoblex quantity first. Count the entire assigned category and every stocked SKU/variant. For moulding profiles stocked in both PRF and MDF, count each variant separately against its respective Qoblex SKU."
+      ],
+      [
+        "Compare Correctly",
+        "Compare the confirmed physical quantity to Qoblex On Hand—not merely Available inventory. Example: if Qoblex shows 100 On Hand and 25 Allocated, approximately 100 pieces should physically exist; only 75 are available to sell. Allocation does not remove material from physical inventory."
+      ],
+      [
+        "Discrepancy Investigation",
+        "If Physical On Hand does not equal Qoblex On Hand, do not immediately adjust Qoblex. Recount first. Then check the correct SKU/profile/size and material variant, other storage locations, allocated or staged customer material, recent receiving, transfers, returns, damaged material, fulfillment activity, and other reasonable transaction or location issues."
+      ],
+      [
+        "Correct Each Week",
+        "Confirmed discrepancies are addressed during the week they are discovered. Do not wait until the end of the 90-day pilot. After reasonable investigation, unresolved true inventory differences are escalated to the Inventory Manager and/or DOP for review and authorized Qoblex correction."
+      ],
+      [
+        "Verify & Learn",
+        "After an approved adjustment, verify Qoblex against the confirmed physical count. Record enough information to identify patterns: date, SKU, Qoblex on-hand, physical count, variance, known cause when available, and adjustment/result. A problem SKU may be scheduled for an earlier targeted recount."
+      ],
+      [
+        "Customer Impact",
+        "If a discrepancy means material allocated to an existing customer order is no longer physically available, treat it as a customer fulfillment issue and follow the Customer Backorder Management & Resolution SOP. Do not allow an inventory correction to hide an affected customer order."
+      ],
+      [
+        "90-Day Pilot Rotation",
+        "Week 1: Base. Week 2: Casing. Week 3: Interior Doors. Week 4: Crown. Week 5: PVC. Week 6: Smalls + Shiplap + S4S Boards. Week 7: Cabinets. Week 8: Flooring. Week 9: Exterior Doors. Week 10: Base second count. Week 11: Casing second count. Week 12: targeted discrepancy recounts/problem SKUs. Week 13: final verification and catch-up counts."
+      ],
+      [
+        "Operating Standard",
+        "COUNT → INVESTIGATE → CORRECT → VERIFY → MOVE ON. A scheduled cycle count is not permission to blindly overwrite Qoblex. The goal is accurate inventory today and better information for determining future count frequency."
+      ]
+    ],
+    "quiz": [
+      {
+        "question": "Qoblex shows 100 On Hand and 25 Allocated. How many pieces should normally be physically present?",
+        "answers": [
+          "75",
+          "25",
+          "100",
+          "125"
+        ],
+        "correct": 2
+      },
+      {
+        "question": "A warehouse employee counts fewer pieces than Qoblex On Hand. What should happen first?",
+        "answers": [
+          "Immediately change Qoblex",
+          "Recount and investigate the discrepancy",
+          "Wait until Week 13",
+          "Ignore it if material is allocated"
+        ],
+        "correct": 1
+      },
+      {
+        "question": "Who has authority to authorize and/or make inventory quantity adjustments in Qoblex?",
+        "answers": [
+          "Any warehouse employee",
+          "Warehouse Manager only",
+          "Inventory Manager and/or DOP",
+          "Sales staff"
+        ],
+        "correct": 2
+      },
+      {
+        "question": "What does the assigned week mean for a cycle count?",
+        "answers": [
+          "The count should be stretched across all five days",
+          "The full category, investigation, approved corrections, and verification must be completed within that week",
+          "Only the physical count must begin that week",
+          "Discrepancies can wait until the end of the 90-day pilot"
+        ],
+        "correct": 1
+      },
+      {
+        "question": "A cycle count shows allocated material for an existing customer order is physically missing. What else may be required?",
+        "answers": [
+          "Close the allocation",
+          "Follow the Customer Backorder Management & Resolution SOP",
+          "Delete the order",
+          "Wait for the next cycle count"
+        ],
+        "correct": 1
+      }
+    ],
+    "practical": [
+      "Assign an employee a sample category/SKU and observe a blind physical count, including separate stocked variants where applicable.",
+      "Have the employee explain how they would complete an assigned weekly category in concentrated counting blocks while minimizing inventory movement and reconciling counted sections promptly.",
+      "Present a Physical On Hand vs. Qoblex On Hand discrepancy and have the employee explain the recount/investigation path, escalation to the Inventory Manager/DOP, and when a missing allocation triggers the Backorder SOP."
+    ],
+    "source": "Bargain Moulding — Cycle Count & Inventory Discrepancy Policy (90-Day Pilot)"
+  },
+  {
+    "code": "sop-purchase-orders",
+    "school": "SOP School",
+    "title": "Purchase Order Creation & Management",
+    "summary": "Control every purchase from request through vendor documentation so Qoblex, Receiving, Procurement, and Accounting have a matching purchasing record.",
+    "sections": [
+      [
+        "Golden Rule",
+        "NO PO → NO PURCHASE. No material may be ordered from a vendor unless the Director of Procurement (DOP) has first created and issued a Purchase Order in Qoblex. Requesting a PO after an order has already been placed is not the normal process."
+      ],
+      [
+        "Why the PO Matters",
+        "The Qoblex PO is the official purchasing record. The PO number connects the purchase to vendor documentation, receiving, and the invoice Accounting must reconcile and pay. The documentation chain is Qoblex PO → Vendor Order/BOM → Receiving → Vendor Invoice."
+      ],
+      [
+        "Stock & Standard Inventory Orders",
+        "The DOP owns stock and standard inventory purchasing. The DOP creates the PO in Qoblex, places the vendor order, and normally receives the vendor BOM or order confirmation directly. Other employees may not independently place stock inventory orders with vendors."
+      ],
+      [
+        "Customer Special Orders",
+        "Certain customer sales require vendor purchasing, including applicable special-order moulding, flex moulding, third-party special-order doors, and cabinet orders. After the counter sale, the appropriate Inside Sales employee or Kitchen Cabinet Specialist receives the POS order information and requests a PO from the DOP. Do not place the vendor order yet."
+      ],
+      [
+        "PO Before Vendor Order",
+        "The DOP creates the special-order PO in Qoblex and issues the PO number. Only after the Qoblex PO has been issued may Inside Sales or the Kitchen Cabinet Specialist place the order with the vendor."
+      ],
+      [
+        "Vendor BOM / Order Confirmation",
+        "For customer special orders, the vendor may email its BOM or order confirmation to the Inside Sales employee or Kitchen Cabinet Specialist who placed the order. That employee must forward the received BOM/confirmation to the DOP. The DOP acknowledges the documentation and scans/attaches it to the corresponding Qoblex PO. This is a documentation step after the vendor order is placed; it is not a second authorization gate before ordering."
+      ],
+      [
+        "Receiving Handoff",
+        "Once purchased material physically arrives at a branch, follow SOP 03 — Receiving Purchase Orders. SOP 03 governs matching the Qoblex PO, vendor packing slip, and physical product; counting and inspection; partial shipments; Qoblex receiving/authorization; and required closeout communication. Material arriving does not automatically mean the entire PO should be closed."
+      ],
+      [
+        "Partial Shipments",
+        "Under SOP 03, receive only products physically present and leave remaining quantities open. Never receive material that is not physically present on-site. Follow SOP 03 and notify the DOP as required."
+      ],
+      [
+        "Damaged Material Handoff",
+        "Do not receive damaged material as though everything arrived correctly. Follow SOP 03 — Receiving Purchase Orders for the receiving process and SOP 08 — Damaged Material & Claims for damaged-material handling. Photograph the damage, move affected material to HOLD – DAMAGED MATERIAL when practical, notify the DOP, preserve supporting documentation/packaging when applicable, and follow Procurement direction for Qoblex receiving and final disposition."
+      ],
+      [
+        "Related SOPs",
+        "SOP 03 — Receiving Purchase Orders. SOP 08 — Damaged Material & Claims. These procedures control the process after purchased material physically arrives and when damage is identified."
+      ],
+      [
+        "Operating Standard",
+        "REQUEST → PO → ORDER → DOCUMENT → RECEIVE. Above everything else: NO PO → NO PURCHASE."
+      ]
+    ],
+    "quiz": [
+      {
+        "question": "Inside Sales has a customer POS order for special-order moulding. What must happen before placing the vendor order?",
+        "answers": [
+          "Place the order and request a PO afterward",
+          "Request and receive a Qoblex PO from the DOP",
+          "Ask the Branch Manager to create a PO",
+          "Wait until the material arrives"
+        ],
+        "correct": 1
+      },
+      {
+        "question": "Who owns creation and placement of standard stock inventory purchase orders?",
+        "answers": [
+          "Warehouse Manager",
+          "Inside Sales",
+          "Director of Procurement",
+          "Kitchen Cabinet Specialist"
+        ],
+        "correct": 2
+      },
+      {
+        "question": "A Kitchen Cabinet Specialist receives a vendor BOM/order confirmation after placing an authorized special order. What should happen?",
+        "answers": [
+          "Forward it to the DOP for Qoblex filing",
+          "Create a second PO",
+          "Send it only to Accounting",
+          "Wait for the Branch Manager to approve it"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "A PO is for 20 units but only 12 physically arrive. What should happen under SOP 03?",
+        "answers": [
+          "Receive all 20",
+          "Receive 12 and leave the remaining quantity open",
+          "Close the PO and fix it later",
+          "Receive none until all 20 arrive"
+        ],
+        "correct": 1
+      },
+      {
+        "question": "Material arrives damaged against a valid PO. What should the employee do?",
+        "answers": [
+          "Receive it as correct because the PO exists",
+          "Discard it and close the PO",
+          "Photograph and isolate it, notify DOP, and follow SOP 03 and SOP 08",
+          "Return it to sellable inventory while waiting"
+        ],
+        "correct": 2
+      }
+    ],
+    "practical": [
+      "Given a customer special-order scenario, have the employee explain the sequence from POS order through Qoblex PO issuance and vendor ordering, including the NO PO → NO PURCHASE rule.",
+      "Present a vendor BOM/order confirmation received by Inside Sales or the Kitchen Cabinet Specialist and have the employee demonstrate the correct handoff to the DOP for Qoblex documentation.",
+      "Present a partial or damaged shipment and have the employee identify the handoff to SOP 03 — Receiving Purchase Orders and, for damage, SOP 08 — Damaged Material & Claims."
+    ],
+    "source": "Bargain Moulding — Purchase Order Creation & Management Policy"
+  }
+]
