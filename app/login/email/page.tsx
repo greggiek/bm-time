@@ -12,6 +12,9 @@ export default function EmailLoginPage() {
 
   async function sendMagicLink() {
     const normalizedEmail = email.trim().toLowerCase();
+    const callbackOrigin = window.location.hostname === 'localhost'
+      ? 'https://bm-time-git-bm-os-identity-bargain-moulding1.vercel.app'
+      : window.location.origin;
     if (!normalizedEmail.endsWith('@bargainmoulding.com')) {
       setError('Use your @bargainmoulding.com email address.');
       return;
@@ -21,7 +24,7 @@ export default function EmailLoginPage() {
     const { error: emailError } = await getBrowserClient().auth.signInWithOtp({
       email: normalizedEmail,
       options: {
-        emailRedirectTo: `${window.location.origin}/auth/callback`,
+        emailRedirectTo: `${callbackOrigin}/auth/callback`,
       },
     });
     if (emailError) setError(emailError.message);
