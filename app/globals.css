@@ -188,9 +188,10 @@ td button[style*="color"] { border-color: #ffd4d4; background: var(--danger-soft
 .clocked_out { color: #66798c; background: #edf2f7; }
 .on_break { color: #9a6700; background: #fff2c7; }
 
-.homeCard { text-align: center; }
-.homeCard p { color: var(--muted); }
-.homeLinks { display: grid; gap: 12px; margin-top: 28px; }
+.homeShell { background: linear-gradient(180deg, #f7faff 0, var(--canvas) 100%); }
+.homeCard { width: min(420px, 100%); padding: 30px; text-align: center; }
+.homeCard .brand { margin: 0; font-size: 31px; }
+.homeLinks { display: grid; gap: 12px; margin-top: 26px; }
 .homeLinks a { border: 1px solid var(--border); border-radius: 12px; padding: 15px; color: var(--navy); background: var(--surface-muted); font-weight: 750; text-decoration: none; transition: .15s ease; }
 .homeLinks a:hover { border-color: #abc4e2; color: var(--blue); background: var(--blue-soft); transform: translateY(-1px); }
 
@@ -229,6 +230,8 @@ td button[style*="color"] { border-color: #ffd4d4; background: var(--danger-soft
 @media (max-width: 520px) {
   .shell { padding: 0; }
   .card { min-height: 100vh; border: 0; border-radius: 0; padding: 24px 20px; }
+  .homeShell { padding: 20px; }
+  .homeCard { min-height: 0; border: 1px solid rgba(219, 229, 239, .9); border-radius: var(--radius-lg); padding: 28px 22px; }
   .clock { margin: 38px 0 24px; }
   .brand { font-size: 27px; }
   .brand::before { height: 24px; }
