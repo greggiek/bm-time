@@ -114,7 +114,7 @@ export default function ManagerPage() {
         </header>
         <section className="managerCard">
           <div className="loginBox">
-            <h1>Manager Login</h1>
+            <h1>Employee Login</h1>
             <input
               type="password"
               inputMode="numeric"
