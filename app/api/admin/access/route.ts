@@ -60,7 +60,7 @@ export async function GET(request: NextRequest) {
   const supabase = getAdminClient();
   if (!supabase) return NextResponse.json({ message: 'Supabase is not configured.' }, { status: 503 });
 
-  const [identitiesResult, employeesResult, assignmentsResult, rolesResult, permissionsResult, rolePermissionsResult, locationsResult] = await Promise.all([
+  const [identitiesResult, employeesResult, assignmentsResult, rolesResult, permissionsResult, rolePermissionsResult, locationsResult, explicitAccessResult] = await Promise.all([
     supabase.from('bm_identities').select('id,employee_id,display_name,google_email,active').order('display_name'),
     supabase.from('time_employees').select('id,employee_number,first_name,last_name,primary_location_id,job_title_id,active'),
     supabase.from('bm_identity_roles').select('identity_id,role_id,scope_type,scope_ids'),
@@ -68,9 +68,10 @@ export async function GET(request: NextRequest) {
     supabase.from('bm_permissions').select('id,code'),
     supabase.from('bm_role_permissions').select('role_id,permission_id'),
     supabase.from('time_locations').select('id,name'),
+    supabase.from('bm_identity_system_access').select('identity_id,system_code,access_level,scope_type,scope_ids'),
   ]);
 
-  const firstError = [identitiesResult, employeesResult, assignmentsResult, rolesResult, permissionsResult, rolePermissionsResult, locationsResult]
+  const firstError = [identitiesResult, employeesResult, assignmentsResult, rolesResult, permissionsResult, rolePermissionsResult, locationsResult, explicitAccessResult]
     .find((result) => result.error)?.error;
   if (firstError) return NextResponse.json({ message: firstError.message }, { status: 500 });
 
@@ -88,6 +89,10 @@ export async function GET(request: NextRequest) {
   const assignmentsByIdentity = new Map<string, Assignment[]>();
   for (const assignment of (assignmentsResult.data || []) as Assignment[]) {
     assignmentsByIdentity.set(assignment.identity_id, [...(assignmentsByIdentity.get(assignment.identity_id) || []), assignment]);
+  }
+  const explicitByIdentity = new Map<string, Array<{ system_code: string; access_level: string; scope_type: string; scope_ids: string[] }>>();
+  for (const access of explicitAccessResult.data || []) {
+    explicitByIdentity.set(access.identity_id, [...(explicitByIdentity.get(access.identity_id) || []), access]);
   }
 
   const rows = (identitiesResult.data || []).map((identity) => {
@@ -113,7 +118,7 @@ export async function GET(request: NextRequest) {
       return roleId ? getScope(assignments, locations, new Set([roleId])) : '—';
     };
 
-    const systems = {
+    const legacySystems = {
       time: getSystemAccess(
         assignedRoleCodes.has('time_clock_user') || Array.from(effectivePermissions).some((permission) => permission.startsWith('time.')),
         effectivePermissions,
@@ -166,6 +171,32 @@ export async function GET(request: NextRequest) {
         ],
       ),
     };
+    const explicitSystems = explicitByIdentity.get(identity.id) || [];
+    const explicit = (systemCode: string): SystemAccess => {
+      const access = explicitSystems.find((item) => item.system_code === systemCode);
+      if (!access) return { enabled: false, level: 'No access', scope: '—' };
+      const levelLabels: Record<string, string> = {
+        user: systemCode === 'academy' ? 'Learner' : systemCode === 'time' ? 'Employee' : 'User',
+        location_manager: 'Location manager',
+        company_manager: 'Company manager',
+        administrator: 'Administrator',
+      };
+      const scope = access.scope_type === 'company'
+        ? 'Company'
+        : access.scope_type === 'location'
+          ? (access.scope_ids.map((id) => locations.get(id)).filter(Boolean).join(', ')
+            || (employee ? locations.get(employee.primary_location_id) : null)
+            || 'Location')
+          : 'Self';
+      return { enabled: true, level: levelLabels[access.access_level] || access.access_level, scope };
+    };
+    const systems = {
+      time: explicit('time'),
+      academy: explicit('academy'),
+      warehouse: explicit('warehouse'),
+      sales: explicit('sales'),
+      prospecting: explicit('prospecting'),
+    };
 
     return {
       id: identity.id,
@@ -176,6 +207,7 @@ export async function GET(request: NextRequest) {
       loginMethod,
       active: identity.active && (employee ? employee.active : true),
       systems,
+      legacySystems,
     };
   });
 

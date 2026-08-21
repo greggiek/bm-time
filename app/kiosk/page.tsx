@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 
 type EmployeeState = {
@@ -8,11 +8,7 @@ type EmployeeState = {
   firstName: string;
   status: 'clocked_in' | 'clocked_out';
   breakStartedAt: string | null;
-};
-
-type Location = {
-  kioskId: string;
-  name: string;
+  location: string;
 };
 
 export default function KioskPage() {
@@ -21,53 +17,13 @@ export default function KioskPage() {
   const [employee, setEmployee] = useState<EmployeeState | null>(null);
   const [message, setMessage] = useState('');
   const [busy, setBusy] = useState(false);
-  const [success, setSuccess] = useState<{ title: string; time: string } | null>(null);
-  const [locations, setLocations] = useState<Location[]>([]);
-  const [selectedKioskId, setSelectedKioskId] = useState('');
-  const [loadingLocations, setLoadingLocations] = useState(true);
+  const [success, setSuccess] = useState<{ title: string; time: string; location: string } | null>(null);
   const kioskToken = process.env.NEXT_PUBLIC_KIOSK_TOKEN || '';
-
-  const selectedLocation = useMemo(
-    () => locations.find((location) => location.kioskId === selectedKioskId),
-    [selectedKioskId, locations],
-  );
 
   useEffect(() => {
     const timer = setInterval(() => setNow(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    async function loadLocations() {
-      setLoadingLocations(true);
-      setMessage('');
-      try {
-        const response = await fetch('/api/kiosks', {
-          method: 'POST',
-          headers: { 'content-type': 'application/json' },
-          body: JSON.stringify({ kioskToken }),
-        });
-        const data = await response.json();
-        if (!response.ok) throw new Error(data.message || 'Unable to load locations.');
-        if (cancelled) return;
-        setLocations(data.warehouses || []);
-        setSelectedKioskId(data.defaultKioskId || data.warehouses?.[0]?.kioskId || '');
-      } catch (error) {
-        if (!cancelled) {
-          setMessage(error instanceof Error ? error.message : 'Unable to load locations.');
-        }
-      } finally {
-        if (!cancelled) setLoadingLocations(false);
-      }
-    }
-
-    loadLocations();
-    return () => {
-      cancelled = true;
-    };
-  }, [kioskToken]);
 
   useEffect(() => {
     if (!success) return;
@@ -84,11 +40,6 @@ export default function KioskPage() {
   }
 
   async function send(action: 'identify' | 'clock_in' | 'clock_out' | 'start_break' | 'end_break') {
-    if (!selectedKioskId) {
-      setMessage('Select a location before continuing.');
-      return;
-    }
-
     setBusy(true);
     setMessage('');
     try {
@@ -100,7 +51,6 @@ export default function KioskPage() {
           action,
           employeeId: employee?.employeeId,
           kioskToken,
-          kioskId: selectedKioskId,
         }),
       });
       const data = await response.json();
@@ -111,6 +61,7 @@ export default function KioskPage() {
         setSuccess({
           title: action === 'clock_in' ? 'CLOCKED IN' : action === 'end_break' ? 'BREAK ENDED' : 'CLOCKED OUT',
           time: new Date(data.occurredAt).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }),
+          location: employee?.location || data.location || '',
         });
       }
     } catch (error) {
@@ -139,7 +90,7 @@ export default function KioskPage() {
           <div className="check">✓</div>
           <h1>{success.title}</h1>
           <div className="successTime">{success.time}</div>
-          <p>{selectedLocation?.name}</p>
+          <p>{success.location}</p>
           <p>Have a good {success.title === 'CLOCKED IN' ? 'shift' : 'day'}.</p>
         </section>
       </main>
@@ -152,33 +103,12 @@ export default function KioskPage() {
         <div className="topline">
           <div>
             <div className="brand">BM TIME</div>
-            <div className="location">{selectedLocation?.name || 'Select location'}</div>
+            <div className="location">Location assigned by employee PIN</div>
           </div>
           <div className="date">
             {now.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' })}
           </div>
         </div>
-
-        <label className="warehousePicker">
-          Location
-          <select
-            value={selectedKioskId}
-            onChange={(event) => {
-              reset();
-              setSelectedKioskId(event.target.value);
-            }}
-            disabled={loadingLocations || busy || Boolean(employee)}
-          >
-            <option value="" disabled>
-              {loadingLocations ? 'Loading locations…' : 'Select location'}
-            </option>
-            {locations.map((location) => (
-              <option key={location.kioskId} value={location.kioskId}>
-                {location.name}
-              </option>
-            ))}
-          </select>
-        </label>
 
         <div className="clock">{now.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}</div>
 
@@ -200,7 +130,7 @@ export default function KioskPage() {
             </div>
             <button
               className="primary"
-              disabled={pin.length !== 4 || busy || !selectedKioskId}
+              disabled={pin.length !== 4 || busy}
               onClick={() => send('identify')}
             >
               {busy ? 'Checking…' : 'Continue'}
@@ -209,6 +139,7 @@ export default function KioskPage() {
         ) : (
           <div className="employeePanel">
             <p className="welcome">Welcome, <strong>{employee.firstName}</strong></p>
+            <div className="employeeLocation">{employee.location}</div>
             <div className="status">
               Status: <strong>{employee.breakStartedAt ? 'On Break' : employee.status === 'clocked_in' ? 'Clocked In' : 'Clocked Out'}</strong>
             </div>
@@ -227,12 +158,13 @@ export default function KioskPage() {
         <div className="demoNote">
           {process.env.NEXT_PUBLIC_DEMO_MODE === 'true' ? 'Demo PINs: 1234, 2468, 7300' : ''}
         </div>
-        {!employee && (
-          <div className="kioskManagerExit">
+        <div className="kioskManagerExit">
+          <Link href="/">Back to BM OS</Link>
+          {!employee && <>
             <Link href="/manager">Manager Portal</Link>
             <span>Manager PIN required</span>
-          </div>
-        )}
+          </>}
+        </div>
       </section>
     </main>
   );

@@ -12,27 +12,18 @@ const RequestSchema = z.object({
   kioskId: z.string().uuid().optional(),
 });
 
-const demoWarehouseNames: Record<string, string> = {
-  '00000000-0000-4000-8000-000000000336': 'Amityville',
-  '00000000-0000-4000-8000-000000001611': 'Bohemia',
-  '00000000-0000-4000-8000-000000001133': 'Riverhead',
-  '00000000-0000-4000-8000-000000000730': 'Windham',
-};
-
 export async function POST(request: Request) {
   const parsed = RequestSchema.safeParse(await request.json().catch(() => null));
   if (!parsed.success) {
-    return NextResponse.json({ message: 'Enter a valid 4-digit PIN and select a warehouse.' }, { status: 400 });
+    return NextResponse.json({ message: 'Enter a valid 4-digit PIN.' }, { status: 400 });
   }
 
   const demo = process.env.NEXT_PUBLIC_DEMO_MODE === 'true';
   console.info('[api/punch] request', { action: parsed.data.action, kioskId: parsed.data.kioskId || null, demo });
   if (demo) {
-    const location = parsed.data.kioskId ? demoWarehouseNames[parsed.data.kioskId] : 'Amityville';
-    if (!location) return NextResponse.json({ message: 'Select a valid warehouse.' }, { status: 400 });
-
     const employee = findDemoEmployee(parsed.data.pin);
     if (!employee) return NextResponse.json({ message: 'PIN not recognized.' }, { status: 404 });
+    const location = employee.location;
     const status = currentDemoStatus(employee.id);
     if (parsed.data.action === 'identify') {
       return NextResponse.json({
@@ -78,24 +69,9 @@ export async function POST(request: Request) {
     return NextResponse.json({ message: 'This kiosk is not registered.' }, { status: 401 });
   }
 
-  let kiosk = authorizedKiosk;
-  if (parsed.data.kioskId && parsed.data.kioskId !== authorizedKiosk.id) {
-    const { data: selectedKiosk, error: selectedKioskError } = await supabase
-      .from('time_kiosks')
-      .select('id,location_id,time_locations!time_kiosks_location_id_fkey(name)')
-      .eq('id', parsed.data.kioskId)
-      .eq('active', true)
-      .maybeSingle();
-
-    if (selectedKioskError || !selectedKiosk) {
-      return NextResponse.json({ message: 'The selected warehouse is unavailable.' }, { status: 400 });
-    }
-    kiosk = selectedKiosk;
-  }
-
   const { data: employees, error } = await supabase
     .from('time_employees')
-    .select('id,first_name,pin_hash,active')
+    .select('id,first_name,pin_hash,active,primary_location_id')
     .eq('active', true);
 
   if (error) {
@@ -104,6 +80,22 @@ export async function POST(request: Request) {
 
   const employee = await findMatchingEmployee(employees ?? [], parsed.data.pin);
   if (!employee) return NextResponse.json({ message: 'PIN not recognized.' }, { status: 404 });
+
+  if (!employee.primary_location_id) {
+    return NextResponse.json({ message: 'No primary location is assigned. Ask a manager for help.' }, { status: 409 });
+  }
+
+  const { data: kiosk, error: kioskError } = await supabase
+    .from('time_kiosks')
+    .select('id,location_id,time_locations!time_kiosks_location_id_fkey(name)')
+    .eq('location_id', employee.primary_location_id)
+    .eq('active', true)
+    .limit(1)
+    .maybeSingle();
+
+  if (kioskError || !kiosk) {
+    return NextResponse.json({ message: 'Your assigned location does not have an active kiosk.' }, { status: 409 });
+  }
 
   const { data: latest } = await supabase
     .from('time_punch_events')
@@ -206,11 +198,12 @@ export async function POST(request: Request) {
     firstName: employee.first_name,
     action: parsed.data.action,
     occurredAt: punch.occurred_at,
+    location: (kiosk as any).time_locations?.name || '',
   });
 }
 
 async function findMatchingEmployee(
-  employees: Array<{ id: string; first_name: string; pin_hash: string; active: boolean }>,
+  employees: Array<{ id: string; first_name: string; pin_hash: string; active: boolean; primary_location_id: string | null }>,
   pin: string,
 ) {
   for (const employee of employees) {
