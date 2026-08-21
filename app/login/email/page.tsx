@@ -50,7 +50,7 @@ export default function EmailLoginPage() {
         <button className="googleLogin" disabled={loading || sent} onClick={sendMagicLink}>
           {loading ? 'Sending…' : sent ? 'Check your email' : 'Email me a login link'}
         </button>
-        {sent ? <div className="loginSuccess">Login link sent to {email.trim().toLowerCase()}.</div> : null}
+        {sent ? <div className="loginSuccess" aria-live="polite">Login link sent to {email.trim().toLowerCase()}.</div> : null}
         {error ? <div className="error">{error}</div> : null}
         <Link className="loginBack" href="/login">Back to login options</Link>
       </section>
