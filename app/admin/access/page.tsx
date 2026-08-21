@@ -86,7 +86,7 @@ export default function AccessPage() {
         <div className="sectionHeading">
           <div>
             <h2>System Access</h2>
-            <p>The roster controls which systems each person can enter. Their job determines the level they receive inside that system.</p>
+            <p>System access is assigned directly. Job title and primary location do not silently grant software access.</p>
           </div>
           <div className="accessTools">
             <input
