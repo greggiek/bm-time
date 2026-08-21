@@ -158,12 +158,13 @@ export default function KioskPage() {
         <div className="demoNote">
           {process.env.NEXT_PUBLIC_DEMO_MODE === 'true' ? 'Demo PINs: 1234, 2468, 7300' : ''}
         </div>
-        {!employee && (
-          <div className="kioskManagerExit">
+        <div className="kioskManagerExit">
+          <Link href="/">Back to BM OS</Link>
+          {!employee && <>
             <Link href="/manager">Manager Portal</Link>
             <span>Manager PIN required</span>
-          </div>
-        )}
+          </>}
+        </div>
       </section>
     </main>
   );

@@ -202,7 +202,10 @@ td button[style*="color"] { border-color: #ffd4d4; background: var(--danger-soft
 .loginBack { display: inline-block; margin-top: 22px; color: var(--muted); font-size: 13px; font-weight: 750; text-decoration: none; }
 .loginBack:hover { color: var(--blue); }
 .emailLoginNotice { margin: 20px 0 0; color: var(--muted); }
+.emailLoginField { display: grid; gap: 7px; margin-top: 20px; color: var(--muted); font-size: 13px; font-weight: 800; text-align: left; }
+.emailLoginField input { width: 100%; background: #fff; }
 .googleLogin { width: 100%; min-height: 50px; margin-top: 20px; color: var(--navy); background: white; }
+.loginSuccess { margin-top: 14px; border: 1px solid #bde5c8; border-radius: 10px; padding: 11px; color: var(--success); background: var(--success-soft); font-size: 13px; font-weight: 750; }
 
 .warehousePicker { display: grid; gap: 7px; margin-top: 22px; color: var(--muted); font-size: 13px; font-weight: 800; }
 .warehousePicker select { background: #fff; }

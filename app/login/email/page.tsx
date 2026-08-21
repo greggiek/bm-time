@@ -5,20 +5,28 @@ import { useState } from 'react';
 import { getBrowserClient } from '@/lib/supabase-browser';
 
 export default function EmailLoginPage() {
+  const [email, setEmail] = useState('');
   const [error, setError] = useState('');
+  const [sent, setSent] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  async function continueWithGoogle() {
+  async function sendMagicLink() {
+    const normalizedEmail = email.trim().toLowerCase();
+    if (!normalizedEmail.endsWith('@bargainmoulding.com')) {
+      setError('Use your @bargainmoulding.com email address.');
+      return;
+    }
     setLoading(true);
     setError('');
-    const { error: oauthError } = await getBrowserClient().auth.signInWithOAuth({
-      provider: 'google',
+    const { error: emailError } = await getBrowserClient().auth.signInWithOtp({
+      email: normalizedEmail,
       options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
-        queryParams: { hd: 'bargainmoulding.com', prompt: 'select_account' },
+        emailRedirectTo: `${window.location.origin}/auth/callback`,
       },
     });
-    if (oauthError) { setError(oauthError.message); setLoading(false); }
+    if (emailError) setError(emailError.message);
+    else setSent(true);
+    setLoading(false);
   }
 
   return (
@@ -26,10 +34,23 @@ export default function EmailLoginPage() {
       <section className="card loginChoiceCard" aria-labelledby="email-login-title">
         <div className="brand">BM OS</div>
         <h1 id="email-login-title">Email Log In</h1>
-        <p className="emailLoginNotice">Use your Bargain Moulding Google account.</p>
-        <button className="googleLogin" disabled={loading} onClick={continueWithGoogle}>
-          {loading ? 'Opening Google…' : 'Continue with Google'}
+        <p className="emailLoginNotice">We’ll email a secure sign-in link to your Bargain Moulding account.</p>
+        <label className="emailLoginField">
+          <span>Work email</span>
+          <input
+            type="email"
+            inputMode="email"
+            autoComplete="email"
+            placeholder="you@bargainmoulding.com"
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
+            onKeyDown={(event) => event.key === 'Enter' && !loading && sendMagicLink()}
+          />
+        </label>
+        <button className="googleLogin" disabled={loading || sent} onClick={sendMagicLink}>
+          {loading ? 'Sending…' : sent ? 'Check your email' : 'Email me a login link'}
         </button>
+        {sent ? <div className="loginSuccess">Login link sent to {email.trim().toLowerCase()}.</div> : null}
         {error ? <div className="error">{error}</div> : null}
         <Link className="loginBack" href="/login">Back to login options</Link>
       </section>
