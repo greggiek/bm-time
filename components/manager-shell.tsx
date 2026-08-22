@@ -2,6 +2,7 @@
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import type { ReactNode } from 'react';
+import { getBrowserClient } from '@/lib/supabase-browser';
 
 export type ManagerUser = { name: string; role: 'admin' | 'manager'; locationName?: string | null; allLocations?: boolean; canManageEmployees?: boolean };
 
@@ -17,7 +18,14 @@ export default function ManagerShell({ brand, title, user, children }: { brand: 
     { href: '/admin/managers', label: 'Managers', show: user.role === 'admin' },
     { href: '/admin/access', label: 'Identity & Access', show: user.role === 'admin' },
   ];
-  async function logout() { await fetch('/api/auth/logout', { method: 'POST' }); router.push('/manager'); router.refresh(); }
+  async function logout() {
+    await Promise.allSettled([
+      getBrowserClient().auth.signOut(),
+      fetch('/api/auth/logout', { method: 'POST' }),
+    ]);
+    router.replace('/');
+    router.refresh();
+  }
   return <main className="managerApp"><aside className="managerSidebar">
     <div><div className="brand">{brand}</div><div className="sidebarLabel">Management</div></div>
     <nav>{links.filter(link => link.show).map(link => <Link key={link.href} href={link.href} className={pathname === link.href ? 'active' : ''}>{link.label}</Link>)}</nav>
