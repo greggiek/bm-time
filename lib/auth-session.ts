@@ -2,8 +2,9 @@ import { createHmac, timingSafeEqual } from 'crypto';
 
 export type TimeUserSession = {
   userId: string;
+  identityId?: string | null;
   name: string;
-  role: 'admin' | 'manager';
+  role: 'admin' | 'manager' | 'employee';
   locationId: string | null;
   locationName: string | null;
   allLocations: boolean;
