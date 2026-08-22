@@ -53,6 +53,11 @@ export default function ManagerPage() {
       const data = await response.json();
       if (!response.ok) throw new Error(data.message || 'Unable to sign in.');
       setPin('');
+      if (data.user?.role === 'employee') {
+        router.push(data.redirectTo || '/portal');
+        router.refresh();
+        return;
+      }
       const next = new URLSearchParams(window.location.search).get('next');
       if (data.user?.role === 'admin' && next && /^\/admin(?:\/|$)/.test(next)) {
         router.push(next);
