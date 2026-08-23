@@ -14,7 +14,7 @@ type Timecard = {
 
 const catalog = {
   time: { name: 'BM Time', description: 'Punch in, take breaks and access your time tools.', href: '/kiosk', action: 'Open Time Clock' },
-  academy: { name: 'BM Academy', description: 'Training and learning assigned to your role.', href: '/academy', action: 'Open Academy' },
+  academy: { name: 'BM Academy', description: 'Training and learning assigned to your role.', href: '/api/auth/academy-handoff', action: 'Open Academy' },
   warehouse: { name: 'BM Warehouse', description: 'Receiving, transfers and warehouse operations.', href: '/api/auth/warehouse-handoff', action: 'Open Warehouse' },
   sales: { name: 'BM Sales', description: 'Customer, quote and order workflows.', href: null, action: 'Coming soon' },
   prospecting: { name: 'BM Prospecting', description: 'Field prospecting and new-business activity.', href: 'https://greg-playground.vercel.app', action: 'Open Prospecting' },
