@@ -1,16 +1,12 @@
 export const canonicalJobTitles = [
   'Administration',
   'Branch Manager',
-  'Director of Operations',
-  'Door Shop',
   'Door Shop Manager',
   'Door Shop Worker',
   'Driver',
-  'Sales',
   'Sales Inside',
   'Sales Manager',
   'Sales Outside',
-  'Warehouse',
   'Warehouse Manager',
   'Warehouse Worker',
 ] as const;
