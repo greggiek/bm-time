@@ -104,10 +104,11 @@ export async function POST(request: NextRequest) {
     const parsed = ToggleSchema.safeParse(body);
     if (!parsed.success) return NextResponse.json({ message: 'Invalid checklist item.' }, { status: 400 });
     const { data: item } = await supabase.from('hr_onboarding_items')
-      .select('id,onboarding_id,hr_onboarding_records!inner(employee_id,time_employees!inner(primary_location_id))')
+      .select('id,item_key,onboarding_id,hr_onboarding_records!inner(employee_id,time_employees!inner(primary_location_id))')
       .eq('id', parsed.data.itemId).maybeSingle();
     const locationId = (item as any)?.hr_onboarding_records?.time_employees?.primary_location_id;
     if (!item || !canAccessLocation(session, locationId)) return NextResponse.json({ message: 'You do not have access to this checklist.' }, { status: 403 });
+    if (item.item_key === 'academy_training') return NextResponse.json({ message: 'BM Academy updates this item automatically.' }, { status: 409 });
     const { error } = await supabase.from('hr_onboarding_items').update({
       item_status: parsed.data.itemStatus,
       completed: parsed.data.itemStatus === 'completed' || parsed.data.itemStatus === 'not_applicable',

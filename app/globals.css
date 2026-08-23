@@ -289,6 +289,9 @@ textarea:focus { border-color: var(--blue); box-shadow: 0 0 0 4px rgba(37, 99, 2
 .onboardingItems > div > span { display: grid; gap: 2px; }
 .onboardingItems select { width: 165px; flex: 0 0 165px; }
 .onboardingItems small { color: var(--muted); font-weight: 600; }
+.academyAutoStatus { display: inline-flex !important; align-items: center; justify-content: center; width: 165px; flex: 0 0 165px; border-radius: 999px; padding: 8px 12px; color: var(--muted); background: #eef2f6; font-size: 12px; font-weight: 850; }
+.academyAutoStatus.sent { color: #9a5a00; background: #fff4d6; }
+.academyAutoStatus.completed { color: var(--success); background: #dff7ec; }
 .onboardingMeta { margin-top: 18px; border-radius: 12px; padding: 12px 15px; color: var(--muted); background: var(--surface-muted); font-size: 13px; }
 .onboardingMeta p { margin: 4px 0; }
 .onboardingActions { display: flex; gap: 10px; margin-top: 18px; }
@@ -298,6 +301,7 @@ textarea:focus { border-color: var(--blue); box-shadow: 0 0 0 4px rgba(37, 99, 2
   .onboardingCreate form, .onboardingWorkspace { grid-template-columns: 1fr; }
   .onboardingItems > div { align-items: stretch; flex-direction: column; }
   .onboardingItems select { width: 100%; flex-basis: auto; }
+  .academyAutoStatus { width: 100%; flex-basis: auto; }
 }
 
 
@@ -418,6 +422,11 @@ a.systemCard:hover { border-color: #9dbce0; box-shadow: 0 10px 28px rgba(16,42,6
 .academyQuiz input { width: auto; min-height: auto; }
 .academyResult { border-radius: 10px; padding: 12px; color: var(--navy); background: white; font-weight: 800; text-align: center; }
 .academyPractical { margin-top: 18px; border-left-color: #f59e0b; background: #fffbeb; }
+.academyLessonComplete { display: flex; align-items: center; justify-content: space-between; gap: 20px; margin-top: 22px; border-radius: 14px; padding: 18px; background: var(--success-soft); }
+.academyLessonComplete div { display: grid; gap: 3px; }
+.academyLessonComplete strong { color: var(--success); }
+.academyLessonComplete span { color: var(--muted); font-size: 13px; }
+.academyLessonComplete button { flex: 0 1 auto; }
 .academyAssignmentList { display: grid; gap: 14px; }
 .academyAssignment { border: 1px solid var(--border); border-radius: 14px; padding: 18px; background: #fafbfd; }
 .academyAssignmentTitle { display: flex; justify-content: space-between; gap: 20px; margin-bottom: 14px; }
@@ -426,6 +435,29 @@ a.systemCard:hover { border-color: #9dbce0; box-shadow: 0 10px 28px rgba(16,42,6
 .academyAssignmentTitle > strong { color: var(--blue); font-size: 13px; }
 .academyAssignmentOptions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px 18px; }
 .academyAssignmentOptions label { border-radius: 8px; padding: 8px 10px; background: white; }
+.academyProgressCard { display: grid; gap: 18px; margin-bottom: 22px; }
+.academyProgressFilters { display: grid; grid-template-columns: minmax(220px, 1.5fr) repeat(3, minmax(150px, 1fr)); gap: 10px; }
+.academyProgressTable table { min-width: 1080px; }
+.academyEmployeeRow td { vertical-align: middle; }
+.academyEmployeeButton { display: grid; grid-template-columns: 25px 1fr; align-items: center; gap: 1px 8px; padding: 0; color: var(--navy-deep); background: transparent; text-align: left; }
+.academyEmployeeButton > span { grid-row: 1 / span 2; display: grid; place-items: center; width: 25px; height: 25px; border-radius: 7px; color: var(--blue); background: var(--blue-soft); }
+.academyEmployeeButton small { color: var(--muted); font-size: 11px; }
+.academyEmployeeProgress { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 2px 8px; min-width: 145px; }
+.academyEmployeeProgress > span { color: var(--muted); font-size: 11px; }
+.academyEmployeeProgress > i { grid-column: 1 / -1; height: 6px; overflow: hidden; border-radius: 999px; background: #e5ebf1; }
+.academyEmployeeProgress > i > b { display: block; height: 100%; border-radius: inherit; background: var(--blue); }
+.academyProgressStatus { display: inline-flex; border-radius: 999px; padding: 6px 10px; color: var(--muted); background: #eef2f6; font-size: 11px; font-weight: 850; white-space: nowrap; }
+.academyProgressStatus.complete { color: var(--success); background: var(--success-soft); }
+.academyProgressStatus.in_progress { color: #9a5a00; background: #fff4d6; }
+.academyProgressStatus.not_started { color: #315a86; background: var(--blue-soft); }
+.academyLessonDetailRow > td { padding: 0 18px 18px; background: #f8fafc; }
+.academyLessonDetail { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; padding-top: 12px; }
+.academyLessonDetail article { display: grid; grid-template-columns: 28px 1fr auto; align-items: center; gap: 10px; border: 1px solid var(--border); border-radius: 10px; padding: 11px 12px; background: white; }
+.academyLessonDetail article > span { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; color: var(--muted); background: #eef2f6; font-weight: 900; }
+.academyLessonDetail article.complete > span { color: var(--success); background: var(--success-soft); }
+.academyLessonDetail article > div { display: grid; gap: 2px; }
+.academyLessonDetail article > div:last-child { text-align: right; }
+.academyLessonDetail small { color: var(--muted); font-size: 11px; }
 
 @media (max-width: 980px) { .academyModuleGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 620px) {
@@ -435,4 +467,6 @@ a.systemCard:hover { border-color: #9dbce0; box-shadow: 0 10px 28px rgba(16,42,6
   .academyModuleGrid, .academyAssignmentOptions { grid-template-columns: 1fr; }
   .academyModal { padding: 0; }
   .academyModal > article { min-height: 100vh; border-radius: 0; padding: 28px 20px; }
+  .academyLessonComplete { align-items: stretch; flex-direction: column; }
+  .academyProgressFilters, .academyLessonDetail { grid-template-columns: 1fr; }
 }

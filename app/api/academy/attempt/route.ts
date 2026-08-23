@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { academyModuleByCode } from '@/lib/academy/catalog';
 import { academySessionCookie, readAcademySession } from '@/lib/academy/session';
 import { getAdminClient } from '@/lib/supabase-server';
+import { syncAcademyOnboardingStatus } from '@/lib/academy/onboarding-progress';
 
 const AttemptSchema = z.object({ moduleCode: z.string().min(1), answers: z.array(z.number().int().min(0).max(10)).length(5) });
 
@@ -25,6 +26,11 @@ export async function POST(request: NextRequest) {
   if (passed) {
     const { error } = await supabase.from('academy_completions').upsert({ employee_id: session.employeeId, module_code: module.code, latest_score: score, completed_at: new Date().toISOString() }, { onConflict: 'employee_id,module_code' });
     if (error) return NextResponse.json({ message: error.message }, { status: 500 });
+  }
+  try {
+    await syncAcademyOnboardingStatus(supabase, session.employeeId);
+  } catch (syncError) {
+    console.error('[api/academy/attempt] onboarding sync failed', { employeeId: session.employeeId, error: String(syncError) });
   }
   return NextResponse.json({ score, passed, message: passed ? `Passed: ${score}/5.` : `Not yet: ${score}/5. Review and try again.` });
 }

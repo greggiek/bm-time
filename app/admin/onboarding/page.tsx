@@ -7,7 +7,7 @@ type User = { name: string; role: 'admin' | 'manager'; canManageEmployees: boole
 type Option = { id: string; name: string };
 type Employee = { id: string; first_name: string; last_name: string; time_locations: { id: string; name: string } | null; time_job_titles: { id: string; name: string } | null };
 type ItemStatus = 'not_started' | 'sent' | 'completed' | 'not_applicable';
-type Item = { id: string; label: string; item_status: ItemStatus; completed: boolean; completed_by_name: string | null };
+type Item = { id: string; item_key: string; label: string; item_status: ItemStatus; completed: boolean; completed_by_name: string | null };
 type OnboardingRecord = { id: string; employee_id: string; start_date: string | null; assigned_manager: string; notes: string; status: 'active' | 'completed' | 'cancelled'; time_employees: Employee; hr_onboarding_items: Item[] };
 
 export default function OnboardingPage() {
@@ -98,10 +98,10 @@ export default function OnboardingPage() {
             <div className="onboardingTitle"><div><span className="osEyebrow">{selected.time_employees.time_locations?.name || 'No location'}</span><h2>{selected.time_employees.first_name} {selected.time_employees.last_name}</h2><p>{selected.time_employees.time_job_titles?.name || 'No job title'}{selected.start_date ? ` · Starts ${new Date(`${selected.start_date}T12:00:00`).toLocaleDateString()}` : ''}</p></div><strong>{completedCount}/{selected.hr_onboarding_items.length}</strong></div>
             <div className="onboardingProgress"><i style={{ width: `${selected.hr_onboarding_items.length ? completedCount / selected.hr_onboarding_items.length * 100 : 0}%` }} /></div>
             <div className="onboardingItems">{selected.hr_onboarding_items.map(item => <div key={item.id} className={item.completed ? 'done' : ''}>
-              <span><strong>{item.label}</strong>{item.completed_by_name && <small>Updated by {item.completed_by_name}</small>}</span>
-              <select aria-label={`${item.label} status`} value={item.item_status || (item.completed ? 'completed' : 'not_started')} disabled={loading || selected.status === 'completed'} onChange={event => run({ action: 'toggle', itemId: item.id, itemStatus: event.target.value }, 'Checklist updated.')}>
+              <span><strong>{item.label}</strong>{item.item_key === 'academy_training' ? <small>Updated automatically from BM Academy</small> : item.completed_by_name && <small>Updated by {item.completed_by_name}</small>}</span>
+              {item.item_key === 'academy_training' ? <span className={`academyAutoStatus ${item.item_status}`}>{academyStatusLabel(item.item_status)}</span> : <select aria-label={`${item.label} status`} value={item.item_status || (item.completed ? 'completed' : 'not_started')} disabled={loading || selected.status === 'completed'} onChange={event => run({ action: 'toggle', itemId: item.id, itemStatus: event.target.value }, 'Checklist updated.')}>
                 <option value="not_started">Not Started</option><option value="sent">Sent</option><option value="completed">Completed</option><option value="not_applicable">Not Applicable</option>
-              </select>
+              </select>}
             </div>)}</div>
             {(selected.assigned_manager || selected.notes) && <div className="onboardingMeta">{selected.assigned_manager && <p><strong>Assigned manager:</strong> {selected.assigned_manager}</p>}{selected.notes && <p><strong>Notes:</strong> {selected.notes}</p>}</div>}
             <div className="onboardingActions">{selected.status !== 'completed' ? <button className="primary" disabled={loading || completedCount !== selected.hr_onboarding_items.length} onClick={() => run({ action: 'status', onboardingId: selected.id, status: 'completed' }, 'Onboarding completed.')}>Complete Onboarding</button> : <span className="accessPill accessGranted">Onboarding complete</span>}<button disabled={loading} onClick={() => run({ action: 'status', onboardingId: selected.id, status: 'cancelled' }, 'Onboarding cancelled.')}>Cancel Checklist</button></div>
@@ -110,4 +110,11 @@ export default function OnboardingPage() {
       </div>
     </div>
   </ManagerShell>;
+}
+
+function academyStatusLabel(status: ItemStatus) {
+  if (status === 'sent') return 'In Progress';
+  if (status === 'completed') return 'Complete';
+  if (status === 'not_applicable') return 'Not Assigned';
+  return 'Not Started';
 }

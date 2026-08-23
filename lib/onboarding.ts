@@ -10,6 +10,7 @@ export const onboardingChecklist = [
   ['direct_deposit_form', 'Direct Deposit Form'],
   ['it_asset_receipt', 'IT Asset Receipt & Acknowledgement'],
   ['digital_rights_policy', 'Digital Rights & Computer Use Policy'],
+  ['academy_training', 'Complete Required BM Academy Training'],
 ] as const;
 
 export const onboardingItemStatuses = ['not_started', 'sent', 'completed', 'not_applicable'] as const;
