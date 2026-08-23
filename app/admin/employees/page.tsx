@@ -4,7 +4,6 @@ import { FormEvent, useEffect, useRef, useState } from 'react';
 import ManagerShell from '@/components/manager-shell';
 
 type Option = { id: string; name: string };
-type JobTitleOption = { name: string };
 type User = { name: string; role: 'admin' | 'manager'; canManageEmployees: boolean };
 type Employee = {
   id: string;
@@ -22,7 +21,7 @@ type EditState = {
   firstName: string;
   lastName: string;
   locationId: string;
-  jobTitle: string;
+  jobTitleId: string;
   pin: string;
   active: boolean;
 };
@@ -32,7 +31,7 @@ export default function EmployeesPage() {
   const [user, setUser] = useState<User | null>(null);
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [locations, setLocations] = useState<Option[]>([]);
-  const [jobTitles, setJobTitles] = useState<JobTitleOption[]>([]);
+  const [jobTitles, setJobTitles] = useState<Option[]>([]);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
@@ -68,7 +67,7 @@ export default function EmployeesPage() {
       const data = await request({});
       setEmployees(data.employees);
       setLocations(data.locations);
-      setJobTitles(data.jobTitles || []);
+      setJobTitles(data.jobTitles);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to load employees.');
     } finally {
@@ -114,7 +113,7 @@ export default function EmployeesPage() {
         lastName: form.get('lastName'),
         pin: form.get('pin'),
         locationId: form.get('locationId'),
-        jobTitle: form.get('jobTitle') || null,
+        jobTitleId: form.get('jobTitleId') || null,
       });
       setFormKey((value) => value + 1);
       setMessage('Employee added.');
@@ -133,7 +132,7 @@ export default function EmployeesPage() {
       firstName: employee.first_name,
       lastName: employee.last_name,
       locationId: employee.time_locations?.id || '',
-      jobTitle: employee.time_job_titles?.name || '',
+      jobTitleId: employee.time_job_titles?.id || '',
       pin: '',
       active: employee.active,
     });
@@ -159,7 +158,7 @@ export default function EmployeesPage() {
         firstName: editing.firstName,
         lastName: editing.lastName,
         locationId: editing.locationId,
-        jobTitle: editing.jobTitle || null,
+        jobTitleId: editing.jobTitleId || null,
         pin: editing.pin,
         active: editing.active,
       });
@@ -234,7 +233,7 @@ export default function EmployeesPage() {
               <input name="lastName" placeholder="Last name" required />
               <input name="pin" placeholder="4-digit PIN" inputMode="numeric" pattern="\d{4}" maxLength={4} required />
               <select name="locationId" required defaultValue=""><option value="" disabled>Select location</option>{locations.map((location) => <option key={location.id} value={location.id}>{location.name}</option>)}</select>
-              <select name="jobTitle" defaultValue=""><option value="">No job title</option>{jobTitles.map((jobTitle) => <option key={jobTitle.name} value={jobTitle.name}>{jobTitle.name}</option>)}</select>
+              <select name="jobTitleId" defaultValue=""><option value="">No job title</option>{jobTitles.map((jobTitle) => <option key={jobTitle.id} value={jobTitle.id}>{jobTitle.name}</option>)}</select>
               <button className="primary" disabled={loading}>{loading ? 'Saving…' : 'Add Employee'}</button>
             </form>
           </section>
@@ -248,7 +247,7 @@ export default function EmployeesPage() {
                 <input value={editing.lastName} onChange={(event) => setEditing({ ...editing, lastName: event.target.value })} placeholder="Last name" required />
                 <input value={editing.pin} onChange={(event) => setEditing({ ...editing, pin: event.target.value })} placeholder="New 4-digit PIN (optional)" inputMode="numeric" pattern="\d{4}" maxLength={4} />
                 <select value={editing.locationId} onChange={(event) => setEditing({ ...editing, locationId: event.target.value })} required>{locations.map((location) => <option key={location.id} value={location.id}>{location.name}</option>)}</select>
-                <select value={editing.jobTitle} onChange={(event) => setEditing({ ...editing, jobTitle: event.target.value })}><option value="">No job title</option>{jobTitles.map((jobTitle) => <option key={jobTitle.name} value={jobTitle.name}>{jobTitle.name}</option>)}</select>
+                <select value={editing.jobTitleId} onChange={(event) => setEditing({ ...editing, jobTitleId: event.target.value })}><option value="">No job title</option>{jobTitles.map((jobTitle) => <option key={jobTitle.id} value={jobTitle.id}>{jobTitle.name}</option>)}</select>
                 <label><input type="checkbox" checked={editing.active} onChange={(event) => setEditing({ ...editing, active: event.target.checked })} /> Active employee</label>
                 <div style={{ display: 'flex', gap: 10 }}>
                   <button className="primary" disabled={loading}>{loading ? 'Saving…' : 'Save Changes'}</button>
