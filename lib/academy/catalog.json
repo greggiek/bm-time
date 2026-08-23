@@ -2511,5 +2511,705 @@
       "Present a partial or damaged shipment and have the employee identify the handoff to SOP 03 — Receiving Purchase Orders and, for damage, SOP 08 — Damaged Material & Claims."
     ],
     "source": "Bargain Moulding — Purchase Order Creation & Management Policy"
+  },
+  {
+    "code": "sop-transfer-dispatch",
+    "school": "SOP School",
+    "title": "Creating & Dispatching Inventory Transfers",
+    "summary": "Create, verify, assign, prepare, and dispatch inventory transfers with complete QOBLEX documentation and second-person verification.",
+    "sections": [
+      [
+        "Inventory control policy",
+        "Every inventory movement must be documented. Nothing enters or leaves inventory without being recorded in QOBLEX, and no employee is exempt from the process."
+      ],
+      [
+        "Before creating a transfer",
+        "Login to QOBLEX with your unique credentials. Confirm physical inventory exists, verify the quantity inside QOBLEX, and confirm the products are in sellable condition before creating the transfer."
+      ],
+      [
+        "Create the transfer in QOBLEX",
+        "From STOCK CONTROL choose TRANSFERS, click the + sign, confirm YOU are selected in ASSIGNED TO, set TRANSFER FROM LOCATION and RECEIVING LOCATION, add each product/SKU and quantity, add useful NOTES such as order number, Stock or Special Order, or Backorder, double-check every line item, and SAVE. Create a PDF copy and save it to the dedicated folder."
+      ],
+      [
+        "Assign the transfer",
+        "Email the transfer PDF to the appropriate Warehouse Manager. After confirmation, record the transfer number, transfer date, and assigned employee."
+      ],
+      [
+        "Prepare and verify",
+        "Warehouse employees pull the inventory from the transfer paperwork. Check SKU, product name, quantity, and condition. The Warehouse Manager repeats the same Quality Control check and initials the transfer paperwork."
+      ],
+      [
+        "Dispatch and notify",
+        "Email dispatch confirmation to the Inventory Manager. Notify the receiving Warehouse Manager and Branch Manager of the inbound transfer by email with the transfer PDF attached."
+      ]
+    ],
+    "quiz": [
+      {
+        "question": "What must be verified before creating an inventory transfer?",
+        "answers": [
+          "Physical stock, QOBLEX quantity, and sellable condition",
+          "Only the customer name",
+          "Only the transfer date",
+          "Only the truck number"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "Where are inventory transfers created in QOBLEX?",
+        "answers": [
+          "STOCK CONTROL → TRANSFERS",
+          "SALES → CUSTOMERS",
+          "ACCOUNTING → DEPOSITS",
+          "SETTINGS → USERS"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "Who repeats the Quality Control verification after the warehouse worker pulls the transfer?",
+        "answers": [
+          "Warehouse Manager",
+          "Customer",
+          "Driver only",
+          "Accountant"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "What should be done after the transfer is saved?",
+        "answers": [
+          "Create and save a PDF copy",
+          "Delete the transfer",
+          "Receive it immediately",
+          "Change the quantity"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "Who must be notified when the transfer is dispatched?",
+        "answers": [
+          "Inventory Manager and the receiving Warehouse Manager/Branch Manager",
+          "Only the customer",
+          "Only Accounting",
+          "No one"
+        ],
+        "correct": 0
+      }
+    ],
+    "practical": [
+      "Create a sample transfer in QOBLEX with correct locations, line items, quantities, notes, and PDF documentation.",
+      "Demonstrate the pull, second verification, initials, dispatch confirmation, and receiving-branch notification process."
+    ],
+    "source": "Bargain Build, Inc. SOP v1 — Inventory Management SOP, Version 1.0",
+    "translations": {
+      "es": {
+        "title": "Creación y Despacho de Transferencias de Inventario",
+        "summary": "Cree, verifique, asigne, prepare y despache transferencias de inventario con documentación completa en QOBLEX y una segunda verificación.",
+        "sections": [
+          [
+            "Política de control de inventario",
+            "Todo movimiento de inventario debe tener documentación. Nada entra o sale del inventario sin registrarse en QOBLEX y ningún empleado está exento del proceso."
+          ],
+          [
+            "Antes de crear una transferencia",
+            "Inicie sesión en QOBLEX con sus credenciales únicas. Confirme que exista inventario físico, verifique la cantidad en QOBLEX y confirme que los productos estén en condición vendible antes de crear la transferencia."
+          ],
+          [
+            "Crear la transferencia en QOBLEX",
+            "En STOCK CONTROL seleccione TRANSFERS, haga clic en +, confirme que USTED esté seleccionado en ASSIGNED TO, configure TRANSFER FROM LOCATION y RECEIVING LOCATION, agregue cada producto/SKU y cantidad, agregue NOTES útiles como número de pedido, Stock o Special Order, o Backorder, revise cada línea y seleccione SAVE. Cree una copia PDF y guárdela en la carpeta dedicada."
+          ],
+          [
+            "Asignar la transferencia",
+            "Envíe por email el PDF de la transferencia al Warehouse Manager correspondiente. Después de la confirmación, registre número de transferencia, fecha y empleado asignado."
+          ],
+          [
+            "Preparar y verificar",
+            "El personal de almacén recoge el inventario según el documento. Verifique SKU, nombre del producto, cantidad y condición. El Warehouse Manager repite el mismo control de Quality Control y coloca sus iniciales en el documento."
+          ],
+          [
+            "Despachar y notificar",
+            "Envíe confirmación del despacho por email al Inventory Manager. Notifique al Warehouse Manager y Branch Manager que recibirán la transferencia y adjunte el PDF."
+          ]
+        ],
+        "quiz": [
+          {
+            "question": "¿Qué debe verificarse antes de crear una transferencia?",
+            "answers": [
+              "Inventario físico, cantidad en QOBLEX y condición vendible",
+              "Solo nombre del cliente",
+              "Solo fecha",
+              "Solo número del camión"
+            ],
+            "correct": 0
+          },
+          {
+            "question": "¿Dónde se crean las transferencias en QOBLEX?",
+            "answers": [
+              "STOCK CONTROL → TRANSFERS",
+              "SALES → CUSTOMERS",
+              "ACCOUNTING → DEPOSITS",
+              "SETTINGS → USERS"
+            ],
+            "correct": 0
+          },
+          {
+            "question": "¿Quién repite la verificación de Quality Control?",
+            "answers": [
+              "Warehouse Manager",
+              "Cliente",
+              "Solo conductor",
+              "Accountant"
+            ],
+            "correct": 0
+          },
+          {
+            "question": "¿Qué debe hacerse después de guardar la transferencia?",
+            "answers": [
+              "Crear y guardar una copia PDF",
+              "Borrarla",
+              "Recibirla inmediatamente",
+              "Cambiar cantidad"
+            ],
+            "correct": 0
+          },
+          {
+            "question": "¿A quién se notifica cuando se despacha?",
+            "answers": [
+              "Inventory Manager y Warehouse Manager/Branch Manager receptor",
+              "Solo cliente",
+              "Solo Accounting",
+              "A nadie"
+            ],
+            "correct": 0
+          }
+        ],
+        "practical": [
+          "Cree una transferencia de ejemplo en QOBLEX con ubicaciones, líneas, cantidades, notas y PDF correctos.",
+          "Demuestre el proceso de recogida, segunda verificación, iniciales, confirmación de despacho y notificación a la sucursal receptora."
+        ]
+      }
+    }
+  },
+  {
+    "code": "sop-transfer-receiving",
+    "school": "SOP School",
+    "title": "Receiving Inventory Transfers",
+    "summary": "Physically inspect and count inbound transfers before receiving them in QOBLEX, document damage or discrepancies, then file the records.",
+    "sections": [
+      [
+        "Do not receive immediately",
+        "When a transfer arrives, DO NOT receive it into QOBLEX immediately. Inspect the shipment/material first."
+      ],
+      [
+        "Inspect and physically count",
+        "Verify quantities, SKU and product names, and potentially missing items. Never rely only on labels, packing slips, pallets, or verbal assurance from the branch of origin."
+      ],
+      [
+        "Compare to paperwork",
+        "Every line item and quantity must match the transfer paperwork before receiving."
+      ],
+      [
+        "Inspect for damage",
+        "Check for broken product, water damage, forklift damage, and manufacturer defects. Photograph any damage."
+      ],
+      [
+        "Handle discrepancies",
+        "Do not adjust inventory without documentation. Record missing SKUs, shortages, overages, and damaged material. Notify the branch-of-origin Warehouse Manager and the Inventory Manager and attach damage photos."
+      ],
+      [
+        "Receive and file",
+        "In QOBLEX go to STOCK CONTROL → TRANSFERS. Double-check source and receiving locations, confirm any documented adjustments, then click RECEIVE. Retain the transfer paperwork, damage photos, and discrepancy reports."
+      ]
+    ],
+    "quiz": [
+      {
+        "question": "When should an inbound transfer be received in QOBLEX?",
+        "answers": [
+          "After physical inspection and count",
+          "Immediately when the truck arrives",
+          "Before unloading",
+          "Before checking paperwork"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "What should never be relied on as the only count?",
+        "answers": [
+          "Labels, packing slips, pallets, or verbal assurance",
+          "Physical count",
+          "Transfer paperwork",
+          "SKU verification"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "What must happen when damage is found?",
+        "answers": [
+          "Photograph and document it",
+          "Hide it",
+          "Receive without comment",
+          "Throw away paperwork"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "Who should be notified of transfer discrepancies?",
+        "answers": [
+          "Origin Warehouse Manager and Inventory Manager",
+          "Only the driver",
+          "Only Accounting",
+          "Only the customer"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "Where is the transfer received in QOBLEX?",
+        "answers": [
+          "STOCK CONTROL → TRANSFERS",
+          "SALES → ORDERS",
+          "ACCOUNTING → CASH",
+          "SETTINGS → USERS"
+        ],
+        "correct": 0
+      }
+    ],
+    "practical": [
+      "Inspect and count a sample inbound transfer against the paperwork.",
+      "Demonstrate discrepancy documentation, photo handling, QOBLEX RECEIVE, and record filing."
+    ],
+    "source": "Bargain Build, Inc. SOP v1 — Inventory Management SOP, Version 1.0",
+    "translations": {
+      "es": {
+        "title": "Recepción de Transferencias de Inventario",
+        "summary": "Inspeccione y cuente físicamente las transferencias entrantes antes de recibirlas en QOBLEX, documente daños o diferencias y archive los registros.",
+        "sections": [
+          [
+            "No recibir inmediatamente",
+            "Cuando llegue una transferencia, NO la reciba inmediatamente en QOBLEX. Primero inspeccione el envío/material."
+          ],
+          [
+            "Inspeccionar y contar físicamente",
+            "Verifique cantidades, SKU y nombres de producto, y artículos posiblemente faltantes. Nunca dependa solamente de etiquetas, packing slips, pallets o confirmaciones verbales de la sucursal de origen."
+          ],
+          [
+            "Comparar con el documento",
+            "Cada línea y cantidad debe coincidir con el documento de transferencia antes de recibir."
+          ],
+          [
+            "Inspeccionar daños",
+            "Revise producto roto, daño por agua, daño de montacargas y defectos del fabricante. Tome fotografías de cualquier daño."
+          ],
+          [
+            "Manejar diferencias",
+            "No ajuste inventario sin documentación. Registre SKUs faltantes, faltantes, sobrantes y material dañado. Notifique al Warehouse Manager de la sucursal de origen y al Inventory Manager y adjunte fotos."
+          ],
+          [
+            "Recibir y archivar",
+            "En QOBLEX vaya a STOCK CONTROL → TRANSFERS. Verifique ubicaciones de origen y recepción, confirme ajustes documentados y seleccione RECEIVE. Conserve el documento de transferencia, fotos y reportes de diferencias."
+          ]
+        ],
+        "quiz": [
+          {
+            "question": "¿Cuándo se recibe una transferencia en QOBLEX?",
+            "answers": [
+              "Después de inspección y conteo físico",
+              "Al llegar el camión",
+              "Antes de descargar",
+              "Antes de revisar documentos"
+            ],
+            "correct": 0
+          },
+          {
+            "question": "¿En qué nunca se debe confiar como único conteo?",
+            "answers": [
+              "Etiquetas, packing slips, pallets o confirmación verbal",
+              "Conteo físico",
+              "Documento de transferencia",
+              "Verificación de SKU"
+            ],
+            "correct": 0
+          },
+          {
+            "question": "¿Qué hacer si hay daño?",
+            "answers": [
+              "Fotografiarlo y documentarlo",
+              "Ocultarlo",
+              "Recibir sin comentario",
+              "Botar documentos"
+            ],
+            "correct": 0
+          },
+          {
+            "question": "¿A quién se notifican las diferencias?",
+            "answers": [
+              "Warehouse Manager de origen e Inventory Manager",
+              "Solo conductor",
+              "Solo Accounting",
+              "Solo cliente"
+            ],
+            "correct": 0
+          },
+          {
+            "question": "¿Dónde se recibe la transferencia en QOBLEX?",
+            "answers": [
+              "STOCK CONTROL → TRANSFERS",
+              "SALES → ORDERS",
+              "ACCOUNTING → CASH",
+              "SETTINGS → USERS"
+            ],
+            "correct": 0
+          }
+        ],
+        "practical": [
+          "Inspeccione y cuente una transferencia de ejemplo contra el documento.",
+          "Demuestre documentación de diferencias, fotos, RECEIVE en QOBLEX y archivo de registros."
+        ]
+      }
+    }
+  },
+  {
+    "code": "sop-receiving-purchase-orders",
+    "school": "SOP School",
+    "title": "Receiving Purchase Orders",
+    "summary": "Check purchase-order material against QOBLEX, vendor paperwork, and physical product before authorizing receipt.",
+    "sections": [
+      [
+        "Check in the material",
+        "Confirm the PO exists in QOBLEX, the vendor matches, and the vendor packing slip is present. Compare the PO, packing slip, and physical product; all three must align."
+      ],
+      [
+        "Count and inspect",
+        "Count every SKU. Verify damage, correct size, correct finish, and correct quantity."
+      ],
+      [
+        "Partial shipments",
+        "Receive only products physically present and leave remaining quantities open. Notify the Director of Procurement so appropriate adjustments can be made. NEVER receive material that is not physically present on-site."
+      ],
+      [
+        "Damaged material",
+        "Photograph damaged material immediately, notify the Director of Procurement, and place the items in the dedicated section. File the packing slip, purchase order, and applicable photos."
+      ],
+      [
+        "Receive in QOBLEX",
+        "Login with your unique credentials. From STOCK CONTROL choose PURCHASES, search the UNIQUE PO #, verify supplier, product name/SKU, and quantity, click RECEIVE, then AUTHORIZE. Create and save a PDF copy."
+      ],
+      [
+        "Closeout communication",
+        "Email the PDF of the closed Purchase Order to the Director of Procurement and Accounting."
+      ]
+    ],
+    "quiz": [
+      {
+        "question": "What three things must align before receiving a PO?",
+        "answers": [
+          "PO, vendor packing slip, and physical product",
+          "Customer name, route, and cash",
+          "Transfer PDF, deposit slip, and invoice",
+          "Only the PO number"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "What is the rule for a partial shipment?",
+        "answers": [
+          "Receive only what is physically present",
+          "Receive the full PO anyway",
+          "Close all remaining quantities",
+          "Ignore the missing product"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "What should happen to damaged PO material?",
+        "answers": [
+          "Photograph it, notify DOP, and set it aside",
+          "Receive and sell it",
+          "Hide the damage",
+          "Delete the PO"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "Where are Purchase Orders found in QOBLEX?",
+        "answers": [
+          "STOCK CONTROL → PURCHASES",
+          "STOCK CONTROL → TRANSFERS",
+          "SALES → CUSTOMERS",
+          "ACCOUNTING → CASH"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "Who receives the closed PO PDF by email?",
+        "answers": [
+          "DOP and Accountant",
+          "Customer and driver",
+          "Only Warehouse Manager",
+          "No one"
+        ],
+        "correct": 0
+      }
+    ],
+    "practical": [
+      "Check a sample PO against the packing slip and physical material, including quantity and condition.",
+      "Demonstrate partial-shipment handling and the QOBLEX RECEIVE → AUTHORIZE → PDF → email workflow."
+    ],
+    "source": "Bargain Build, Inc. SOP v1 — Inventory Management SOP, Version 1.0",
+    "translations": {
+      "es": {
+        "title": "Recepción de Órdenes de Compra",
+        "summary": "Verifique material de órdenes de compra contra QOBLEX, documentos del proveedor y producto físico antes de autorizar la recepción.",
+        "sections": [
+          [
+            "Registrar el material",
+            "Confirme que el PO exista en QOBLEX, que el proveedor coincida y que esté presente el vendor packing slip. Compare PO, packing slip y producto físico; los tres deben coincidir."
+          ],
+          [
+            "Contar e inspeccionar",
+            "Cuente cada SKU. Verifique daño, tamaño correcto, acabado correcto y cantidad correcta."
+          ],
+          [
+            "Envíos parciales",
+            "Reciba solo los productos físicamente presentes y deje abiertas las cantidades restantes. Notifique al Director de Compras para los ajustes correspondientes. NUNCA reciba material que no esté físicamente en el sitio."
+          ],
+          [
+            "Material dañado",
+            "Fotografíe inmediatamente el material dañado, notifique al Director de Compras y coloque los artículos en la sección dedicada. Archive packing slip, purchase order y fotos aplicables."
+          ],
+          [
+            "Recibir en QOBLEX",
+            "Inicie sesión con credenciales únicas. En STOCK CONTROL seleccione PURCHASES, busque el UNIQUE PO #, verifique supplier, product name/SKU y quantity, seleccione RECEIVE y luego AUTHORIZE. Cree y guarde una copia PDF."
+          ],
+          [
+            "Comunicación de cierre",
+            "Envíe por email el PDF del Purchase Order cerrado al Director de Compras y Contabilidad."
+          ]
+        ],
+        "quiz": [
+          {
+            "question": "¿Qué tres elementos deben coincidir antes de recibir un PO?",
+            "answers": [
+              "PO, vendor packing slip y producto físico",
+              "Cliente, ruta y efectivo",
+              "Transfer PDF, depósito e invoice",
+              "Solo número de PO"
+            ],
+            "correct": 0
+          },
+          {
+            "question": "¿Cuál es la regla para un envío parcial?",
+            "answers": [
+              "Recibir solo lo físicamente presente",
+              "Recibir todo el PO",
+              "Cerrar todas las cantidades",
+              "Ignorar faltantes"
+            ],
+            "correct": 0
+          },
+          {
+            "question": "¿Qué hacer con material dañado?",
+            "answers": [
+              "Fotografiar, notificar al DOP y separar",
+              "Recibir y vender",
+              "Ocultar daño",
+              "Borrar PO"
+            ],
+            "correct": 0
+          },
+          {
+            "question": "¿Dónde se encuentran los Purchase Orders en QOBLEX?",
+            "answers": [
+              "STOCK CONTROL → PURCHASES",
+              "STOCK CONTROL → TRANSFERS",
+              "SALES → CUSTOMERS",
+              "ACCOUNTING → CASH"
+            ],
+            "correct": 0
+          },
+          {
+            "question": "¿Quién recibe el PDF del PO cerrado?",
+            "answers": [
+              "DOP y Accountant",
+              "Cliente y conductor",
+              "Solo Warehouse Manager",
+              "Nadie"
+            ],
+            "correct": 0
+          }
+        ],
+        "practical": [
+          "Verifique un PO de ejemplo contra packing slip y material físico, incluyendo cantidad y condición.",
+          "Demuestre envío parcial y el flujo QOBLEX RECEIVE → AUTHORIZE → PDF → email."
+        ]
+      }
+    }
+  },
+  {
+    "code": "sop-inventory-adjustments",
+    "school": "SOP School",
+    "title": "Inventory Adjustments & IAL",
+    "summary": "Create documented stock adjustments in QOBLEX, file the PDF, update the Inventory Adjustment Ledger, and notify DOP.",
+    "sections": [
+      [
+        "Adjustment policy",
+        "Inventory adjustments are NOT to be used to correct receiving mistakes. Every adjustment must be documented."
+      ],
+      [
+        "Create the stock adjustment",
+        "Login to QOBLEX. From STOCK CONTROL choose ADJUSTMENTS, click CREATE, select the ADJUSTMENT REASON, set LOCATION to the correct warehouse, use ADD NEW LINE for the items, search by SKU or SUPPLIER, and use SET under QUANTITY to enter the adjusted quantity."
+      ],
+      [
+        "Save the record",
+        "Click SAVE. Save a PDF copy to the dedicated folder. The file name MUST match the QOBLEX ADJUSTMENT NUMBER."
+      ],
+      [
+        "IAL — Inventory Adjustment Ledger",
+        "Access the IAL through Google Drive. Add the PDF to the running list and add the adjusted items to the INVENTORY ADJUSTMENT LEDGER TABLE."
+      ],
+      [
+        "Required notification",
+        "Notify the Director of Procurement of ALL inventory adjustments."
+      ]
+    ],
+    "quiz": [
+      {
+        "question": "What should inventory adjustments NOT be used for?",
+        "answers": [
+          "Correcting receiving mistakes",
+          "Documented stock corrections",
+          "Approved adjustments",
+          "Updating IAL"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "Where are stock adjustments created in QOBLEX?",
+        "answers": [
+          "STOCK CONTROL → ADJUSTMENTS",
+          "STOCK CONTROL → PURCHASES",
+          "SALES → ORDERS",
+          "ACCOUNTING → DEPOSITS"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "What must the saved PDF filename match?",
+        "answers": [
+          "QOBLEX ADJUSTMENT NUMBER",
+          "Employee phone number",
+          "PO vendor name",
+          "Customer address"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "What must be updated after the PDF is saved?",
+        "answers": [
+          "Inventory Adjustment Ledger",
+          "Delivery route",
+          "Cash reconciliation",
+          "Customer credit"
+        ],
+        "correct": 0
+      },
+      {
+        "question": "Who must be notified of all inventory adjustments?",
+        "answers": [
+          "Director of Procurement",
+          "Only the customer",
+          "Only the driver",
+          "No one"
+        ],
+        "correct": 0
+      }
+    ],
+    "practical": [
+      "Create a sample stock adjustment in QOBLEX with the correct reason, location, line item, and SET quantity.",
+      "Demonstrate PDF naming, IAL entry, and DOP notification."
+    ],
+    "source": "Bargain Build, Inc. SOP v1 — Inventory Management SOP, Version 1.0",
+    "translations": {
+      "es": {
+        "title": "Ajustes de Inventario e IAL",
+        "summary": "Cree ajustes de stock documentados en QOBLEX, archive el PDF, actualice el Inventory Adjustment Ledger y notifique al DOP.",
+        "sections": [
+          [
+            "Política de ajustes",
+            "Los ajustes de inventario NO deben usarse para corregir errores de recepción. Todo ajuste debe estar documentado."
+          ],
+          [
+            "Crear el stock adjustment",
+            "Inicie sesión en QOBLEX. En STOCK CONTROL seleccione ADJUSTMENTS, haga clic en CREATE, seleccione ADJUSTMENT REASON, configure LOCATION al almacén correcto, use ADD NEW LINE, busque por SKU o SUPPLIER y use SET en QUANTITY para ingresar la cantidad ajustada."
+          ],
+          [
+            "Guardar el registro",
+            "Seleccione SAVE. Guarde una copia PDF en la carpeta dedicada. El nombre del archivo DEBE coincidir con el QOBLEX ADJUSTMENT NUMBER."
+          ],
+          [
+            "IAL — Inventory Adjustment Ledger",
+            "Acceda al IAL por Google Drive. Agregue el PDF a la lista continua y agregue los artículos ajustados a la INVENTORY ADJUSTMENT LEDGER TABLE."
+          ],
+          [
+            "Notificación obligatoria",
+            "Notifique al Director de Compras de TODOS los ajustes de inventario."
+          ]
+        ],
+        "quiz": [
+          {
+            "question": "¿Para qué NO deben usarse los ajustes?",
+            "answers": [
+              "Corregir errores de recepción",
+              "Correcciones documentadas",
+              "Ajustes aprobados",
+              "Actualizar IAL"
+            ],
+            "correct": 0
+          },
+          {
+            "question": "¿Dónde se crean los stock adjustments en QOBLEX?",
+            "answers": [
+              "STOCK CONTROL → ADJUSTMENTS",
+              "STOCK CONTROL → PURCHASES",
+              "SALES → ORDERS",
+              "ACCOUNTING → DEPOSITS"
+            ],
+            "correct": 0
+          },
+          {
+            "question": "¿Con qué debe coincidir el nombre del PDF?",
+            "answers": [
+              "QOBLEX ADJUSTMENT NUMBER",
+              "Teléfono del empleado",
+              "Proveedor del PO",
+              "Dirección del cliente"
+            ],
+            "correct": 0
+          },
+          {
+            "question": "¿Qué debe actualizarse después de guardar el PDF?",
+            "answers": [
+              "Inventory Adjustment Ledger",
+              "Ruta de entrega",
+              "Reconciliación de efectivo",
+              "Crédito"
+            ],
+            "correct": 0
+          },
+          {
+            "question": "¿A quién se debe notificar de todos los ajustes?",
+            "answers": [
+              "Director de Compras",
+              "Solo cliente",
+              "Solo conductor",
+              "A nadie"
+            ],
+            "correct": 0
+          }
+        ],
+        "practical": [
+          "Cree un stock adjustment de ejemplo en QOBLEX con razón, ubicación, línea y cantidad SET correctas.",
+          "Demuestre nombre del PDF, entrada en IAL y notificación al DOP."
+        ]
+      }
+    }
   }
 ]
