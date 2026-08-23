@@ -4,6 +4,7 @@ import bcrypt from 'bcryptjs';
 import { readSessionToken, sessionCookie, TimeUserSession } from '@/lib/auth-session';
 import { onboardingChecklist, onboardingItemStatuses } from '@/lib/onboarding';
 import { getAdminClient } from '@/lib/supabase-server';
+import { provisionEmployeeAccess } from '@/lib/bm-os/provision-employee';
 
 const CreateSchema = z.object({
   action: z.literal('create'),
@@ -47,6 +48,9 @@ export async function POST(request: NextRequest) {
     if (!canAccessLocation(session, parsed.data.locationId)) {
       return NextResponse.json({ message: 'You cannot add employees to that location.' }, { status: 403 });
     }
+    const { data: jobTitle, error: titleError } = await supabase.from('time_job_titles')
+      .select('id,name,active').eq('id', parsed.data.jobTitleId).eq('active', true).maybeSingle();
+    if (titleError || !jobTitle) return NextResponse.json({ message: 'Select an active canonical job title.' }, { status: 400 });
     const pinHash = await bcrypt.hash(parsed.data.pin, 10);
     const { data: employee, error: employeeError } = await supabase.from('time_employees').insert({
       employee_number: parsed.data.employeeNumber,
@@ -60,6 +64,19 @@ export async function POST(request: NextRequest) {
     if (employeeError || !employee) {
       return NextResponse.json({ message: employeeError?.code === '23505' ? 'That employee number already exists.' : employeeError?.message || 'Unable to create employee.' }, { status: 400 });
     }
+    try {
+      await provisionEmployeeAccess({
+        supabase,
+        employeeId: employee.id,
+        displayName: `${parsed.data.firstName} ${parsed.data.lastName}`,
+        jobTitle: jobTitle.name,
+        locationId: parsed.data.locationId,
+        actorName: session.name,
+      });
+    } catch (provisionError) {
+      await supabase.from('time_employees').delete().eq('id', employee.id);
+      return NextResponse.json({ message: provisionError instanceof Error ? provisionError.message : 'Unable to provision BM OS access.' }, { status: 500 });
+    }
     const { data: record, error } = await supabase.from('hr_onboarding_records').insert({
       employee_id: employee.id,
       start_date: parsed.data.startDate || null,
@@ -68,6 +85,7 @@ export async function POST(request: NextRequest) {
       created_by_name: session.name,
     }).select('id').single();
     if (error || !record) {
+      await supabase.from('bm_identities').delete().eq('employee_id', employee.id);
       await supabase.from('time_employees').delete().eq('id', employee.id);
       return NextResponse.json({ message: error?.message || 'Unable to create onboarding.' }, { status: 400 });
     }
@@ -76,6 +94,7 @@ export async function POST(request: NextRequest) {
     );
     if (itemsError) {
       await supabase.from('hr_onboarding_records').delete().eq('id', record.id);
+      await supabase.from('bm_identities').delete().eq('employee_id', employee.id);
       await supabase.from('time_employees').delete().eq('id', employee.id);
       return NextResponse.json({ message: itemsError.message }, { status: 500 });
     }
