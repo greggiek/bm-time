@@ -9,15 +9,16 @@ export async function GET(request: NextRequest) {
   const supabase = getAdminClient();
   if (!supabase) return NextResponse.json({ message: 'Supabase is not configured.' }, { status: 503 });
 
-  const [identitiesResult, employeesResult, assignmentsResult, rolesResult, permissionsResult, rolePermissionsResult] = await Promise.all([
+  const [identitiesResult, employeesResult, assignmentsResult, rolesResult, permissionsResult, rolePermissionsResult, explicitAccessResult] = await Promise.all([
     supabase.from('bm_identities').select('id,employee_id,active'),
     supabase.from('time_employees').select('id,active,time_punch_events(action,occurred_at),time_breaks(started_at,ended_at)').eq('active', true),
     supabase.from('bm_identity_roles').select('identity_id,role_id'),
     supabase.from('bm_roles').select('id,code').eq('active', true),
     supabase.from('bm_permissions').select('id,code'),
     supabase.from('bm_role_permissions').select('role_id,permission_id'),
+    supabase.from('bm_identity_system_access').select('identity_id,system_code'),
   ]);
-  const firstError = [identitiesResult, employeesResult, assignmentsResult, rolesResult, permissionsResult, rolePermissionsResult].find(result => result.error)?.error;
+  const firstError = [identitiesResult, employeesResult, assignmentsResult, rolesResult, permissionsResult, rolePermissionsResult, explicitAccessResult].find(result => result.error)?.error;
   if (firstError) return NextResponse.json({ message: firstError.message }, { status: 500 });
 
   const roles = new Map((rolesResult.data || []).map(role => [role.id, role.code]));
@@ -35,9 +36,16 @@ export async function GET(request: NextRequest) {
     for (const permission of permissionsByRole.get(assignment.role_id) || []) access.add(permission);
     accessByIdentity.set(assignment.identity_id, access);
   }
+  const explicitSystemsByIdentity = new Map<string, Set<string>>();
+  for (const access of explicitAccessResult.data || []) {
+    const systems = explicitSystemsByIdentity.get(access.identity_id) || new Set<string>();
+    systems.add(access.system_code);
+    explicitSystemsByIdentity.set(access.identity_id, systems);
+  }
 
   const activeIdentities = (identitiesResult.data || []).filter(identity => identity.active);
   const hasAccess = (identityId: string, system: string) => {
+    if (explicitSystemsByIdentity.get(identityId)?.has(system)) return true;
     const access = accessByIdentity.get(identityId) || new Set<string>();
     if (system === 'warehouse' || system === 'sales' || system === 'prospecting') return access.has(`${system}_access`);
     return Array.from(access).some(value => value.startsWith(`${system}.`)) || (system === 'time' && access.has('time_clock_user'));
