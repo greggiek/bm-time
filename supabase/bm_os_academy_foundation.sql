@@ -39,7 +39,8 @@ with modules(code, school) as (
     ('door-01','door'),('door-02','door'),('door-03','door'),('door-04','door'),('door-05','door'),('door-06','door'),('door-07','door'),('door-08','door'),
     ('moulding-01','moulding'),('moulding-02','moulding'),('moulding-03','moulding'),('moulding-04','moulding'),('moulding-05','moulding'),('moulding-06','moulding'),('moulding-07','moulding'),('moulding-08','moulding'),
     ('pvc-01','pvc'),('pvc-02','pvc'),('pvc-03','pvc'),('pvc-04','pvc'),('pvc-05','pvc'),('pvc-06','pvc'),('pvc-07','pvc'),('pvc-08','pvc'),
-    ('sop-cash','sop'),('sop-delivery','sop'),('sop-returns','sop'),('sop-damaged','sop'),('sop-backorders','sop'),('sop-cycle-count','sop'),('sop-purchase-orders','sop')
+    ('sop-cash','sop'),('sop-delivery','sop'),('sop-returns','sop'),('sop-damaged','sop'),('sop-backorders','sop'),('sop-cycle-count','sop'),('sop-purchase-orders','sop'),
+    ('sop-transfer-dispatch','sop'),('sop-transfer-receiving','sop'),('sop-receiving-purchase-orders','sop'),('sop-inventory-adjustments','sop')
 ), school_rules(job_title, school) as (
   values
     ('Counter Sales','door'),('Counter Sales','moulding'),('Counter Sales','pvc'),
