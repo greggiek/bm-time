@@ -263,6 +263,40 @@ td button[style*="color"] { border-color: #ffd4d4; background: var(--danger-soft
   *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; }
 }
 
+/* Non-sensitive HR onboarding */
+textarea { width: 100%; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px 13px; color: var(--text); background: var(--surface); font: inherit; resize: vertical; }
+textarea:focus { border-color: var(--blue); box-shadow: 0 0 0 4px rgba(37, 99, 235, .12); outline: none; }
+.onboardingLayout { display: grid; gap: 20px; }
+.onboardingCreate form { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 12px; }
+.onboardingCreate textarea { grid-column: 1 / -1; }
+.onboardingCreate button { grid-column: 1 / -1; }
+.onboardingNotice { padding: 12px 18px; }
+.onboardingNotice .loginSuccess, .onboardingNotice .error { margin: 0; }
+.onboardingWorkspace { display: grid; grid-template-columns: minmax(240px, .72fr) minmax(0, 1.7fr); gap: 20px; align-items: start; }
+.onboardingRosterList { display: grid; gap: 8px; }
+.onboardingRosterList button { display: grid; gap: 3px; width: 100%; text-align: left; }
+.onboardingRosterList button.selected { border-color: var(--blue); color: var(--blue); background: var(--blue-soft); box-shadow: 0 0 0 3px rgba(37,99,235,.08); }
+.onboardingRosterList span { color: var(--muted); font-size: 12px; }
+.onboardingTitle { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; }
+.onboardingTitle h2 { margin: 4px 0 2px; }
+.onboardingTitle p { margin: 0; color: var(--muted); font-size: 13px; }
+.onboardingTitle > strong { color: var(--blue); font-size: 25px; }
+.onboardingProgress { height: 9px; margin: 18px 0; overflow: hidden; border-radius: 999px; background: #e8eef5; }
+.onboardingProgress i { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #2563eb, #10b981); transition: width .2s ease; }
+.onboardingItems { display: grid; gap: 9px; }
+.onboardingItems label { display: flex; align-items: flex-start; gap: 9px; border: 1px solid var(--border); border-radius: 11px; padding: 12px; background: white; cursor: pointer; }
+.onboardingItems label.done { border-color: #bde5c8; background: var(--success-soft); }
+.onboardingItems label > span { display: grid; gap: 2px; }
+.onboardingItems small { color: var(--muted); font-weight: 600; }
+.onboardingMeta { margin-top: 18px; border-radius: 12px; padding: 12px 15px; color: var(--muted); background: var(--surface-muted); font-size: 13px; }
+.onboardingMeta p { margin: 4px 0; }
+.onboardingActions { display: flex; gap: 10px; margin-top: 18px; }
+.onboardingActions .primary { width: auto; flex: 1; }
+
+@media (max-width: 900px) {
+  .onboardingCreate form, .onboardingWorkspace { grid-template-columns: 1fr; }
+}
+
 
 /* BM OS identity and access audit */
 .accessTools { display: flex; flex-wrap: wrap; gap: 10px; }

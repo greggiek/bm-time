@@ -15,6 +15,7 @@ export default function ManagerShell({ brand, title, user, children }: { brand: 
     { href: '/admin/academy', label: 'BM Academy', show: user.role === 'admin' },
     { href: '/admin/timecards', label: 'Timecards', show: true },
     { href: '/admin/employees', label: 'Employees', show: user.role === 'admin' || Boolean(user.canManageEmployees) },
+    { href: '/admin/onboarding', label: 'Onboarding', show: user.role === 'admin' || Boolean(user.canManageEmployees) },
     { href: '/admin/managers', label: 'Managers', show: user.role === 'admin' },
     { href: '/admin/access', label: 'Identity & Access', show: user.role === 'admin' },
   ];
