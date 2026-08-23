@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs';
 import { z } from 'zod';
 import { readSessionToken, sessionCookie, TimeUserSession } from '@/lib/auth-session';
 import { getAdminClient } from '@/lib/supabase-server';
+import { canonicalJobTitles } from '@/lib/bm-os/job-titles';
 
 const CreateEmployeeSchema = z.object({
   action: z.literal('create'),
@@ -11,7 +12,7 @@ const CreateEmployeeSchema = z.object({
   lastName: z.string().min(1).max(80),
   pin: z.string().regex(/^\d{4}$/),
   locationId: z.string().uuid(),
-  jobTitleId: z.string().uuid().nullable().optional(),
+  jobTitle: z.enum(canonicalJobTitles).nullable().optional(),
 });
 
 const UpdateEmployeeSchema = z.object({
@@ -22,7 +23,7 @@ const UpdateEmployeeSchema = z.object({
   lastName: z.string().min(1).max(80),
   pin: z.union([z.literal(''), z.string().regex(/^\d{4}$/)]).optional(),
   locationId: z.string().uuid(),
-  jobTitleId: z.string().uuid().nullable().optional(),
+  jobTitle: z.enum(canonicalJobTitles).nullable().optional(),
   active: z.boolean(),
 });
 
@@ -51,6 +52,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ message: 'You cannot add employees to that warehouse.' }, { status: 403 });
     }
 
+    const jobTitleId = await resolveJobTitleId(supabase, parsed.data.jobTitle);
+    if (parsed.data.jobTitle && !jobTitleId) return NextResponse.json({ message: 'That BM OS job title is unavailable.' }, { status: 400 });
     const pinHash = await bcrypt.hash(parsed.data.pin, 10);
     const { error } = await supabase.from('time_employees').insert({
       employee_number: parsed.data.employeeNumber.trim(),
@@ -58,7 +61,7 @@ export async function POST(request: NextRequest) {
       last_name: parsed.data.lastName.trim(),
       pin_hash: pinHash,
       primary_location_id: parsed.data.locationId,
-      job_title_id: parsed.data.jobTitleId || null,
+      job_title_id: jobTitleId,
       active: true,
     });
     if (error) return NextResponse.json({ message: error.code === '23505' ? 'Employee number already exists.' : error.message }, { status: 400 });
@@ -71,10 +74,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ message: 'You do not have access to this employee.' }, { status: 403 });
     }
 
+    const jobTitleId = await resolveJobTitleId(supabase, parsed.data.jobTitle);
+    if (parsed.data.jobTitle && !jobTitleId) return NextResponse.json({ message: 'That BM OS job title is unavailable.' }, { status: 400 });
     const updates: Record<string, unknown> = {
       employee_number: parsed.data.employeeNumber.trim(), first_name: parsed.data.firstName.trim(),
       last_name: parsed.data.lastName.trim(), primary_location_id: parsed.data.locationId,
-      job_title_id: parsed.data.jobTitleId || null, active: parsed.data.active,
+      job_title_id: jobTitleId, active: parsed.data.active,
     };
     if (parsed.data.pin) updates.pin_hash = await bcrypt.hash(parsed.data.pin, 10);
     const { error } = await supabase.from('time_employees').update(updates).eq('id', parsed.data.employeeId);
@@ -112,6 +117,12 @@ async function canAccessEmployee(supabase: NonNullable<ReturnType<typeof getAdmi
   return Boolean(data && canAccessLocation(session, data.primary_location_id));
 }
 
+async function resolveJobTitleId(supabase: NonNullable<ReturnType<typeof getAdminClient>>, name?: string | null) {
+  if (!name) return null;
+  const { data } = await supabase.from('time_job_titles').select('id').eq('name', name).eq('active', true).maybeSingle();
+  return data?.id || null;
+}
+
 async function loadEmployees(supabase: NonNullable<ReturnType<typeof getAdminClient>>, session: TimeUserSession) {
   let employeeQuery = supabase.from('time_employees')
     .select('id,employee_number,first_name,last_name,active,primary_location_id,time_locations!time_employees_primary_location_id_fkey(id,name),time_job_titles(id,name)')
@@ -121,9 +132,15 @@ async function loadEmployees(supabase: NonNullable<ReturnType<typeof getAdminCli
     employeeQuery = employeeQuery.eq('primary_location_id', session.locationId);
     locationQuery = locationQuery.eq('id', session.locationId);
   }
-  const [{ data: employees, error }, { data: locations }, { data: jobTitles }] = await Promise.all([
+  const [{ data: employees, error }, { data: locations }, { data: jobTitles, error: jobTitleError }] = await Promise.all([
     employeeQuery, locationQuery, supabase.from('time_job_titles').select('id,name').eq('active', true).order('name'),
   ]);
   if (error) return NextResponse.json({ message: error.message }, { status: 500 });
-  return NextResponse.json({ employees: employees || [], locations: locations || [], jobTitles: jobTitles || [] });
+  if (jobTitleError) console.error('Unable to load BM OS job titles', jobTitleError.message);
+  const availableNames = new Set((jobTitles || []).map(title => title.name));
+  const visibleJobTitles = canonicalJobTitles.filter(name => availableNames.has(name)).map(name => ({ name }));
+  return NextResponse.json({
+    employees: employees || [], locations: locations || [],
+    jobTitles: visibleJobTitles.length ? visibleJobTitles : canonicalJobTitles.map(name => ({ name })),
+  });
 }
