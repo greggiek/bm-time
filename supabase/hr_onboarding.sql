@@ -25,6 +25,19 @@ create table if not exists public.hr_onboarding_items (
   unique (onboarding_id, item_key)
 );
 
+alter table public.hr_onboarding_items
+  add column if not exists item_status text not null default 'not_started';
+
+update public.hr_onboarding_items
+set item_status = 'completed'
+where completed = true and item_status = 'not_started';
+
+alter table public.hr_onboarding_items
+  drop constraint if exists hr_onboarding_items_item_status_check;
+alter table public.hr_onboarding_items
+  add constraint hr_onboarding_items_item_status_check
+  check (item_status in ('not_started', 'sent', 'completed', 'not_applicable'));
+
 create index if not exists hr_onboarding_records_status_idx on public.hr_onboarding_records(status, created_at desc);
 create index if not exists hr_onboarding_items_record_idx on public.hr_onboarding_items(onboarding_id, sort_order);
 
@@ -37,4 +50,3 @@ grant all on public.hr_onboarding_items to service_role;
 
 comment on table public.hr_onboarding_records is
   'Non-sensitive onboarding workflow only. Never store SSNs, DOBs, tax, banking, medical, I-9 document numbers, or identity-document images.';
-
