@@ -16,7 +16,7 @@ const systems = [
   { key: 'academy', name: 'BM Academy', description: 'Employee onboarding, training and assigned learning.', href: '/academy', action: 'Open Academy' },
   { key: 'warehouse', name: 'BM Warehouse', description: 'Purchasing, transfers, receiving and fulfillment.', href: 'https://bargain-warehouse-v2.vercel.app', action: 'Open Warehouse' },
   { key: 'sales', name: 'BM Sales', description: 'Customer, quote, order and approval workflows.', href: null, action: 'Integration queued' },
-  { key: 'prospecting', name: 'BM Prospecting', description: 'Field prospecting, activity and new-business tracking.', href: 'https://greg-playground.vercel.app', action: 'Open Prospecting' },
+  { key: 'prospecting', name: 'BM Prospecting', description: 'Field prospecting, activity and new-business tracking.', href: '/api/auth/prospecting-handoff', action: 'Open Prospecting' },
 ] as const;
 
 export default function AdminPage() {
