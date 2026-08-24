@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getAdminClient } from '@/lib/supabase-server';
 
-const Schema = z.object({ token: z.string().min(30), targetSystem: z.literal('warehouse') });
+const Schema = z.object({ token: z.string().min(30), targetSystem: z.enum(['warehouse', 'prospecting']) });
 
 export async function POST(request: Request) {
   const parsed = Schema.safeParse(await request.json().catch(() => null));
@@ -24,9 +24,9 @@ export async function POST(request: Request) {
 
   const [{ data: identity }, { data: access }] = await Promise.all([
     supabase.from('bm_identities').select('id,display_name,google_email,employee_id,active').eq('id', handoff.identity_id).eq('active', true).maybeSingle(),
-    supabase.from('bm_identity_system_access').select('access_level,scope_type,scope_ids').eq('identity_id', handoff.identity_id).eq('system_code', 'warehouse').maybeSingle(),
+    supabase.from('bm_identity_system_access').select('access_level,scope_type,scope_ids').eq('identity_id', handoff.identity_id).eq('system_code', parsed.data.targetSystem).maybeSingle(),
   ]);
-  if (!identity || !access) return NextResponse.json({ message: 'Warehouse access is no longer active.' }, { status: 403 });
+  if (!identity || !access) return NextResponse.json({ message: `${parsed.data.targetSystem} access is no longer active.` }, { status: 403 });
   const { data: employee } = identity.employee_id
     ? await supabase.from('time_employees').select('first_name,last_name,primary_location_id,time_locations!time_employees_primary_location_id_fkey(name)').eq('id', identity.employee_id).maybeSingle()
     : { data: null };
@@ -37,6 +37,7 @@ export async function POST(request: Request) {
     email: identity.google_email || `employee-${identity.employee_id}@bmos.internal`,
     accessLevel: access.access_level,
     scopeType: access.scope_type,
+    scopeIds: access.scope_ids || [],
     locationName: location?.name || null,
   });
 }
