@@ -330,6 +330,28 @@ details summary { cursor: pointer; color: var(--blue); font-weight: 750; }
 .systemAccess > span:last-child { color: var(--muted); font-size: 11px; font-weight: 650; }
 .accessGranted { color: var(--success); background: var(--success-soft); }
 .accessNone { color: #a8b4c0; font-weight: 750; }
+.accessIdentityButton { margin: 0; border: 0; padding: 0; color: var(--navy-deep); background: transparent; font-size: 14px; text-align: left; }
+.accessIdentityButton:hover:not(:disabled) { border-color: transparent; color: var(--blue); background: transparent; box-shadow: none; transform: none; }
+.accessLoginLink { display: block; margin-top: 20px; text-align: center; text-decoration: none; }
+.accessSuccess { margin-bottom: 16px; border: 1px solid #bde5c8; border-radius: var(--radius-sm); padding: 12px 14px; color: var(--success); background: var(--success-soft); text-align: center; font-weight: 700; }
+.accessEditorBackdrop { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; padding: 24px; background: rgba(8,31,51,.55); backdrop-filter: blur(4px); }
+.accessEditor { width: min(920px, 100%); max-height: calc(100vh - 48px); overflow: auto; border: 1px solid var(--border); border-radius: 20px; padding: 26px; background: white; box-shadow: 0 28px 80px rgba(8,31,51,.28); }
+.accessEditor > header { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; margin-bottom: 20px; }
+.accessEditor > header h2 { margin: 4px 0 0; font-size: 28px; }
+.accessEditor > header p { margin: 3px 0 0; color: var(--muted); font-size: 13px; font-weight: 650; }
+.accessEditorClose { flex: 0 0 auto; width: 42px; height: 42px; border-radius: 999px; padding: 0; font-size: 25px; line-height: 1; }
+.accessEditorSystems { display: grid; gap: 12px; }
+.accessEditorSystem { min-width: 0; margin: 0; border: 1px solid var(--border); border-radius: 14px; padding: 16px; background: var(--surface-muted); }
+.accessEditorSystem.enabled { border-color: #b9d5fa; background: #f7fbff; }
+.accessEditorSystemHeading { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.accessEditorSystem legend { padding: 0; color: var(--navy-deep); font-size: 16px; font-weight: 850; }
+.accessToggle { display: flex; align-items: center; color: var(--muted); }
+.accessEditorFields { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 14px; }
+.accessEditorFields > label { display: grid; gap: 6px; }
+.accessLocationChoices { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 8px 14px; border-top: 1px solid var(--border); padding-top: 13px; }
+.accessLocationChoices label { display: flex; align-items: center; }
+.accessEditor > footer { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+.accessEditor > footer .primary { width: auto; min-width: 155px; }
 
 /* BM OS company overview */
 .osWelcome { display: flex; align-items: center; justify-content: space-between; gap: 24px; margin-bottom: 22px; border-radius: 18px; padding: 26px 28px; color: white; background: linear-gradient(125deg, #0b2238, #163e63 68%, #245b91); box-shadow: var(--shadow-md); }
@@ -376,6 +398,11 @@ a.systemCard:hover { border-color: #9dbce0; box-shadow: 0 10px 28px rgba(16,42,6
   .timecardWeekNav button { flex: 1; }
   .timecardWeekNav strong { width: 100%; order: -1; }
   .employeeTimecardTables { grid-template-columns: 1fr; }
+  .accessEditorBackdrop { padding: 0; align-items: end; }
+  .accessEditor { width: 100%; max-height: 94vh; border-radius: 20px 20px 0 0; padding: 20px 16px; }
+  .accessEditorFields { grid-template-columns: 1fr; }
+  .accessEditor > footer { position: sticky; bottom: -20px; margin: 20px -16px -20px; padding: 14px 16px 20px; background: white; }
+  .accessEditor > footer button { flex: 1; }
 }
 
 /* Integrated BM Academy */

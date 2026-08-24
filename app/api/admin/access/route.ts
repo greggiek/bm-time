@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
 import { readSessionToken, sessionCookie } from '@/lib/auth-session';
 import { getAdminClient } from '@/lib/supabase-server';
 
@@ -8,7 +9,33 @@ type SystemAccess = {
   enabled: boolean;
   level: string;
   scope: string;
+  accessLevel: string;
+  scopeType: string;
+  scopeIds: string[];
 };
+
+const systemCodes = ['time', 'academy', 'warehouse', 'sales', 'prospecting'] as const;
+const systemCodeSet = new Set<string>(systemCodes);
+const accessUpdateSchema = z.object({
+  identityId: z.string().uuid(),
+  systems: z.array(z.object({
+    systemCode: z.enum(systemCodes),
+    enabled: z.boolean(),
+    accessLevel: z.enum(['user', 'location_manager', 'company_manager', 'administrator']),
+    scopeType: z.enum(['self', 'location', 'company']),
+    scopeIds: z.array(z.string().uuid()).max(20),
+  })).length(systemCodes.length),
+}).superRefine((value, context) => {
+  const codes = new Set(value.systems.map((system) => system.systemCode));
+  if (codes.size !== systemCodes.length || systemCodes.some((code) => !codes.has(code))) {
+    context.addIssue({ code: 'custom', path: ['systems'], message: 'Every BM OS system must be supplied exactly once.' });
+  }
+  value.systems.forEach((system, index) => {
+    if (system.enabled && system.scopeType === 'location' && system.scopeIds.length === 0) {
+      context.addIssue({ code: 'custom', path: ['systems', index, 'scopeIds'], message: 'Choose at least one location.' });
+    }
+  });
+});
 
 const systemAccessRoleByNamespace: Record<string, string> = {
   warehouse: 'warehouse_access',
@@ -45,9 +72,9 @@ function getSystemAccess(
   scope: string,
   levels: Array<{ permission: string; label: string }>,
 ): SystemAccess {
-  if (!enabled) return { enabled: false, level: 'No access', scope: '—' };
+  if (!enabled) return { enabled: false, level: 'No access', scope: '—', accessLevel: 'user', scopeType: 'self', scopeIds: [] };
   const level = levels.find(({ permission }) => permissions.has(permission))?.label || 'User';
-  return { enabled: true, level, scope };
+  return { enabled: true, level, scope, accessLevel: 'user', scopeType: 'self', scopeIds: [] };
 }
 
 export async function GET(request: NextRequest) {
@@ -174,7 +201,7 @@ export async function GET(request: NextRequest) {
     const explicitSystems = explicitByIdentity.get(identity.id) || [];
     const explicit = (systemCode: string): SystemAccess => {
       const access = explicitSystems.find((item) => item.system_code === systemCode);
-      if (!access) return { enabled: false, level: 'No access', scope: '—' };
+      if (!access) return { enabled: false, level: 'No access', scope: '—', accessLevel: 'user', scopeType: 'self', scopeIds: [] };
       const levelLabels: Record<string, string> = {
         user: systemCode === 'academy' ? 'Learner' : systemCode === 'time' ? 'Employee' : 'User',
         location_manager: 'Location manager',
@@ -188,7 +215,14 @@ export async function GET(request: NextRequest) {
             || (employee ? locations.get(employee.primary_location_id) : null)
             || 'Location')
           : 'Self';
-      return { enabled: true, level: levelLabels[access.access_level] || access.access_level, scope };
+      return {
+        enabled: true,
+        level: levelLabels[access.access_level] || access.access_level,
+        scope,
+        accessLevel: access.access_level,
+        scopeType: access.scope_type,
+        scopeIds: access.scope_ids || [],
+      };
     };
     const systems = {
       time: explicit('time'),
@@ -213,6 +247,7 @@ export async function GET(request: NextRequest) {
 
   return NextResponse.json({
     rows,
+    locations: (locationsResult.data || []).map((location) => ({ id: location.id, name: location.name })),
     summary: {
       identities: rows.length,
       warehouseUsers: rows.filter((row) => row.systems.warehouse.enabled).length,
@@ -220,4 +255,60 @@ export async function GET(request: NextRequest) {
       prospectingUsers: rows.filter((row) => row.systems.prospecting.enabled).length,
     },
   });
+}
+
+export async function PUT(request: NextRequest) {
+  const session = readSessionToken(request.cookies.get(sessionCookie.name)?.value);
+  if (!session) return NextResponse.json({ message: 'Sign in with your manager PIN.' }, { status: 401 });
+  if (session.role !== 'admin') {
+    return NextResponse.json({ message: 'Company administrator access is required.' }, { status: 403 });
+  }
+
+  const parsed = accessUpdateSchema.safeParse(await request.json().catch(() => null));
+  if (!parsed.success) {
+    return NextResponse.json({ message: parsed.error.issues[0]?.message || 'Invalid access settings.' }, { status: 400 });
+  }
+
+  const supabase = getAdminClient();
+  if (!supabase) return NextResponse.json({ message: 'Supabase is not configured.' }, { status: 503 });
+
+  const { identityId, systems } = parsed.data;
+  if (systems.some((system) => !systemCodeSet.has(system.systemCode))) {
+    return NextResponse.json({ message: 'Unknown BM OS system.' }, { status: 400 });
+  }
+
+  const [identityResult, locationResult] = await Promise.all([
+    supabase.from('bm_identities').select('id').eq('id', identityId).maybeSingle(),
+    supabase.from('time_locations').select('id'),
+  ]);
+  if (identityResult.error || locationResult.error) {
+    return NextResponse.json({ message: identityResult.error?.message || locationResult.error?.message || 'Unable to validate access.' }, { status: 500 });
+  }
+  if (!identityResult.data) return NextResponse.json({ message: 'Identity not found.' }, { status: 404 });
+
+  const validLocationIds = new Set((locationResult.data || []).map((location) => location.id));
+  const invalidLocation = systems.some((system) => system.scopeIds.some((id) => !validLocationIds.has(id)));
+  if (invalidLocation) return NextResponse.json({ message: 'One or more selected locations are invalid.' }, { status: 400 });
+
+  const enabledRows = systems.filter((system) => system.enabled).map((system) => ({
+    identity_id: identityId,
+    system_code: system.systemCode,
+    access_level: system.accessLevel,
+    scope_type: system.scopeType,
+    scope_ids: system.scopeType === 'location' ? system.scopeIds : [],
+    updated_at: new Date().toISOString(),
+  }));
+  const disabledCodes = systems.filter((system) => !system.enabled).map((system) => system.systemCode);
+
+  // Grant/update first. If it fails, no existing access is removed.
+  if (enabledRows.length) {
+    const { error } = await supabase.from('bm_identity_system_access').upsert(enabledRows, { onConflict: 'identity_id,system_code' });
+    if (error) return NextResponse.json({ message: error.message }, { status: 500 });
+  }
+  if (disabledCodes.length) {
+    const { error } = await supabase.from('bm_identity_system_access').delete().eq('identity_id', identityId).in('system_code', disabledCodes);
+    if (error) return NextResponse.json({ message: error.message }, { status: 500 });
+  }
+
+  return NextResponse.json({ ok: true });
 }

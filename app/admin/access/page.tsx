@@ -1,10 +1,13 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import Link from 'next/link';
 import ManagerShell from '@/components/manager-shell';
 
 type User = { name: string; role: 'admin' | 'manager'; canManageEmployees: boolean };
-type SystemAccess = { enabled: boolean; level: string; scope: string };
+type SystemCode = 'time' | 'academy' | 'warehouse' | 'sales' | 'prospecting';
+type SystemAccess = { enabled: boolean; level: string; scope: string; accessLevel: string; scopeType: string; scopeIds: string[] };
+type Location = { id: string; name: string };
 type AccessRow = {
   id: string;
   displayName: string;
@@ -24,6 +27,10 @@ type AccessRow = {
 type Summary = { identities: number; warehouseUsers: number; salesUsers: number; prospectingUsers: number };
 
 const emptySummary: Summary = { identities: 0, warehouseUsers: 0, salesUsers: 0, prospectingUsers: 0 };
+const systemLabels: Record<SystemCode, string> = {
+  time: 'BM Time', academy: 'BM Academy', warehouse: 'BM Warehouse', sales: 'BM Sales', prospecting: 'BM Prospecting',
+};
+const systemCodes = Object.keys(systemLabels) as SystemCode[];
 
 function AccessCell({ access }: { access: SystemAccess }) {
   if (!access.enabled) return <span className="accessNone">—</span>;
@@ -39,6 +46,11 @@ export default function AccessPage() {
   const [user, setUser] = useState<User | null>(null);
   const [rows, setRows] = useState<AccessRow[]>([]);
   const [summary, setSummary] = useState<Summary>(emptySummary);
+  const [locations, setLocations] = useState<Location[]>([]);
+  const [editing, setEditing] = useState<AccessRow | null>(null);
+  const [draft, setDraft] = useState<AccessRow['systems'] | null>(null);
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState('');
   const [search, setSearch] = useState('');
   const [loginFilter, setLoginFilter] = useState('All');
   const [error, setError] = useState('');
@@ -55,9 +67,70 @@ export default function AccessPage() {
       if (!accessResponse.ok) throw new Error(accessData.message || 'Unable to load identity access.');
       setRows(accessData.rows || []);
       setSummary(accessData.summary || emptySummary);
+      setLocations(accessData.locations || []);
     }).catch(err => setError(err instanceof Error ? err.message : 'Unable to load identity access.'))
       .finally(() => setChecking(false));
   }, []);
+
+  function beginEdit(row: AccessRow) {
+    setEditing(row);
+    setDraft(structuredClone(row.systems));
+    setError('');
+    setMessage('');
+  }
+
+  function updateDraft(systemCode: SystemCode, update: Partial<SystemAccess>) {
+    setDraft(current => current ? { ...current, [systemCode]: { ...current[systemCode], ...update } } : current);
+  }
+
+  function closeEditor() {
+    if (saving) return;
+    setEditing(null);
+    setDraft(null);
+  }
+
+  async function saveAccess() {
+    if (!editing || !draft) return;
+    const missingLocation = systemCodes.find(code => draft[code].enabled && draft[code].scopeType === 'location' && draft[code].scopeIds.length === 0);
+    if (missingLocation) {
+      setError(`Choose at least one location for ${systemLabels[missingLocation]}.`);
+      return;
+    }
+    setSaving(true);
+    setError('');
+    setMessage('');
+    try {
+      const response = await fetch('/api/admin/access', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          identityId: editing.id,
+          systems: systemCodes.map(systemCode => ({
+            systemCode,
+            enabled: draft[systemCode].enabled,
+            accessLevel: draft[systemCode].accessLevel,
+            scopeType: draft[systemCode].scopeType,
+            scopeIds: draft[systemCode].scopeType === 'location' ? draft[systemCode].scopeIds : [],
+          })),
+        }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || 'Unable to save access.');
+      const accessResponse = await fetch('/api/admin/access');
+      const accessData = await accessResponse.json();
+      if (!accessResponse.ok) throw new Error(accessData.message || 'Access saved, but the page could not refresh.');
+      setRows(accessData.rows || []);
+      setSummary(accessData.summary || emptySummary);
+      setLocations(accessData.locations || []);
+      setEditing(null);
+      setDraft(null);
+      setMessage(`Access updated for ${editing.displayName}.`);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Unable to save access.');
+    } finally {
+      setSaving(false);
+    }
+  }
 
   const filteredRows = useMemo(() => {
     const query = search.trim().toLowerCase();
@@ -71,7 +144,7 @@ export default function AccessPage() {
   }, [rows, search, loginFilter]);
 
   if (checking) return <main className="managerShell"><section className="managerCard loginBox">Loading identity access…</section></main>;
-  if (!user) return <main className="managerShell"><section className="managerCard loginBox"><h1>Administrator Access Required</h1><p>Sign in through the Manager Dashboard with an administrator PIN.</p>{error ? <div className="error">{error}</div> : null}</section></main>;
+  if (!user) return <main className="managerShell"><section className="managerCard loginBox"><h1>Administrator Access Required</h1><p>Sign in through the Manager Dashboard with an administrator PIN.</p><Link className="primary accessLoginLink" href="/manager">Go to Admin Login</Link>{error ? <div className="error">{error}</div> : null}</section></main>;
 
   return (
     <ManagerShell brand="BM OS" title="Identity & Access" user={user}>
@@ -100,7 +173,8 @@ export default function AccessPage() {
             </select>
           </div>
         </div>
-        {error ? <div className="error">{error}</div> : null}
+        {message ? <div className="accessSuccess">{message}</div> : null}
+        {error && !editing ? <div className="error">{error}</div> : null}
         <div className="tableWrap accessTableWrap">
           <table className="accessMatrix">
             <thead>
@@ -113,12 +187,13 @@ export default function AccessPage() {
                 <th>BM Warehouse</th>
                 <th>BM Sales</th>
                 <th>BM Prospecting</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody>{filteredRows.map(row => (
               <tr key={row.id}>
                 <td>
-                  <strong>{row.displayName}</strong>
+                  <button type="button" className="accessIdentityButton" onClick={() => beginEdit(row)}>{row.displayName}</button>
                   <div className="cellMeta">{row.googleEmail || row.employeeNumber || 'No linked login'}</div>
                 </td>
                 <td><span className="accessPill">{row.loginMethod}</span></td>
@@ -128,11 +203,35 @@ export default function AccessPage() {
                 <td><AccessCell access={row.systems.warehouse} /></td>
                 <td><AccessCell access={row.systems.sales} /></td>
                 <td><AccessCell access={row.systems.prospecting} /></td>
+                <td><button type="button" onClick={() => beginEdit(row)}>Edit access</button></td>
               </tr>
             ))}</tbody>
           </table>
         </div>
       </section>
+      {editing && draft ? <div className="accessEditorBackdrop" role="presentation" onMouseDown={event => event.target === event.currentTarget && closeEditor()}>
+        <section className="accessEditor" role="dialog" aria-modal="true" aria-labelledby="access-editor-title">
+          <header>
+            <div><span className="osEyebrow">Identity &amp; Access</span><h2 id="access-editor-title">{editing.displayName}</h2><p>{editing.location || 'No primary location'} · {editing.loginMethod}</p></div>
+            <button type="button" className="accessEditorClose" onClick={closeEditor} aria-label="Close access editor">×</button>
+          </header>
+          <div className="accessEditorSystems">
+            {systemCodes.map(systemCode => {
+              const access = draft[systemCode];
+              return <fieldset key={systemCode} className={access.enabled ? 'accessEditorSystem enabled' : 'accessEditorSystem'}>
+                <div className="accessEditorSystemHeading"><legend>{systemLabels[systemCode]}</legend><label className="accessToggle"><input type="checkbox" checked={access.enabled} onChange={event => updateDraft(systemCode, { enabled: event.target.checked })}/><span>{access.enabled ? 'Access on' : 'No access'}</span></label></div>
+                {access.enabled ? <div className="accessEditorFields">
+                  <label>Access level<select value={access.accessLevel} onChange={event => updateDraft(systemCode, { accessLevel: event.target.value })}><option value="user">User</option><option value="location_manager">Location manager</option><option value="company_manager">Company manager</option><option value="administrator">Administrator</option></select></label>
+                  <label>Scope<select value={access.scopeType} onChange={event => updateDraft(systemCode, { scopeType: event.target.value, scopeIds: event.target.value === 'location' ? access.scopeIds : [] })}><option value="self">Self</option><option value="location">Location</option><option value="company">Company</option></select></label>
+                  {access.scopeType === 'location' ? <div className="accessLocationChoices" aria-label={`${systemLabels[systemCode]} locations`}>{locations.map(location => <label key={location.id}><input type="checkbox" checked={access.scopeIds.includes(location.id)} onChange={event => updateDraft(systemCode, { scopeIds: event.target.checked ? [...access.scopeIds, location.id] : access.scopeIds.filter(id => id !== location.id) })}/>{location.name}</label>)}</div> : null}
+                </div> : null}
+              </fieldset>;
+            })}
+          </div>
+          {error ? <div className="error">{error}</div> : null}
+          <footer><button type="button" onClick={closeEditor} disabled={saving}>Cancel</button><button type="button" className="primary" onClick={saveAccess} disabled={saving}>{saving ? 'Saving…' : 'Save access'}</button></footer>
+        </section>
+      </div> : null}
     </ManagerShell>
   );
 }
