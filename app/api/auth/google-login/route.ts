@@ -18,7 +18,7 @@ export async function POST(request: Request) {
   const { data: user } = await supabase.from('time_users').select('id,name,role,location_id,all_locations,can_manage_employees,active,time_locations(name)').ilike('name', identity.display_name).eq('active', true).maybeSingle();
   if (!user) return NextResponse.json({ message: 'Your email is approved, but no BM OS management access is assigned.' }, { status: 403 });
   const locationName = Array.isArray(user.time_locations) ? user.time_locations[0]?.name || null : null;
-  const token = createSessionToken({ userId: user.id, name: user.name, role: user.role, locationId: user.location_id, locationName, allLocations: Boolean(user.all_locations), canManageEmployees: Boolean(user.can_manage_employees) });
+  const token = createSessionToken({ userId: user.id, identityId: identity.id, name: user.name, role: user.role, locationId: user.location_id, locationName, allLocations: Boolean(user.all_locations), canManageEmployees: Boolean(user.can_manage_employees) });
   const response = NextResponse.json({ ok: true, redirectTo: user.role === 'admin' ? '/admin' : '/manager' });
   response.cookies.set(sessionCookie.name, token, { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'lax', path: '/', maxAge: sessionCookie.maxAge });
   return response;
