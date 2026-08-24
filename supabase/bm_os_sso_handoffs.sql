@@ -1,7 +1,7 @@
 create table if not exists public.bm_sso_handoffs (
   token_hash text primary key,
   identity_id uuid not null references public.bm_identities(id) on delete cascade,
-  target_system text not null check (target_system in ('warehouse')),
+  target_system text not null check (target_system in ('warehouse', 'prospecting')),
   expires_at timestamptz not null,
   consumed_at timestamptz,
   created_at timestamptz not null default now()
