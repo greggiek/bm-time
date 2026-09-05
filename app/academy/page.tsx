@@ -12,7 +12,6 @@ type Completion = { module_code: string; latest_score: number; completed_at: str
 type AcademyUser = { name: string; jobTitle: string; location: string };
 
 export default function AcademyPage() {
-  const [pin, setPin] = useState('');
   const [user, setUser] = useState<AcademyUser | null>(null);
   const [modules, setModules] = useState<PublicModule[]>([]);
   const [completions, setCompletions] = useState<Completion[]>([]);
@@ -22,23 +21,20 @@ export default function AcademyPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => { load().finally(() => setLoading(false)); }, []);
+  useEffect(() => {
+    load()
+      .catch(err => setError(err instanceof Error ? err.message : 'Unable to load Academy.'))
+      .finally(() => setLoading(false));
+  }, []);
   async function load() {
     const response = await fetch('/api/academy/session');
-    if (response.status === 401) { setUser(null); return; }
+    if (response.status === 401) {
+      window.location.replace('/api/auth/academy-handoff');
+      return;
+    }
     const data = await response.json();
     if (!response.ok) throw new Error(data.message || 'Unable to load Academy.');
     setUser(data.user); setModules(data.modules || []); setCompletions(data.completions || []);
-  }
-  async function signIn() {
-    setLoading(true); setError('');
-    try {
-      const response = await fetch('/api/academy/session', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ pin }) });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.message || 'Unable to sign in.');
-      setPin(''); await load();
-    } catch (err) { setError(err instanceof Error ? err.message : 'Unable to sign in.'); }
-    finally { setLoading(false); }
   }
   async function signOut() { await fetch('/api/academy/session', { method: 'DELETE' }); setUser(null); setModules([]); setCompletions([]); }
   function openModule(module: PublicModule) { setSelected(module); setAnswers([-1, -1, -1, -1, -1]); setResult(''); }
@@ -59,7 +55,8 @@ export default function AcademyPage() {
   const nextModule = selectedIndex >= 0 ? modules[selectedIndex + 1] || null : null;
 
   if (loading) return <main className="academyShell"><section className="academyLogin">Loading BM Academy…</section></main>;
-  if (!user) return <main className="academyShell"><section className="academyLogin"><div className="brand">BM ACADEMY</div><span className="osEyebrow">Part of BM OS</span><h1>Employee Training</h1><p>Use the same four-digit PIN you use for BM Time.</p><input aria-label="Employee PIN" type="password" inputMode="numeric" maxLength={4} value={pin} onChange={event => setPin(event.target.value.replace(/\D/g, '').slice(0, 4))} onKeyDown={event => event.key === 'Enter' && pin.length === 4 && signIn()} placeholder="4-digit PIN"/><button className="primary" disabled={pin.length !== 4 || loading} onClick={signIn}>Open My Academy</button>{error ? <div className="error">{error}</div> : null}<a className="academyBack" href="/">Back to BM OS</a></section></main>;
+  if (error) return <main className="academyShell"><section className="academyLogin"><div className="brand">BM ACADEMY</div><h1>Academy unavailable</h1><p>{error}</p><a className="academyBack" href="/portal">Back to BM OS</a></section></main>;
+  if (!user) return <main className="academyShell"><section className="academyLogin">Taking you to BM OS sign in…</section></main>;
 
   const percent = modules.length ? Math.round(completed.size / modules.length * 100) : 0;
   return <main className="academyApp">
