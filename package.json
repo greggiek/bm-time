@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "db:validate": "node scripts/validate-database-layout.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.55.0",

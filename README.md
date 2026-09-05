@@ -21,11 +21,14 @@ A deliberately small, location-based employee time clock.
 7. Open `/manager` and enter your manager password.
 
 ## Connect Supabase
-1. Create a Supabase project and run `supabase/schema.sql`.
-2. Add the project URL and service-role key to `.env.local` and Vercel.
-3. Create one kiosk row whose `token` matches the kiosk token in Vercel.
-4. Add employees with bcrypt-hashed 4-digit PINs.
-5. Set `NEXT_PUBLIC_DEMO_MODE=false` and redeploy.
+
+Do not run an individual SQL file against a new database. The historical files
+under `supabase/` were created through several separate setup paths and are not
+a complete, ordered Production build.
+
+Database setup now follows [the canonical database process](supabase/CANONICAL_DATABASE.md).
+Until its clean-room replay gate passes, use the existing Production project and
+do not create schema through the Supabase SQL editor.
 
 ## One Vercel project per kiosk location
 For the simplest setup, deploy the same repository four times with different values for:
