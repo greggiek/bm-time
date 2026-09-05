@@ -4,7 +4,9 @@ import bcrypt from 'bcryptjs';
 import { readSessionToken, sessionCookie, TimeUserSession } from '@/lib/auth-session';
 import { onboardingChecklist, onboardingItemStatuses } from '@/lib/onboarding';
 import { getAdminClient } from '@/lib/supabase-server';
-import { provisionEmployeeAccess } from '@/lib/bm-os/provision-employee';
+import { defaultOperationalSystems, provisionEmployeeAccess } from '@/lib/bm-os/provision-employee';
+
+const operationalSystems = ['warehouse', 'sales', 'prospecting'] as const;
 
 const CreateSchema = z.object({
   action: z.literal('create'),
@@ -17,6 +19,11 @@ const CreateSchema = z.object({
   startDate: z.union([z.literal(''), z.string().regex(/^\d{4}-\d{2}-\d{2}$/)]),
   assignedManager: z.string().trim().max(120),
   notes: z.string().trim().max(1000),
+  googleEmail: z.union([z.literal(''), z.string().trim().email().toLowerCase().refine(
+    (email) => email.endsWith('@bargainmoulding.com'),
+    'Use a @bargainmoulding.com Google Workspace email.',
+  )]).default(''),
+  operationalSystems: z.array(z.enum(operationalSystems)).max(operationalSystems.length).optional(),
 });
 
 const ToggleSchema = z.object({
@@ -72,6 +79,8 @@ export async function POST(request: NextRequest) {
         jobTitle: jobTitle.name,
         locationId: parsed.data.locationId,
         actorName: session.name,
+        googleEmail: parsed.data.googleEmail || null,
+        operationalSystems: parsed.data.operationalSystems,
       });
     } catch (provisionError) {
       await supabase.from('time_employees').delete().eq('id', employee.id);
@@ -90,7 +99,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ message: error?.message || 'Unable to create onboarding.' }, { status: 400 });
     }
     const { error: itemsError } = await supabase.from('hr_onboarding_items').insert(
-      onboardingChecklist.map(([item_key, label], sort_order) => ({ onboarding_id: record.id, item_key, label, sort_order })),
+      [
+        ...onboardingChecklist,
+        ...(parsed.data.googleEmail ? [['google_workspace_login', 'Verify Google Workspace and BM OS login'] as const] : []),
+      ].map(([item_key, label], sort_order) => ({ onboarding_id: record.id, item_key, label, sort_order })),
     );
     if (itemsError) {
       await supabase.from('hr_onboarding_records').delete().eq('id', record.id);
@@ -168,5 +180,12 @@ async function load(supabase: NonNullable<ReturnType<typeof getAdminClient>>, se
     ...record,
     hr_onboarding_items: [...(record.hr_onboarding_items || [])].sort((a, b) => a.sort_order - b.sort_order),
   }));
-  return NextResponse.json({ locations: locations || [], jobTitles: jobTitles || [], records: sorted });
+  return NextResponse.json({
+    locations: locations || [],
+    jobTitles: (jobTitles || []).map((jobTitle) => ({
+      ...jobTitle,
+      defaultOperationalSystems: defaultOperationalSystems(jobTitle.name),
+    })),
+    records: sorted,
+  });
 }

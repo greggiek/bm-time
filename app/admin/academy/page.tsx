@@ -60,7 +60,7 @@ export default function AcademyAdminPage() {
   }, [employees, search, locationFilter, jobTitleFilter, statusFilter]);
   if (loading) return <main className="managerShell"><section className="managerCard loginBox">Loading Academy assignments…</section></main>;
   if (!user) return <main className="managerShell"><section className="managerCard loginBox"><h1>Administrator Access Required</h1><p>Sign in with an administrator PIN.</p></section></main>;
-  return <ManagerShell brand="BM OS" title="BM Academy" user={user}>
+  return <ManagerShell brand="BM TIME" title="Academy" user={user}>
     <div className="summary"><div><strong>{catalog.length}</strong><span>Training Modules</span></div><div><strong>{employees.filter(employee => employee.status === 'complete').length}</strong><span>Employees Complete</span></div><div><strong>{employees.filter(employee => employee.status === 'in_progress').length}</strong><span>In Progress</span></div><div><strong>{employees.reduce((sum, employee) => sum + employee.completedCount, 0)}</strong><span>Lessons Completed</span></div></div>
     <section className="managerCard academyProgressCard">
       <div className="sectionHeading"><div><h2>Employee Training Progress</h2><p>Individual status, scores, lesson completion and latest activity.</p></div><a href="/academy" target="_blank" rel="noreferrer">Open Employee Academy →</a></div>

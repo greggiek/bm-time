@@ -31,6 +31,12 @@ export async function POST(request: Request) {
     ? await supabase.from('time_employees').select('first_name,last_name,primary_location_id,time_locations!time_employees_primary_location_id_fkey(name)').eq('id', identity.employee_id).maybeSingle()
     : { data: null };
   const location: any = Array.isArray(employee?.time_locations) ? employee.time_locations[0] : employee?.time_locations;
+  const scopedLocationIds = access.scope_type === 'location'
+    ? Array.from(new Set([...(access.scope_ids || []), employee?.primary_location_id].filter(Boolean)))
+    : [];
+  const { data: scopedLocations } = scopedLocationIds.length
+    ? await supabase.from('time_locations').select('id,name').in('id', scopedLocationIds).eq('active', true)
+    : { data: [] as Array<{ id: string; name: string }> };
   return NextResponse.json({
     identityId: identity.id,
     displayName: identity.display_name,
@@ -38,6 +44,8 @@ export async function POST(request: Request) {
     accessLevel: access.access_level,
     scopeType: access.scope_type,
     scopeIds: access.scope_ids || [],
+    locationScopes: scopedLocations || [],
+    primaryLocationId: employee?.primary_location_id || null,
     locationName: location?.name || null,
   });
 }

@@ -7,6 +7,8 @@ type AccessGrant = {
   scope_ids: string[];
 };
 
+export type OperationalSystem = 'warehouse' | 'sales' | 'prospecting';
+
 const roleCodeByJobTitle: Record<string, string> = {
   Administration: 'administration',
   'Branch Manager': 'branch_manager',
@@ -20,7 +22,7 @@ const roleCodeByJobTitle: Record<string, string> = {
   'Warehouse Worker': 'warehouse_worker',
 };
 
-function grantsFor(jobTitle: string, locationId: string): AccessGrant[] {
+export function grantsFor(jobTitle: string, locationId: string): AccessGrant[] {
   const self = (system_code: 'time' | 'academy'): AccessGrant => ({ system_code, access_level: 'user', scope_type: 'self', scope_ids: [] });
   const location = (system_code: AccessGrant['system_code'], access_level: AccessGrant['access_level'] = 'user'): AccessGrant => ({
     system_code, access_level, scope_type: 'location', scope_ids: [locationId],
@@ -40,6 +42,12 @@ function grantsFor(jobTitle: string, locationId: string): AccessGrant[] {
   }
 }
 
+export function defaultOperationalSystems(jobTitle: string): OperationalSystem[] {
+  return grantsFor(jobTitle, '00000000-0000-0000-0000-000000000000')
+    .map((grant) => grant.system_code)
+    .filter((code): code is OperationalSystem => code === 'warehouse' || code === 'sales' || code === 'prospecting');
+}
+
 export async function provisionEmployeeAccess(input: {
   supabase: AdminClient;
   employeeId: string;
@@ -47,12 +55,27 @@ export async function provisionEmployeeAccess(input: {
   jobTitle: string;
   locationId: string;
   actorName: string;
+  googleEmail?: string | null;
+  operationalSystems?: OperationalSystem[];
 }) {
   const { supabase, employeeId, displayName, jobTitle, locationId, actorName } = input;
+  const requestedSystems = new Set(input.operationalSystems ?? defaultOperationalSystems(jobTitle));
+  const templateGrants = grantsFor(jobTitle, locationId);
+  const grants = [
+    ...templateGrants.filter((grant) => grant.system_code === 'time' || grant.system_code === 'academy'),
+    ...Array.from(requestedSystems).map((systemCode): AccessGrant =>
+      templateGrants.find((grant) => grant.system_code === systemCode) || {
+        system_code: systemCode,
+        access_level: 'user',
+        scope_type: 'location',
+        scope_ids: [locationId],
+      },
+    ),
+  ];
   const expectedRoleCodes = ['staff_member', 'time_clock_user', roleCodeByJobTitle[jobTitle]].filter(Boolean) as string[];
-  if (jobTitle.includes('Warehouse') || jobTitle.includes('Door Shop') || jobTitle === 'Driver' || jobTitle === 'Branch Manager') expectedRoleCodes.push('warehouse_access');
-  if (jobTitle.includes('Sales') || jobTitle === 'Branch Manager') expectedRoleCodes.push('sales_access');
-  if (jobTitle === 'Sales Outside' || jobTitle === 'Sales Manager' || jobTitle === 'Branch Manager') expectedRoleCodes.push('prospecting_access');
+  if (requestedSystems.has('warehouse')) expectedRoleCodes.push('warehouse_access');
+  if (requestedSystems.has('sales')) expectedRoleCodes.push('sales_access');
+  if (requestedSystems.has('prospecting')) expectedRoleCodes.push('prospecting_access');
 
   const { data: roles, error: rolesError } = await supabase.from('bm_roles').select('id,code').in('code', expectedRoleCodes).eq('active', true);
   if (rolesError) throw new Error(rolesError.message);
@@ -63,6 +86,7 @@ export async function provisionEmployeeAccess(input: {
   const { data: identity, error: identityError } = await supabase.from('bm_identities').insert({
     employee_id: employeeId,
     display_name: displayName,
+    google_email: input.googleEmail || null,
     active: true,
   }).select('id').single();
   if (identityError || !identity) throw new Error(identityError?.message || 'Unable to create BM OS identity.');
@@ -77,7 +101,7 @@ export async function provisionEmployeeAccess(input: {
     })));
     if (roleError) throw new Error(roleError.message);
 
-    const { error: accessError } = await supabase.from('bm_identity_system_access').insert(grantsFor(jobTitle, locationId).map(grant => ({
+    const { error: accessError } = await supabase.from('bm_identity_system_access').insert(grants.map(grant => ({
       identity_id: identity.id,
       ...grant,
     })));
@@ -89,7 +113,12 @@ export async function provisionEmployeeAccess(input: {
       resource_id: identity.id,
       location_id: locationId,
       reason: `Onboarded by ${actorName}`,
-      after_data: { employee_id: employeeId, job_title: jobTitle, systems: grantsFor(jobTitle, locationId).map(grant => grant.system_code) },
+      after_data: {
+        employee_id: employeeId,
+        job_title: jobTitle,
+        login_methods: input.googleEmail ? ['pin', 'google'] : ['pin'],
+        systems: grants.map(grant => grant.system_code),
+      },
     });
     return identity.id as string;
   } catch (error) {

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import ManagerShell from '@/components/manager-shell';
 
 type Row = {
@@ -27,7 +28,6 @@ type PayPeriod = { start: string; end: string };
 
 export default function ManagerPage() {
   const router = useRouter();
-  const [pin, setPin] = useState('');
   const [user, setUser] = useState<User | null>(null);
   const [rows, setRows] = useState<Row[]>([]);
   const [error, setError] = useState('');
@@ -41,37 +41,6 @@ export default function ManagerPage() {
     loadDashboard().catch(() => undefined).finally(() => setChecking(false));
   }, []);
 
-  async function signIn() {
-    setLoading(true);
-    setError('');
-    try {
-      const response = await fetch('/api/auth/pin-login', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ pin }),
-      });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.message || 'Unable to sign in.');
-      setPin('');
-      if (data.user?.role === 'employee') {
-        router.push(data.redirectTo || '/portal');
-        router.refresh();
-        return;
-      }
-      const next = new URLSearchParams(window.location.search).get('next');
-      if (data.user?.role === 'admin' && next && /^\/admin(?:\/|$)/.test(next)) {
-        router.push(next);
-        router.refresh();
-        return;
-      }
-      await loadDashboard();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unable to sign in.');
-    } finally {
-      setLoading(false);
-    }
-  }
-
   async function loadDashboard() {
     const response = await fetch('/api/manager/status', {
       method: 'POST',
@@ -79,7 +48,10 @@ export default function ManagerPage() {
       body: '{}',
     });
     const data = await response.json();
-    if (response.status === 401) setUser(null);
+    if (response.status === 401) {
+      setUser(null);
+      router.replace('/login/email?next=/manager');
+    }
     if (!response.ok) throw new Error(data.message || 'Unable to load the dashboard.');
     setRows(data.rows || []);
     setOvertimeWatch(data.overtimeWatch || []);
@@ -100,48 +72,22 @@ export default function ManagerPage() {
     }
   }
 
-  async function logout() {
-    await fetch('/api/auth/logout', { method: 'POST' });
-    setUser(null);
-    setRows([]);
-    setPin('');
-    setError('');
-  }
-
   if (checking) return <main className="managerShell"><section className="managerCard loginBox">Loading management portal…</section></main>;
 
-  if (!user) {
-    return (
-      <main className="managerShell">
-        <header className="managerHeader">
-          <div><div className="brand">BM TIME</div><div className="location">Manager Dashboard</div></div>
-          <a href="/kiosk">Open Kiosk</a>
-        </header>
-        <section className="managerCard">
-          <div className="loginBox">
-            <h1>Employee Login</h1>
-            <input
-              type="password"
-              inputMode="numeric"
-              maxLength={4}
-              pattern="\d{4}"
-              placeholder="4-digit PIN"
-              value={pin}
-              onChange={(event) => setPin(event.target.value.replace(/\D/g, '').slice(0, 4))}
-              onKeyDown={(event) => event.key === 'Enter' && pin.length === 4 && signIn()}
-            />
-            <button className="primary" onClick={signIn} disabled={pin.length !== 4 || loading}>
-              {loading ? 'Signing in…' : 'Open Dashboard'}
-            </button>
-            {error && <div className="error">{error}</div>}
-          </div>
-        </section>
-      </main>
-    );
-  }
+  if (!user) return <main className="managerShell"><section className="managerCard loginBox">Taking you to BM OS sign in…</section></main>;
 
   return (
     <ManagerShell brand="BM TIME" title="Dashboard" user={user}>
+      <section className="managerCard timeHomeActions">
+        <div className="sectionHeading"><div><span className="osEyebrow">BM Time home</span><h2>What do you need to do?</h2><p>Start with a complete employee record, then manage time, training, and access from one place.</p></div></div>
+        <div className="timeActionGrid">
+          {(user.role === 'admin' || user.canManageEmployees) && <Link href="/admin/onboarding"><strong>Onboard Employee</strong><span>Create the employee, identity, access, and checklist together.</span></Link>}
+          {(user.role === 'admin' || user.canManageEmployees) && <Link href="/admin/employees"><strong>Employee Directory</strong><span>Edit employee details or deactivate a former employee.</span></Link>}
+          <Link href="/admin/timecards"><strong>Review Timecards</strong><span>Review hours, breaks, and payroll records.</span></Link>
+          {(user.role === 'admin' || user.canManageEmployees) && <Link href="/admin/academy"><strong>Manage Academy</strong><span>Assign and review employee training.</span></Link>}
+          {user.role === 'admin' && <Link href="/admin/access"><strong>Access &amp; Permissions</strong><span>Control which BM systems each person can use.</span></Link>}
+        </div>
+      </section>
       <div className="dashboardPeriod">Current pay period: <strong>{payPeriod ? `${formatDate(payPeriod.start)} – ${formatDate(payPeriod.end)}` : 'Thursday – Wednesday'}</strong></div>
       <div className="dashboardGrid">
         <section className="managerCard">

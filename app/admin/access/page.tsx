@@ -147,7 +147,7 @@ export default function AccessPage() {
   if (!user) return <main className="managerShell"><section className="managerCard loginBox"><h1>Administrator Access Required</h1><p>Sign in through the Manager Dashboard with an administrator PIN.</p><Link className="primary accessLoginLink" href="/manager">Go to Admin Login</Link>{error ? <div className="error">{error}</div> : null}</section></main>;
 
   return (
-    <ManagerShell brand="BM OS" title="Identity & Access" user={user}>
+    <ManagerShell brand="BM TIME" title="Access & Permissions" user={user}>
       <div className="summary">
         <div><strong>{summary.identities}</strong><span>Identities</span></div>
         <div><strong>{summary.warehouseUsers}</strong><span>BM Warehouse</span></div>

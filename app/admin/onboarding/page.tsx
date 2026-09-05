@@ -4,7 +4,8 @@ import { FormEvent, useEffect, useState } from 'react';
 import ManagerShell from '@/components/manager-shell';
 
 type User = { name: string; role: 'admin' | 'manager'; canManageEmployees: boolean };
-type Option = { id: string; name: string };
+type OperationalSystem = 'warehouse' | 'sales' | 'prospecting';
+type Option = { id: string; name: string; defaultOperationalSystems?: OperationalSystem[] };
 type Employee = { id: string; first_name: string; last_name: string; time_locations: { id: string; name: string } | null; time_job_titles: { id: string; name: string } | null };
 type ItemStatus = 'not_started' | 'sent' | 'completed' | 'not_applicable';
 type Item = { id: string; item_key: string; label: string; item_status: ItemStatus; completed: boolean; completed_by_name: string | null };
@@ -19,6 +20,8 @@ export default function OnboardingPage() {
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(true);
+  const [selectedJobTitleId, setSelectedJobTitleId] = useState('');
+  const [selectedSystems, setSelectedSystems] = useState<OperationalSystem[]>([]);
 
   useEffect(() => {
     fetch('/api/auth/session').then(async response => {
@@ -50,8 +53,20 @@ export default function OnboardingPage() {
       action: 'create', employeeNumber: form.get('employeeNumber'), firstName: form.get('firstName'), lastName: form.get('lastName'),
       pin: form.get('pin'), locationId: form.get('locationId'), jobTitleId: form.get('jobTitleId'), startDate: form.get('startDate'),
       assignedManager: form.get('assignedManager'), notes: form.get('notes'),
+      googleEmail: form.get('googleEmail'), operationalSystems: selectedSystems,
     }, 'Employee created and onboarding started.');
     event.currentTarget.reset();
+    setSelectedJobTitleId('');
+    setSelectedSystems([]);
+  }
+
+  function selectJobTitle(id: string) {
+    setSelectedJobTitleId(id);
+    setSelectedSystems(jobTitles.find((option) => option.id === id)?.defaultOperationalSystems || []);
+  }
+
+  function toggleSystem(system: OperationalSystem) {
+    setSelectedSystems((current) => current.includes(system) ? current.filter((item) => item !== system) : [...current, system]);
   }
 
   const activeRecords = records.filter(record => record.status !== 'cancelled');
@@ -71,9 +86,19 @@ export default function OnboardingPage() {
           <input name="lastName" required maxLength={80} placeholder="Last name" />
           <input name="pin" required inputMode="numeric" pattern="[0-9]{4}" maxLength={4} placeholder="4-digit BM Time PIN" />
           <select name="locationId" required defaultValue=""><option value="" disabled>Select location</option>{locations.map(option => <option key={option.id} value={option.id}>{option.name}</option>)}</select>
-          <select name="jobTitleId" required defaultValue=""><option value="" disabled>Select job title</option>{jobTitles.map(option => <option key={option.id} value={option.id}>{option.name}</option>)}</select>
+          <select name="jobTitleId" required value={selectedJobTitleId} onChange={(event) => selectJobTitle(event.target.value)}><option value="" disabled>Select job title</option>{jobTitles.map(option => <option key={option.id} value={option.id}>{option.name}</option>)}</select>
           <input name="startDate" type="date" aria-label="Start date" />
           <input name="assignedManager" maxLength={120} placeholder="Assigned manager" />
+          <input name="googleEmail" type="email" maxLength={254} placeholder="Google email (optional)" />
+          <fieldset className="onboardingAccess">
+            <legend>BM OS access</legend>
+            <p>BM Time and BM Academy are always included. Select any operational systems this employee needs.</p>
+            {(['warehouse', 'sales', 'prospecting'] as OperationalSystem[]).map((system) => <label key={system}>
+              <input type="checkbox" checked={selectedSystems.includes(system)} onChange={() => toggleSystem(system)} />
+              <span>{system === 'warehouse' ? 'BM Warehouse' : system === 'sales' ? 'BM Sales' : 'BM Prospecting'}</span>
+            </label>)}
+            <small>PIN-only employees can use assigned systems. Google email is required only when their role needs Google Workspace.</small>
+          </fieldset>
           <textarea name="notes" maxLength={1000} placeholder="Optional non-sensitive notes" rows={3} />
           <button className="primary" disabled={loading}>{loading ? 'Creating…' : 'Add Employee & Start Onboarding'}</button>
         </form>
