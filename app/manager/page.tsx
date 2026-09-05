@@ -28,7 +28,6 @@ type PayPeriod = { start: string; end: string };
 
 export default function ManagerPage() {
   const router = useRouter();
-  const [pin, setPin] = useState('');
   const [user, setUser] = useState<User | null>(null);
   const [rows, setRows] = useState<Row[]>([]);
   const [error, setError] = useState('');
@@ -42,37 +41,6 @@ export default function ManagerPage() {
     loadDashboard().catch(() => undefined).finally(() => setChecking(false));
   }, []);
 
-  async function signIn() {
-    setLoading(true);
-    setError('');
-    try {
-      const response = await fetch('/api/auth/pin-login', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ pin }),
-      });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.message || 'Unable to sign in.');
-      setPin('');
-      if (data.user?.role === 'employee') {
-        router.push(data.redirectTo || '/portal');
-        router.refresh();
-        return;
-      }
-      const next = new URLSearchParams(window.location.search).get('next');
-      if (data.user?.role === 'admin' && next && /^\/admin(?:\/|$)/.test(next)) {
-        router.push(next);
-        router.refresh();
-        return;
-      }
-      await loadDashboard();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unable to sign in.');
-    } finally {
-      setLoading(false);
-    }
-  }
-
   async function loadDashboard() {
     const response = await fetch('/api/manager/status', {
       method: 'POST',
@@ -80,7 +48,10 @@ export default function ManagerPage() {
       body: '{}',
     });
     const data = await response.json();
-    if (response.status === 401) setUser(null);
+    if (response.status === 401) {
+      setUser(null);
+      router.replace('/login/email?next=/manager');
+    }
     if (!response.ok) throw new Error(data.message || 'Unable to load the dashboard.');
     setRows(data.rows || []);
     setOvertimeWatch(data.overtimeWatch || []);
@@ -101,45 +72,9 @@ export default function ManagerPage() {
     }
   }
 
-  async function logout() {
-    await fetch('/api/auth/logout', { method: 'POST' });
-    setUser(null);
-    setRows([]);
-    setPin('');
-    setError('');
-  }
-
   if (checking) return <main className="managerShell"><section className="managerCard loginBox">Loading management portal…</section></main>;
 
-  if (!user) {
-    return (
-      <main className="managerShell">
-        <header className="managerHeader">
-          <div><div className="brand">BM TIME</div><div className="location">Manager Dashboard</div></div>
-          <a href="/kiosk">Open Kiosk</a>
-        </header>
-        <section className="managerCard">
-          <div className="loginBox">
-            <h1>Employee Login</h1>
-            <input
-              type="password"
-              inputMode="numeric"
-              maxLength={4}
-              pattern="\d{4}"
-              placeholder="4-digit PIN"
-              value={pin}
-              onChange={(event) => setPin(event.target.value.replace(/\D/g, '').slice(0, 4))}
-              onKeyDown={(event) => event.key === 'Enter' && pin.length === 4 && signIn()}
-            />
-            <button className="primary" onClick={signIn} disabled={pin.length !== 4 || loading}>
-              {loading ? 'Signing in…' : 'Open Dashboard'}
-            </button>
-            {error && <div className="error">{error}</div>}
-          </div>
-        </section>
-      </main>
-    );
-  }
+  if (!user) return <main className="managerShell"><section className="managerCard loginBox">Taking you to BM OS sign in…</section></main>;
 
   return (
     <ManagerShell brand="BM TIME" title="Dashboard" user={user}>

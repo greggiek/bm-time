@@ -31,7 +31,7 @@ export default function AdminPage() {
       .then(async ([sessionResponse, overviewResponse]) => {
         const sessionData = await sessionResponse.json();
         if (!sessionResponse.ok || sessionData.user?.role !== 'admin') {
-          router.replace('/manager?next=/admin');
+          router.replace('/login/email?next=/admin');
           return;
         }
         setUser(sessionData.user);

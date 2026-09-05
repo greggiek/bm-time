@@ -15,7 +15,9 @@ export default function AuthCallbackPage() {
       const response = await fetch('/api/auth/google-login', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ accessToken: data.session.access_token }) });
       const result = await response.json();
       if (!response.ok) { await supabase.auth.signOut(); return setMessage(result.message || 'This email is not authorized for BM OS.'); }
-      router.replace(result.redirectTo || '/manager');
+      const requestedNext = new URLSearchParams(window.location.search).get('next');
+      const next = requestedNext && /^\/(?:admin(?:\/|$)|manager(?:\/|$))/.test(requestedNext) ? requestedNext : result.redirectTo || '/manager';
+      router.replace(next);
       router.refresh();
     }
     finishLogin().catch(() => setMessage('Email login could not be completed.'));

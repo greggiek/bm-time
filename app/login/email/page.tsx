@@ -14,10 +14,12 @@ export default function EmailLoginPage() {
       : window.location.origin;
     setLoading(true);
     setError('');
+    const requestedNext = new URLSearchParams(window.location.search).get('next');
+    const next = requestedNext && /^\/(?:admin(?:\/|$)|manager(?:\/|$))/.test(requestedNext) ? requestedNext : '/admin';
     const { error: oauthError } = await getBrowserClient().auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${callbackOrigin}/auth/callback`,
+        redirectTo: `${callbackOrigin}/auth/callback?next=${encodeURIComponent(next)}`,
         queryParams: { hd: 'bargainmoulding.com', prompt: 'select_account' },
       },
     });
