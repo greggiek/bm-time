@@ -1,6 +1,7 @@
 'use client';
 
 import { FormEvent, useEffect, useRef, useState } from 'react';
+import Link from 'next/link';
 import ManagerShell from '@/components/manager-shell';
 
 type Option = { id: string; name: string };
@@ -36,7 +37,6 @@ export default function EmployeesPage() {
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
-  const [formKey, setFormKey] = useState(0);
   const [editing, setEditing] = useState<EditState | null>(null);
   const editSectionRef = useRef<HTMLElement | null>(null);
   const [checking, setChecking] = useState(true);
@@ -94,33 +94,6 @@ export default function EmployeesPage() {
       await load();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to sign in.');
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function addEmployee(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const form = new FormData(event.currentTarget);
-    setLoading(true);
-    setError('');
-    setMessage('');
-
-    try {
-      await request({
-        action: 'create',
-        employeeNumber: form.get('employeeNumber'),
-        firstName: form.get('firstName'),
-        lastName: form.get('lastName'),
-        pin: form.get('pin'),
-        locationId: form.get('locationId'),
-        jobTitle: form.get('jobTitle') || null,
-      });
-      setFormKey((value) => value + 1);
-      setMessage('Employee added.');
-      await load();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unable to add employee.');
     } finally {
       setLoading(false);
     }
@@ -189,27 +162,6 @@ export default function EmployeesPage() {
     }
   }
 
-  async function deleteEmployee(employee: Employee) {
-    const confirmed = confirm(
-      `Permanently delete ${employee.first_name} ${employee.last_name}? This is only allowed when the employee has no punch history.`,
-    );
-    if (!confirmed) return;
-
-    setLoading(true);
-    setError('');
-    setMessage('');
-    try {
-      await request({ action: 'delete', employeeId: employee.id });
-      if (editing?.employeeId === employee.id) setEditing(null);
-      setMessage('Employee permanently deleted.');
-      await load();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unable to delete employee.');
-    } finally {
-      setLoading(false);
-    }
-  }
-
   if (checking) return <main className="managerShell"><section className="managerCard loginBox">Loading management portal…</section></main>;
 
   if (!user) return (
@@ -224,19 +176,11 @@ export default function EmployeesPage() {
   );
 
   return (
-    <ManagerShell brand="BM TIME" title="Employees" user={user}>
+    <ManagerShell brand="BM TIME" title="People" user={user}>
         <div style={{ display: 'grid', gap: 20 }}>
-          <section className="managerCard">
-            <h2>Add Employee</h2>
-            <form key={formKey} onSubmit={addEmployee} style={{ display: 'grid', gap: 12 }}>
-              <input name="employeeNumber" placeholder="Employee number" required />
-              <input name="firstName" placeholder="First name" required />
-              <input name="lastName" placeholder="Last name" required />
-              <input name="pin" placeholder="4-digit PIN" inputMode="numeric" pattern="\d{4}" maxLength={4} required />
-              <select name="locationId" required defaultValue=""><option value="" disabled>Select location</option>{locations.map((location) => <option key={location.id} value={location.id}>{location.name}</option>)}</select>
-              <select name="jobTitle" defaultValue=""><option value="">No job title</option>{jobTitles.map((jobTitle) => <option key={jobTitle.name} value={jobTitle.name}>{jobTitle.name}</option>)}</select>
-              <button className="primary" disabled={loading}>{loading ? 'Saving…' : 'Add Employee'}</button>
-            </form>
+          <section className="managerCard peopleIntro">
+            <div><span className="osEyebrow">Employee directory</span><h2>Manage your team</h2><p>Edit employment details or deactivate a former employee. All new employees must begin through Onboarding so their identity, access, and checklist are created together.</p></div>
+            <Link className="primaryLink" href="/admin/onboarding">Onboard Employee</Link>
           </section>
 
           {editing && (
@@ -261,8 +205,8 @@ export default function EmployeesPage() {
           {(message || error) && <section className="managerCard">{message && <div>{message}</div>}{error && <div className="error">{error}</div>}</section>}
 
           <section className="managerCard">
-            <h2>Employees</h2>
-            <p style={{ color: '#6b7280' }}>Delete is permanent and only works for employees with no punch history. Use Deactivate to preserve payroll records.</p>
+            <h2>Employee Directory</h2>
+            <p style={{ color: '#6b7280' }}>Deactivate former employees to preserve payroll and audit history.</p>
             <div className="tableWrap">
               <table>
                 <thead><tr><th>Employee</th><th>Number</th><th>Location</th><th>Job Title</th><th>Status</th><th>Actions</th></tr></thead>
@@ -277,7 +221,6 @@ export default function EmployeesPage() {
                       <td>
                         <button type="button" onClick={() => startEdit(employee)}>Edit</button>
                         {employee.active && <> <button type="button" onClick={() => deactivate(employee.id)}>Deactivate</button></>}
-                        {' '}<button type="button" onClick={() => deleteEmployee(employee)} disabled={loading} style={{ color: '#b42318' }}>Delete</button>
                       </td>
                     </tr>
                   ))}

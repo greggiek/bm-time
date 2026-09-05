@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import ManagerShell from '@/components/manager-shell';
 
 type Row = {
@@ -142,6 +143,16 @@ export default function ManagerPage() {
 
   return (
     <ManagerShell brand="BM TIME" title="Dashboard" user={user}>
+      <section className="managerCard timeHomeActions">
+        <div className="sectionHeading"><div><span className="osEyebrow">BM Time home</span><h2>What do you need to do?</h2><p>Start with a complete employee record, then manage time, training, and access from one place.</p></div></div>
+        <div className="timeActionGrid">
+          {(user.role === 'admin' || user.canManageEmployees) && <Link href="/admin/onboarding"><strong>Onboard Employee</strong><span>Create the employee, identity, access, and checklist together.</span></Link>}
+          {(user.role === 'admin' || user.canManageEmployees) && <Link href="/admin/employees"><strong>Employee Directory</strong><span>Edit employee details or deactivate a former employee.</span></Link>}
+          <Link href="/admin/timecards"><strong>Review Timecards</strong><span>Review hours, breaks, and payroll records.</span></Link>
+          {(user.role === 'admin' || user.canManageEmployees) && <Link href="/admin/academy"><strong>Manage Academy</strong><span>Assign and review employee training.</span></Link>}
+          {user.role === 'admin' && <Link href="/admin/access"><strong>Access &amp; Permissions</strong><span>Control which BM systems each person can use.</span></Link>}
+        </div>
+      </section>
       <div className="dashboardPeriod">Current pay period: <strong>{payPeriod ? `${formatDate(payPeriod.start)} – ${formatDate(payPeriod.end)}` : 'Thursday – Wednesday'}</strong></div>
       <div className="dashboardGrid">
         <section className="managerCard">
